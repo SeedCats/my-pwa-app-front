@@ -1,15 +1,17 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { VitePWA } from 'vite-plugin-pwa';
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [
     vue(),
+    tailwindcss(),
     
     VitePWA({
       registerType: 'autoUpdate',  // Automatically updates the service worker
       devOptions: { enabled: true },  // Enables PWA in development mode for testing
-      includeAssets: ['vite.svg'],  // Assets to cache
+      includeAssets: ['vite.svg', 'screenshot.png'],  // Assets to cache
       injectRegister: 'auto',  // Automatically injects the service worker registration
 
       manifest: {
