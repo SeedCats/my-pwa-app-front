@@ -6,7 +6,18 @@
       sidebarHidden ? 'lg:ml-0' : 'lg:ml-72'
     ]">
       <main>
-        <div class="px-3 sm:px-4 md:px-6 lg:px-8 pt-16">
+        <div class="px-3 sm:px-4 md:px-6 lg:px-8 pt-8">
+
+          <!-- Overall Dashboard -->
+          <div class="mb-4 sm:mt-6 md:mt-8 grid grid-cols-1 lg:grid-cols-full gap-4 sm:gap-6">
+            <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-100">
+              <h4 class="text-sm sm:text-base font-semibold text-gray-900 mb-2">Weekly Heart Rate</h4>
+              <div class="h-64 sm:h-72 md:h-80 lg:h-96 bg-gray-50 rounded-lg flex items-center justify-center">
+                <span class="text-gray-400 text-sm">Chart placeholder</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Stats Grid -->
           <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             <!-- Stat Card 1 -->

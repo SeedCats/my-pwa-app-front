@@ -26,7 +26,7 @@
                                 </div>
                             </TransitionChild>
 
-                            <!-- Sidebar component, swap this element with another sidebar if you like -->
+                            <!-- Sidebar component -->
                             <div
                                 class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
                                 <div class="flex h-24 shrink-0 items-center">
@@ -43,21 +43,23 @@
                                         <li>
                                             <ul role="list" class="-mx-2 space-y-1">
                                                 <li v-for="item in navigation" :key="item.name">
-                                                    <a :href="item.href"
-                                                        :class="[item.current ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                                                    <router-link :to="item.to" :class="[
+                                                        'text-gray-400 hover:bg-gray-800 hover:text-white', 
+                                                        'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold' 
+                                                    ]">
                                                         <component :is="item.icon" class="size-6 shrink-0"
                                                             aria-hidden="true" />
                                                         {{ item.name }}
-                                                    </a>
+                                                    </router-link>
                                                 </li>
                                             </ul>
                                         </li>
                                         <li class="mt-auto">
-                                            <a href="#"
+                                            <router-link to="/Settings"
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
                                                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                                                 Settings
-                                            </a>
+                                            </router-link>
                                         </li>
                                     </ul>
                                 </nav>
@@ -71,7 +73,6 @@
         <!-- sidebar for desktop -->
         <TransitionRoot as="template" :show="!isDesktopSidebarHidden">
             <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-                <!-- Sidebar component, swap this element with another sidebar if you like -->
                 <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4">
                     <div class="flex h-24 shrink-0 items-center">
                         <div class="flex flex-col">
@@ -84,22 +85,24 @@
                     <nav class="flex flex-1 flex-col">
                         <ul role="list" class="flex flex-1 flex-col gap-y-7">
                             <li>
-                                <ul role="list" class="-mx-2 space-y-7">
+                                <ul role="list" class="-mx-2 space-y-1">
                                     <li v-for="item in navigation" :key="item.name">
-                                        <a :href="item.href"
-                                            :class="[item.current ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                                        <router-link :to="item.to" :class="[
+                                            'text-gray-400 hover:bg-gray-800 hover:text-white', 
+                                            'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold' 
+                                        ]">
                                             <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
                                             {{ item.name }}
-                                        </a>
+                                        </router-link>
                                     </li>
                                 </ul>
                             </li>
                             <li class="mt-auto">
-                                <a href="#"
+                                <router-link to="/settings"
                                     class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
                                     <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                                     Settings
-                                </a>
+                                </router-link>
                             </li>
                         </ul>
                     </nav>
@@ -129,22 +132,24 @@
                     <span class="sr-only">Open sidebar</span>
                     <Bars3Icon class="size-5" aria-hidden="true" />
                 </button>
-                
+
                 <!-- Breadcrumbs -->
                 <!--Only shows in desktop big screen (hidden lg:block)  -->
                 <nav class="hidden lg:block" aria-label="Breadcrumb">
                     <ol role="list" class="flex items-center space-x-4">
                         <li>
                             <div>
-                                <a href="#" class="text-gray-400 hover:text-gray-500">
+                                <!-- Home icon in breadcrumbs -->
+                                <router-link to="/home" class="text-gray-400 hover:text-gray-500">
                                     <HomeIcon class="size-5 shrink-0" aria-hidden="true" />
                                     <span class="sr-only">Home</span>
-                                </a>
+                                </router-link>
                             </div>
                         </li>
                         <li v-for="page in pages" :key="page.name">
                             <div class="flex items-center">
                                 <ChevronRightIcon class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
+                                <!-- Breadcrumb links-->
                                 <a :href="page.href" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
                                     :aria-current="page.current ? 'page' : undefined">{{ page.name }}</a>
                             </div>
@@ -186,14 +191,14 @@
                                 leave-from-class="transform opacity-100 scale-100"
                                 leave-to-class="transform opacity-0 scale-95">
                                 <MenuItems
-                                    class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
-                                    <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                                    <a :href="item.href" :class="[
+                                    class="absolute right-0 z-[1000] mt-2.5 w-36 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+                                    <MenuItem v-slot="{ active }">
+                                    <button type="button" @click="handleSignOut" :class="[
                                         active ? 'bg-gray-50' : '',
-                                        'block px-3 py-1 text-sm text-gray-900 transition-colors duration-200 hover:bg-gray-100'
+                                        'block w-full text-left px-3 py-2 text-sm text-gray-900 hover:bg-gray-100'
                                     ]">
-                                        {{ item.name }}
-                                    </a>
+                                        Sign out
+                                    </button>
                                     </MenuItem>
                                 </MenuItems>
                             </transition>
@@ -207,8 +212,8 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid'
-
 import {
     Dialog,
     DialogPanel,
@@ -231,33 +236,37 @@ import {
     XMarkIcon,
 } from '@heroicons/vue/24/outline'
 
+// Initialize router and route for active state checking
+const router = useRouter()
+const route = useRoute()
+
 const navigation = [
-    { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
-    { name: '1', href: '#', icon: UsersIcon, current: false },
-    { name: '2', href: '#', icon: FolderIcon, current: false },
-    { name: '3', href: '#', icon: CalendarIcon, current: false },
-    { name: '4', href: '#', icon: DocumentDuplicateIcon, current: false },
-    { name: '5', href: '#', icon: ChartPieIcon, current: false },
-]
-const userNavigation = [
-    { name: 'Sign out', href: '#' },
+    { name: 'Dashboard', to: '/home', icon: HomeIcon },
+    { name: 'test', to: '/', icon: UsersIcon },
 ]
 
+// Sidebar state management
 const sidebarOpen = ref(false)
 const isDesktopSidebarHidden = ref(false)
 
 const emit = defineEmits(['update:sidebarState'])
 
+// Desktop sidebar functions
 function toggleDesktopSidebar() {
     isDesktopSidebarHidden.value = !isDesktopSidebarHidden.value
     emit('update:sidebarState', isDesktopSidebarHidden.value)
 }
 
-const pages = [
-    { name: 'Projects', href: '#', current: false },
-    { name: 'Project Nero', href: '#', current: true },
-    { name: 'Project Nero', href: '#', current: true },
-    { name: 'Project Nero', href: '#', current: true },
-]
+// Sign out function
+function handleSignOut() {
+    localStorage.removeItem('token')
+    router.push('/')
+}
 
+const pages = [
+    { name: 'Projects', href: '#', current: true },
+    { name: 'Project Nero', href: '#', current: false },
+    { name: 'Project Nero', href: '#', current: false },
+    { name: 'Project Nero', href: '#', current: false },
+]
 </script>
