@@ -124,7 +124,6 @@
                   <div class="py-3 sm:py-4">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div class="flex items-center">
-                        <CalendarIcon class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 flex-shrink-0" />
                         <span class="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-600">Last checkup: 2 days ago</span>
                       </div>
                       <span class="text-xs sm:text-sm text-indigo-600 hover:text-indigo-500 cursor-pointer font-medium">
@@ -137,7 +136,6 @@
                   <div class="py-3 sm:py-4">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div class="flex items-center">
-                        <ClockIcon class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 flex-shrink-0" />
                         <span class="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-600">Medication taken: Today 08:00
                           AM</span>
                       </div>
@@ -151,7 +149,6 @@
                   <div class="py-3 sm:py-4">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div class="flex items-center">
-                        <ArrowTrendingUpIcon class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 flex-shrink-0" />
                         <span class="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-600">Exercise completed: 30 min
                           walk</span>
                       </div>

@@ -11,8 +11,26 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Health Monitoring Systems</title>
   <style>
-    html, body { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-    input, textarea, select { font-size: 16px; }
+    html, body { 
+      height: 100%; 
+      -webkit-text-size-adjust: 100%; 
+      text-size-adjust: 100%;
+      overscroll-behavior: none;
+    }
+    input, textarea, select { 
+      font-size: 16px; 
+      transform: translateZ(0);
+    }
+    /* Prevent iOS zoom on input focus */
+    @supports (-webkit-touch-callout: none) {
+      input[type="email"],
+      input[type="password"],
+      input[type="text"],
+      textarea,
+      select {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>

@@ -44,8 +44,8 @@
                                             <ul role="list" class="-mx-2 space-y-1">
                                                 <li v-for="item in navigation" :key="item.name">
                                                     <router-link :to="item.to" :class="[
-                                                        'text-gray-400 hover:bg-gray-800 hover:text-white', 
-                                                        'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold' 
+                                                        'text-gray-400 hover:bg-gray-800 hover:text-white',
+                                                        'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold'
                                                     ]">
                                                         <component :is="item.icon" class="size-6 shrink-0"
                                                             aria-hidden="true" />
@@ -55,7 +55,7 @@
                                             </ul>
                                         </li>
                                         <li class="mt-auto">
-                                            <router-link to="/Settings"
+                                            <router-link to="/setting"
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
                                                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                                                 Settings
@@ -88,8 +88,8 @@
                                 <ul role="list" class="-mx-2 space-y-1">
                                     <li v-for="item in navigation" :key="item.name">
                                         <router-link :to="item.to" :class="[
-                                            'text-gray-400 hover:bg-gray-800 hover:text-white', 
-                                            'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold' 
+                                            'text-gray-400 hover:bg-gray-800 hover:text-white',
+                                            'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold'
                                         ]">
                                             <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
                                             {{ item.name }}
@@ -98,7 +98,7 @@
                                 </ul>
                             </li>
                             <li class="mt-auto">
-                                <router-link to="/settings"
+                                <router-link to="/setting"
                                     class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
                                     <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                                     Settings
@@ -176,7 +176,7 @@
                                     <span
                                         class="text-sm font-semibold text-gray-900 transition-colors duration-200 group-hover:text-gray-600"
                                         aria-hidden="true">
-                                        Tom Cook
+                                        {{ userEmail || 'User' }}
                                     </span>
                                     <ChevronDownIcon
                                         class="ml-2 size-5 text-gray-400 transition-transform duration-200 group-hover:rotate-180"
@@ -193,11 +193,11 @@
                                 <MenuItems
                                     class="absolute right-0 z-[1000] mt-2.5 w-36 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                                     <MenuItem v-slot="{ active }">
-                                    <button type="button" @click="handleSignOut" :class="[
+                                    <button type="button" @click="handleLogOut" :class="[
                                         active ? 'bg-gray-50' : '',
                                         'block w-full text-left px-3 py-2 text-sm text-gray-900 hover:bg-gray-100'
                                     ]">
-                                        Sign out
+                                        Log out
                                     </button>
                                     </MenuItem>
                                 </MenuItems>
@@ -211,7 +211,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid'
 import {
@@ -249,7 +249,18 @@ const navigation = [
 const sidebarOpen = ref(false)
 const isDesktopSidebarHidden = ref(false)
 
+// User data
+const userData = ref(null)
+
 const emit = defineEmits(['update:sidebarState'])
+
+// Computed property to get user email
+const userEmail = computed(() => {
+    if (userData.value && userData.value.email) {
+        return userData.value.email
+    }
+    return 'User'
+})
 
 // Desktop sidebar functions
 function toggleDesktopSidebar() {
@@ -257,11 +268,42 @@ function toggleDesktopSidebar() {
     emit('update:sidebarState', isDesktopSidebarHidden.value)
 }
 
-// Sign out function
-function handleSignOut() {
-    localStorage.removeItem('token')
-    router.push('/')
+// Log out function
+async function handleLogOut() {
+    const token = localStorage.getItem('token');
+    
+    const response = await fetch('/api/logout', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('remember_me');
+        router.push('/');
+    }
+    
+    return data;
 }
+
+// Load user data on component mount
+onMounted(() => {
+    try {
+        const storedUser = localStorage.getItem('user')
+        if (storedUser) {
+            userData.value = JSON.parse(storedUser)
+        }
+    } catch (error) {
+        console.error('Error parsing user data:', error)
+        userData.value = null
+    }
+})
 
 const pages = [
     { name: 'Projects', href: '#', current: true },
