@@ -1,45 +1,48 @@
 <template>
-  <div class="min-h-full bg-gray-50">
+  <div class="min-h-screen" :class="themeClasses.background">
     <Sidebar @update:sidebarState="updateSidebarState" />
-    <div :class="[
+    <div :class=" [
       'transition-all duration-300 ease-in-out',
       sidebarHidden ? 'lg:ml-0' : 'lg:ml-72'
     ]">
       <main>
-        <div class="px-3 sm:px-4 md:px-6 lg:px-8 pt-16 pb-8">
+        <div class="px-3 sm:px-4 md:px-6 lg:px-8 pt-4 pb-8">
           <!-- Header -->
           <div class="mb-8">
-            <h1 class="text-3xl font-bold ml-2 text-gray-900">Account Settings</h1>
-            <p class="mt-2 text-sm text-gray-600 ml-2">Manage your account information and preferences</p>
+            <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">Account Settings</h1>
+            <p class="mt-2 text-sm" :class="themeClasses.textSecondary">Manage your account information and preferences</p>
           </div>
 
           <!-- Success/Error Messages -->
-          <div v-if="successMessage" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p class="text-sm text-green-600">{{ successMessage }}</p>
+          <div v-if="successMessage" class="mb-6 p-4 rounded-lg" :class="isDarkMode ? 'bg-green-900 border border-green-700' : 'bg-green-50 border border-green-200'">
+            <p class="text-sm" :class="isDarkMode ? 'text-green-200' : 'text-green-600'">{{ successMessage }}</p>
           </div>
           
-          <div v-if="errorMessage" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p class="text-sm text-red-600">{{ errorMessage }}</p>
+          <div v-if="errorMessage" class="mb-6 p-4 rounded-lg" :class="isDarkMode ? 'bg-red-900 border border-red-700' : 'bg-red-50 border border-red-200'">
+            <p class="text-sm" :class="isDarkMode ? 'text-red-200' : 'text-red-600'">{{ errorMessage }}</p>
           </div>
 
           <div class="space-y-8">
             <!-- Profile Information -->
-            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
-              <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-900">Profile Information</h2>
-                <p class="mt-1 text-sm text-gray-600">Update your account's profile information and email address.</p>
+            <div class="shadow-sm rounded-lg border" :class="[themeClasses.cardBackground, themeClasses.border]">
+              <div class="px-6 py-4 border-b" :class="themeClasses.border">
+                <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">Profile Information</h2>
+                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">Update your account's profile information and email address.</p>
               </div>
               
               <form @submit.prevent="updateProfile" class="p-6 space-y-6">
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <!-- Name -->
                   <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <label for="name" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Full Name</label>
                     <input 
                       type="text" 
                       id="name" 
                       v-model="profileForm.name"
-                      class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                      :class=" [
+                        'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
+                      ]"
                       placeholder="Enter your full name"
                       required
                     />
@@ -47,12 +50,15 @@
 
                   <!-- Email -->
                   <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <label for="email" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Email Address</label>
                     <input 
                       type="email" 
                       id="email" 
                       v-model="profileForm.email"
-                      class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                      :class=" [
+                        'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
+                      ]"
                       placeholder="Enter your email address"
                       required
                     />
@@ -76,22 +82,25 @@
             </div>
 
             <!-- Change Password -->
-            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
-              <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-900">Change Password</h2>
-                <p class="mt-1 text-sm text-gray-600">Ensure your account is using a long, random password to stay secure.</p>
+            <div class="shadow-sm rounded-lg border" :class="[themeClasses.cardBackground, themeClasses.border]">
+              <div class="px-6 py-4 border-b" :class="themeClasses.border">
+                <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">Change Password</h2>
+                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">Ensure your account is using a long, random password to stay secure.</p>
               </div>
               
               <form @submit.prevent="updatePassword" class="p-6 space-y-6">
                 <div class="grid grid-cols-1 gap-6">
                   <!-- Current Password -->
                   <div>
-                    <label for="current-password" class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                    <label for="current-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Current Password</label>
                     <input 
                       type="password" 
                       id="current-password" 
                       v-model="passwordForm.currentPassword"
-                      class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                      :class=" [
+                        'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
+                      ]"
                       placeholder="Enter your current password"
                       required
                     />
@@ -99,12 +108,15 @@
 
                   <!-- New Password -->
                   <div>
-                    <label for="new-password" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <label for="new-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">New Password</label>
                     <input 
                       type="password" 
                       id="new-password" 
                       v-model="passwordForm.newPassword"
-                      class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                      :class=" [
+                        'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
+                      ]"
                       placeholder="Enter your new password"
                       required
                     />
@@ -112,12 +124,15 @@
 
                   <!-- Confirm New Password -->
                   <div>
-                    <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                    <label for="confirm-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Confirm New Password</label>
                     <input 
                       type="password" 
                       id="confirm-password" 
                       v-model="passwordForm.confirmPassword"
-                      class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                      :class=" [
+                        'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
+                      ]"
                       placeholder="Confirm your new password"
                       required
                     />
@@ -141,27 +156,30 @@
             </div>
 
             <!-- Delete Account -->
-            <div class="bg-white shadow-sm rounded-lg border border-red-200">
-              <div class="px-6 py-4 border-b border-red-200">
+            <div class="shadow-sm rounded-lg border" :class="isDarkMode ? 'bg-gray-800 border-red-600' : 'bg-white border-red-200'">
+              <div class="px-6 py-4 border-b" :class="isDarkMode ? 'border-red-600' : 'border-red-200'">
                 <h2 class="text-xl font-semibold text-red-600">Delete Account</h2>
-                <p class="mt-1 text-sm text-gray-600">Once your account is deleted, all of its resources and data will be permanently deleted.</p>
+                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">Once your account is deleted, all of its resources and data will be permanently deleted.</p>
               </div>
               
               <div class="p-6">
-                <div class="max-w-full text-sm text-gray-600 mb-4">
+                <div class="max-w-full text-sm mb-4" :class="themeClasses.textSecondary">
                   <p>Before deleting your account, please download any data or information that you wish to retain.</p>
                 </div>
                 
                 <!-- Password confirmation input (appears when delete is clicked) -->
                 <div v-if="showDeletePassword" class="mb-4">
-                  <label for="delete-password" class="block text-sm font-medium text-gray-700 mb-2">
+                  <label for="delete-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">
                     Enter your password to confirm deletion
                   </label>
                   <input 
                     type="password" 
                     id="delete-password" 
                     v-model="deletePassword"
-                    class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                    :class=" [
+                      'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200',
+                      isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
+                    ]"
                     placeholder="Enter your password"
                     @keyup.enter="deleteAccount"
                   />
@@ -191,7 +209,7 @@
                     
                     <button 
                       @click="showDeletePassword = false; deletePassword = ''"
-                      class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      class="inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" :class="isDarkMode ? 'border-gray-600 text-gray-300 bg-gray-700 hover:bg-gray-600' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'"
                     >
                       Cancel
                     </button>
@@ -209,10 +227,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useTheme } from '../composables/useTheme'
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 
 const router = useRouter()
 const sidebarHidden = ref(false)
+
+// Theme integration
+const { isDarkMode, themeClasses } = useTheme()
 
 // Form data
 const profileForm = ref({
@@ -260,7 +282,7 @@ const updateSidebarState = (state) => {
 const clearMessages = () => {
   successMessage.value = ''
   errorMessage.value = ''
-  console.log('Messages cleared') // Debug log
+  console.log('Messages cleared')
 }
 
 // Update profile
@@ -280,40 +302,34 @@ const updateProfile = async () => {
     })
     
     const data = await response.json()
-    console.log('Update profile response:', data) // Debug log
+    console.log('Update profile response:', data)
     
     if (response.ok && data.success) {
-      // Extract user data from the correct path in backend response
-      const updatedUser = data.data.user // Backend returns data.data.user
+      const updatedUser = data.data.user
       
-      // Update localStorage with new user data
       localStorage.setItem('user', JSON.stringify(updatedUser))
       
-      // Trigger a custom event to notify other components of user data change
       window.dispatchEvent(new CustomEvent('userUpdated', { 
         detail: updatedUser 
       }))
       
       successMessage.value = data.message || 'Profile updated successfully!'
       
-      // Scroll to top to show the success message
       window.scrollTo({ top: 0, behavior: 'smooth' })
       
-      console.log('Updated user data:', updatedUser) // Debug log
-      console.log('Profile success message set:', successMessage.value) // Debug log
+      console.log('Updated user data:', updatedUser)
+      console.log('Profile success message set:', successMessage.value)
     } else {
       errorMessage.value = data.message || 'Failed to update profile'
       
-      // Scroll to top to show the error message
       window.scrollTo({ top: 0, behavior: 'smooth' })
       
-      console.log('Profile error message set:', errorMessage.value) // Debug log
+      console.log('Profile error message set:', errorMessage.value)
     }
   } catch (error) {
     console.error('Profile update error:', error)
     errorMessage.value = 'Network error. Please try again.'
     
-    // Scroll to top to show the error message
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } finally {
     profileLoading.value = false
@@ -325,7 +341,10 @@ const updatePassword = async () => {
   clearMessages()
   
   if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
-    errorMessage.value = 'New password does not match'
+    errorMessage.value = 'New passwords do not match'
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    
     return
   }
   
@@ -349,34 +368,27 @@ const updatePassword = async () => {
     
     if (response.ok && data.success) {
       successMessage.value = 'Password updated successfully!'
-      // Clear form
       passwordForm.value = {
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       }
-
+      
       window.scrollTo({ top: 0, behavior: 'smooth' })
-
-      setTimeout(() => {
-        // Clear all user data
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        localStorage.removeItem('remember_me')
-        
-        // Redirect to login
-        router.push('/')
-      }, 1500) // 1.5 second delay to show the success message
-
+      
+      console.log('Password success message set:', successMessage.value)
     } else {
       errorMessage.value = data.message || 'Failed to update password'
-
+      
       window.scrollTo({ top: 0, behavior: 'smooth' })
-
+      
+      console.log('Password error message set:', errorMessage.value)
     }
   } catch (error) {
     console.error('Password update error:', error)
     errorMessage.value = 'Network error. Please try again.'
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   } finally {
     passwordLoading.value = false
   }
@@ -400,59 +412,48 @@ const deleteAccount = async () => {
     })
     
     const data = await response.json()
-    console.log('Delete account response:', data) // Debug log
+    console.log('Delete account response:', data)
     
     if (response.ok && data.success) {
-      // Clear any previous error messages first
       errorMessage.value = ''
       
-      // Show success message from backend
       successMessage.value = data.message || 'Account deleted successfully!'
       
-      // Hide the password input and reset form
       showDeletePassword.value = false
       deletePassword.value = ''
       
-      // Scroll to top to show the success message
       window.scrollTo({ top: 0, behavior: 'smooth' })
       
-      console.log('Success message set:', successMessage.value) // Debug log
+      console.log('Success message set:', successMessage.value)
       
-      // Wait a moment to show the message before redirecting
       setTimeout(() => {
-        // Clear all user data
         localStorage.removeItem('token')
         localStorage.removeItem('user')
         localStorage.removeItem('remember_me')
         
-        // Redirect to login
         router.push('/')
-      }, 1500) // 1.5 second delay to show the success message
-
+      }, 3000)
+      
     } else {
-      // Clear any previous success messages first
       successMessage.value = ''
       
       errorMessage.value = data.message || 'Failed to delete account'
       showDeletePassword.value = false
       deletePassword.value = ''
       
-      // Scroll to top to show the error message
       window.scrollTo({ top: 0, behavior: 'smooth' })
       
-      console.log('Error message set:', errorMessage.value) // Debug log
+      console.log('Error message set:', errorMessage.value)
     }
   } catch (error) {
     console.error('Account deletion error:', error)
     
-    // Clear any previous success messages first
     successMessage.value = ''
     
     errorMessage.value = 'Network error. Please try again.'
     showDeletePassword.value = false
     deletePassword.value = ''
     
-    // Scroll to top to show the error message
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } finally {
     deleteLoading.value = false

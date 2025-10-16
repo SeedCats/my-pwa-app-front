@@ -1,15 +1,19 @@
 <template>
-  <div class="flex min-h-[100dvh] flex-1 items-center justify-center px-3 py-6 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+  <div
+    class="flex min-h-[100dvh] flex-1 items-center justify-center px-3 py-6 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
     <div class="w-full max-w-xs sm:max-w-md lg:max-w-lg space-y-4 sm:space-y-6 lg:space-y-8">
       <!-- Header Section -->
       <div class="text-center">
         <!-- Logo -->
-        <div class="mx-auto w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-lg mb-4 sm:mb-6 lg:mb-8">
-          <svg class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        <div
+          class="mx-auto w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-lg mb-4 sm:mb-6 lg:mb-8">
+          <svg class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
         </div>
-        
+
         <h2 class="text-xl sm:text-2xl lg:text-4xl font-bold tracking-tight text-gray-900 mb-1 sm:mb-2">
           Welcome Back
         </h2>
@@ -19,7 +23,8 @@
       </div>
 
       <!-- Login Card -->
-      <div class="bg-white/70 backdrop-blur-lg rounded-xl sm:rounded-3xl shadow-xl border border-white/50 p-4 sm:p-6 lg:p-10">
+      <div
+        class="bg-white/70 backdrop-blur-lg rounded-xl sm:rounded-3xl shadow-xl border border-white/50 p-4 sm:p-6 lg:p-10">
         <!-- Error Message -->
         <div v-if="error" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
           <p class="text-sm text-red-600">{{ error }}</p>
@@ -33,36 +38,23 @@
         <form @submit.prevent="handleLogin" class="space-y-4 sm:space-y-6">
           <!-- Input Group -->
           <div class="relative">
-            <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
+            </div>
             <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div class="col-span-2">
                 <div class="relative">
-                  <input 
-                    id="email-address" 
-                    name="email" 
-                    type="email" 
-                    autocomplete="email" 
-                    required 
-                    v-model="loginForm.email"
-                    aria-label="Email address" 
-                    class="block w-full rounded-t-xl bg-white px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 border-b border-gray-200 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation" 
-                    placeholder="Email address" 
-                  />
+                  <input id="email-address" name="email" type="email" autocomplete="email" required
+                    v-model="loginForm.email" aria-label="Email address"
+                    class="block w-full rounded-t-xl bg-white px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 border-b border-gray-200 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
+                    placeholder="Email address" />
                 </div>
               </div>
               <div class="-mt-px pt-2">
                 <div class="relative">
-                  <input 
-                    id="password" 
-                    name="password" 
-                    type="password" 
-                    autocomplete="current-password" 
-                    required 
-                    v-model="loginForm.password"
-                    aria-label="Password" 
-                    class="block w-full rounded-b-xl bg-white px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 transition-colors duration-200 touch-manipulation" 
-                    placeholder="Password" 
-                  />
+                  <input id="password" name="password" type="password" autocomplete="current-password" required
+                    v-model="loginForm.password" aria-label="Password"
+                    class="block w-full rounded-b-xl bg-white px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 transition-colors duration-200 touch-manipulation"
+                    placeholder="Password" />
                 </div>
               </div>
             </div>
@@ -73,48 +65,47 @@
             <div class="flex gap-3 items-center">
               <div class="flex h-6 shrink-0 items-center">
                 <div class="group grid size-4 sm:size-5 grid-cols-1">
-                  <input 
-                    id="remember-me" 
-                    name="remember-me" 
-                    type="checkbox" 
-                    v-model="loginForm.remember"
-                    class="col-start-1 row-start-1 appearance-none rounded-md border-2 border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto transition-colors duration-200" 
-                  />
-                  <svg class="pointer-events-none col-start-1 row-start-1 size-3 sm:size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25" viewBox="0 0 14 14" fill="none">
-                    <path class="opacity-0 group-has-checked:opacity-100" d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    <path class="opacity-0 group-has-indeterminate:opacity-100" d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  <input id="remember-me" name="remember-me" type="checkbox" v-model="loginForm.remember"
+                    class="col-start-1 row-start-1 appearance-none rounded-md border-2 border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto transition-colors duration-200" />
+                  <svg
+                    class="pointer-events-none col-start-1 row-start-1 size-3 sm:size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
+                    viewBox="0 0 14 14" fill="none">
+                    <path class="opacity-0 group-has-checked:opacity-100" d="M3 8L6 11L11 3.5" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+                    <path class="opacity-0 group-has-indeterminate:opacity-100" d="M3 7H11" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </div>
               </div>
-              <label for="remember-me" class="block text-sm sm:text-base text-gray-700 font-medium">Remember me</label>
+              <label for="remember-me" class="block text-sm sm:text-base text-gray-700 font-medium">Remember
+                me</label>
             </div>
           </div>
 
           <!-- Buttons -->
           <div class="space-y-3 sm:space-y-4">
-            <button 
-              type="submit" 
-              :disabled="loading"
-              class="group flex w-full justify-center items-center rounded-xl sm:rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base lg:text-lg font-semibold text-white hover:from-indigo-700 hover:to-purple-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] touch-manipulation min-h-[48px] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
-            >
+            <button type="submit" :disabled="loading"
+              class="group flex w-full justify-center items-center rounded-xl sm:rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base lg:text-lg font-semibold text-white hover:from-indigo-700 hover:to-purple-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] touch-manipulation min-h-[48px] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none">
               <svg v-if="loading" class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
               </svg>
-              <svg v-else class="w-5 h-5 sm:w-5 sm:h-5 mr-2 group-hover:animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              <svg v-else class="w-5 h-5 sm:w-5 sm:h-5 mr-2 group-hover:animate-pulse" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
               </svg>
               {{ loading ? 'Signing in...' : 'Sign in' }}
             </button>
-            
-            <button 
-              type="button" 
-              @click="handleRegister" 
-              :disabled="loading"
-              class="group flex w-full justify-center items-center rounded-xl sm:rounded-2xl bg-white border-2 border-gray-300 px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base lg:text-lg font-semibold text-gray-700 hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md active:scale-[0.98] touch-manipulation min-h-[48px] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              <svg class="w-5 h-5 sm:w-5 sm:h-5 mr-2 group-hover:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+
+            <button type="button" @click="handleRegister" :disabled="loading"
+              class="group flex w-full justify-center items-center rounded-xl sm:rounded-2xl bg-white border-2 border-gray-300 px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base lg:text-lg font-semibold text-gray-700 hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md active:scale-[0.98] touch-manipulation min-h-[48px] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none">
+              <svg class="w-5 h-5 sm:w-5 sm:h-5 mr-2 group-hover:animate-bounce" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
               Create Account
             </button>
@@ -128,6 +119,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useTheme } from '../composables/useTheme'
 
 const router = useRouter()
 
@@ -135,7 +127,7 @@ const router = useRouter()
 onMounted(() => {
   const token = localStorage.getItem('token')
   const user = localStorage.getItem('user')
-  
+
   if (token && user) {
     // User is already logged in, redirect to home
     router.push('/home')
@@ -160,12 +152,12 @@ async function handleLogin() {
   error.value = ''
   success.value = ''
   loading.value = true
-  
+
   // Clear any existing auth data
   localStorage.removeItem('token')
   localStorage.removeItem('user')
   localStorage.removeItem('remember_me')
-  
+
   try {
     // Make API request to backend
     const response = await fetch('/api/login', {
@@ -187,11 +179,11 @@ async function handleLogin() {
 
     if (response.ok && responseData.success) {
       success.value = responseData.message || 'Login successful! Redirecting...'
-      
+
       localStorage.setItem('token', responseData.data.token)
       localStorage.setItem('user', JSON.stringify(responseData.data.user))
       localStorage.setItem('remember_me', 'true')
-      
+
 
       // Redirect to home page after a short delay
       setTimeout(() => {
@@ -205,7 +197,7 @@ async function handleLogin() {
 
   } catch (err) {
     console.error('Login error:', err)
-    
+
     // Handle different types of network errors
     if (err.name === 'TypeError' && err.message.includes('fetch')) {
       error.value = 'Cannot connect to server. Please check your internet connection.'

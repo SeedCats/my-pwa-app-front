@@ -1,11 +1,19 @@
 <template>
-  <div id="app-wrapper">
-    <!-- Potentially your header or global layout -->
-    <router-view /> <!-- THIS IS CRUCIAL -->
-    <!-- Potentially your footer -->
+  <div id="app">
+    <router-view />
   </div>
 </template>
 
 <script setup>
-// If you have global logic or imports in App.vue
+import { onMounted } from 'vue'
+import { useTheme } from '../composables/useTheme'
+
+const { initializeTheme } = useTheme()
+
+onMounted(() => {
+  initializeTheme()
+})
 </script>
+
+<style>
+</style>
