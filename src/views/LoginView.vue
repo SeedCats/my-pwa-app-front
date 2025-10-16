@@ -37,11 +37,6 @@
             <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div class="col-span-2">
                 <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                    </svg>
-                  </div>
                   <input 
                     id="email-address" 
                     name="email" 
@@ -50,18 +45,13 @@
                     required 
                     v-model="loginForm.email"
                     aria-label="Email address" 
-                    class="block w-full rounded-t-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 border-b border-gray-200 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation" 
+                    class="block w-full rounded-t-xl bg-white px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 border-b border-gray-200 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation" 
                     placeholder="Email address" 
                   />
                 </div>
               </div>
               <div class="-mt-px pt-2">
                 <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
                   <input 
                     id="password" 
                     name="password" 
@@ -70,7 +60,7 @@
                     required 
                     v-model="loginForm.password"
                     aria-label="Password" 
-                    class="block w-full rounded-b-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 transition-colors duration-200 touch-manipulation" 
+                    class="block w-full rounded-b-xl bg-white px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 transition-colors duration-200 touch-manipulation" 
                     placeholder="Password" 
                   />
                 </div>
@@ -97,12 +87,6 @@
                 </div>
               </div>
               <label for="remember-me" class="block text-sm sm:text-base text-gray-700 font-medium">Remember me</label>
-            </div>
-            
-            <div class="text-sm sm:text-base">
-              <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200 hover:underline underline-offset-4">
-                Forgot password?
-              </a>
             </div>
           </div>
 
@@ -142,10 +126,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+// Check if user is already logged in on component mount
+onMounted(() => {
+  const token = localStorage.getItem('token')
+  const user = localStorage.getItem('user')
+  
+  if (token && user) {
+    // User is already logged in, redirect to home
+    router.push('/home')
+  }
+})
 
 // Reactive data
 const loading = ref(false)
@@ -225,7 +220,6 @@ async function handleLogin() {
 }
 
 function handleRegister() {
-  console.log('🔄 Navigating to register page')
   router.push('/register')
 }
 </script>

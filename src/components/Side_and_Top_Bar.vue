@@ -41,11 +41,11 @@
                                 <nav class="flex flex-1 flex-col">
                                     <ul role="list" class="flex flex-1 flex-col gap-y-7">
                                         <li>
-                                            <ul role="list" class="-mx-2 space-y-1">
+                                            <ul role="list" class="-mx-2 space-y-2">
                                                 <li v-for="item in navigation" :key="item.name">
                                                     <router-link :to="item.to" :class="[
                                                         'text-gray-400 hover:bg-gray-800 hover:text-white',
-                                                        'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold'
+                                                        'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center'
                                                     ]">
                                                         <component :is="item.icon" class="size-6 shrink-0"
                                                             aria-hidden="true" />
@@ -55,8 +55,13 @@
                                             </ul>
                                         </li>
                                         <li class="mt-auto">
+                                            <router-link to="/user"
+                                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white items-center">
+                                                <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
+                                                User settings
+                                            </router-link>
                                             <router-link to="/setting"
-                                                class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white items-center">
                                                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                                                 Settings
                                             </router-link>
@@ -85,11 +90,11 @@
                     <nav class="flex flex-1 flex-col">
                         <ul role="list" class="flex flex-1 flex-col gap-y-7">
                             <li>
-                                <ul role="list" class="-mx-2 space-y-1">
+                                <ul role="list" class="-mx-2 my-2 space-y-2">
                                     <li v-for="item in navigation" :key="item.name">
                                         <router-link :to="item.to" :class="[
                                             'text-gray-400 hover:bg-gray-800 hover:text-white',
-                                            'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold'
+                                            'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center'
                                         ]">
                                             <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
                                             {{ item.name }}
@@ -98,8 +103,13 @@
                                 </ul>
                             </li>
                             <li class="mt-auto">
+                                <router-link to="/user"
+                                    class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white items-center">
+                                    <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
+                                    User Settings
+                                </router-link>
                                 <router-link to="/setting"
-                                    class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white items-center">
                                     <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                                     Settings
                                 </router-link>
@@ -176,7 +186,7 @@
                                     <span
                                         class="text-sm font-semibold text-gray-900 transition-colors duration-200 group-hover:text-gray-600"
                                         aria-hidden="true">
-                                        {{ userEmail || 'User' }}
+                                        {{ userName }}
                                     </span>
                                     <ChevronDownIcon
                                         class="ml-2 size-5 text-gray-400 transition-transform duration-200 group-hover:rotate-180"
@@ -243,6 +253,8 @@ const route = useRoute()
 const navigation = [
     { name: 'Dashboard', to: '/home', icon: HomeIcon },
     { name: 'test', to: '/', icon: UsersIcon },
+    { name: 'test2', to: '/', icon: UsersIcon },
+    { name: 'test3', to: '/', icon: UsersIcon },
 ]
 
 // Sidebar state management
@@ -254,10 +266,10 @@ const userData = ref(null)
 
 const emit = defineEmits(['update:sidebarState'])
 
-// Computed property to get user email
-const userEmail = computed(() => {
-    if (userData.value && userData.value.email) {
-        return userData.value.email
+// Computed property to get user name
+const userName = computed(() => {
+    if (userData.value && userData.value.name) {
+        return userData.value.name
     }
     return 'User'
 })
@@ -271,7 +283,7 @@ function toggleDesktopSidebar() {
 // Log out function
 async function handleLogOut() {
     const token = localStorage.getItem('token');
-    
+
     const response = await fetch('/api/logout', {
         method: 'POST',
         headers: {
@@ -279,16 +291,16 @@ async function handleLogOut() {
             'Content-Type': 'application/json'
         }
     });
-    
+
     const data = await response.json();
-    
+
     if (data.success) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('remember_me');
         router.push('/');
     }
-    
+
     return data;
 }
 
@@ -303,6 +315,12 @@ onMounted(() => {
         console.error('Error parsing user data:', error)
         userData.value = null
     }
+    
+    // Listen for user data updates
+    window.addEventListener('userUpdated', (event) => {
+        userData.value = event.detail
+        console.log('User data updated in sidebar:', event.detail)
+    })
 })
 
 const pages = [
