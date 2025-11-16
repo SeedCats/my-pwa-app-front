@@ -8,7 +8,7 @@
       <main>
         <div class="px-3 sm:px-4 md:px-6 lg:px-8 pt-4 pb-8">
           <!-- Header -->
-          <div class="mb-8">
+          <div class="mb-8 pt-16">
             <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">Settings</h1>
             <p class="mt-2 text-sm" :class="themeClasses.textSecondary">Customize your application preferences</p>
           </div>

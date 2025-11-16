@@ -1,199 +1,232 @@
 <template>
-  <div>
-    <!-- Mobile sidebar -->
-    <TransitionRoot as="template" :show="sidebarOpen">
-      <Dialog as="div" class="relative z-50 lg:hidden" @close="sidebarOpen = false">
-        <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="transition-opacity ease-linear duration-300" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-900/80" />
-        </TransitionChild>
+    <div>
+        <!-- Mobile sidebar -->
+        <TransitionRoot as="template" :show="sidebarOpen">
+            <Dialog as="div" class="relative z-50 lg:hidden" @close="sidebarOpen = false">
+                <TransitionChild as="template" enter="transition-opacity ease-linear duration-300"
+                    enter-from="opacity-0" enter-to="opacity-100" leave="transition-opacity ease-linear duration-300"
+                    leave-from="opacity-100" leave-to="opacity-0">
+                    <div class="fixed inset-0 bg-gray-900/80" />
+                </TransitionChild>
 
-        <div class="fixed inset-0 flex">
-          <TransitionChild as="template" enter="transition ease-in-out duration-300 transform" enter-from="-translate-x-full" enter-to="translate-x-0" leave="transition ease-in-out duration-300 transform" leave-from="translate-x-0" leave-to="-translate-x-full">
-            <DialogPanel class="relative mr-16 flex w-full max-w-xs flex-1">
-              <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-300" leave-from="opacity-100" leave-to="opacity-0">
-                <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
-                  <button type="button" class="-m-2.5 p-2.5 transition-all duration-150 ease-in-out transform hover:scale-110 active:scale-95 rounded-full hover:bg-white/10" @click="sidebarOpen = false">
-                    <span class="sr-only">Close sidebar</span>
-                    <XMarkIcon class="h-6 w-6 text-white" aria-hidden="true" />
-                  </button>
+                <div class="fixed inset-0 flex">
+                    <TransitionChild as="template" enter="transition ease-in-out duration-300 transform"
+                        enter-from="-translate-x-full" enter-to="translate-x-0"
+                        leave="transition ease-in-out duration-300 transform" leave-from="translate-x-0"
+                        leave-to="-translate-x-full">
+                        <DialogPanel class="relative mr-16 flex w-full max-w-xs flex-1">
+                            <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0"
+                                enter-to="opacity-100" leave="ease-in-out duration-300" leave-from="opacity-100"
+                                leave-to="opacity-0">
+                                <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
+                                    <button type="button"
+                                        class="-m-2.5 p-2.5 transition-all duration-150 ease-in-out transform hover:scale-110 active:scale-95 rounded-full hover:bg-white/10"
+                                        @click="sidebarOpen = false">
+                                        <span class="sr-only">Close sidebar</span>
+                                        <ArrowLeftIcon class="h-6 w-6 text-white" aria-hidden="true" />
+                                    </button>
+                                </div>
+                            </TransitionChild>
+                            <!-- Mobile Sidebar content -->
+                            <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4"
+                                :class="themeClasses.cardBackground">
+                                <div class="flex h-16 shrink-0 items-center">
+                                    <h1 class="text-xl font-bold" :class="themeClasses.textPrimary">Health Monitoring
+                                        System</h1>
+                                </div>
+                                <nav class="flex flex-1 flex-col">
+                                    <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                                        <li>
+                                            <ul role="list" class="-mx-2 space-y-2">
+                                                <li v-for="item in navigation" :key="item.name">
+                                                    <router-link :to="item.to" :class="[
+                                                        isActiveRoute(item.to)
+                                                            ? 'bg-gray-800 text-white'
+                                                            : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                                                        'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95'
+                                                    ]" @click="sidebarOpen = false">
+                                                        <component :is="item.icon" class="size-6 shrink-0"
+                                                            aria-hidden="true" />
+                                                        {{ item.name }}
+                                                    </router-link>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li class="mt-auto">
+
+                                            <router-link to="/setting"
+                                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
+                                                :class="isActiveRoute('/setting')
+                                                    ? 'bg-gray-800 text-white'
+                                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'" @click="sidebarOpen = false">
+                                                <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
+                                                Settings
+                                            </router-link>
+
+                                            <router-link to="/user"
+                                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
+                                                :class="isActiveRoute('/user')
+                                                    ? 'bg-gray-800 text-white'
+                                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'" @click="sidebarOpen = false">
+                                                <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
+                                                User Settings
+                                            </router-link>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </DialogPanel>
+                    </TransitionChild>
                 </div>
-              </TransitionChild>
-              <!-- Mobile Sidebar content -->
-              <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4" :class="themeClasses.cardBackground">
+            </Dialog>
+        </TransitionRoot>
+
+        <!-- Desktop sidebar -->
+        <div :class="[
+            'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col transition-transform duration-300 ease-in-out',
+            isDesktopSidebarHidden ? '-translate-x-full' : 'translate-x-0'
+        ]">
+            <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r px-6 pb-4"
+                :class="[themeClasses.cardBackground, themeClasses.border]">
                 <div class="flex h-16 shrink-0 items-center">
-                  <h1 class="text-xl font-bold" :class="themeClasses.textPrimary">Health Monitoring System</h1>
+                    <h1 class="text-xl font-bold mt-8 mb-2" :class="themeClasses.textPrimary">Health Monitoring System
+                    </h1>
                 </div>
                 <nav class="flex flex-1 flex-col">
-                  <ul role="list" class="flex flex-1 flex-col gap-y-7">
-                    <li>
-                      <ul role="list" class="-mx-2 space-y-2">
-                        <li v-for="item in navigation" :key="item.name">
-                          <router-link :to="item.to" :class="[
-                            isActiveRoute(item.to) 
-                              ? 'bg-gray-800 text-white' 
-                              : 'text-gray-400 hover:bg-gray-800 hover:text-white',
-                            'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95'
-                          ]" @click="sidebarOpen = false">
-                            <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
-                            {{ item.name }}
-                          </router-link>
+                    <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                        <li>
+                            <ul role="list" class="-mx-2 space-y-2">
+                                <li v-for="item in navigation" :key="item.name">
+                                    <router-link :to="item.to" :class="[
+                                        isActiveRoute(item.to)
+                                            ? 'bg-gray-800 text-white'
+                                            : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                                        'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95'
+                                    ]">
+                                        <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
+                                        {{ item.name }}
+                                    </router-link>
+                                </li>
+                            </ul>
                         </li>
-                      </ul>
-                    </li>
-                    <li class="mt-auto">
-                      <router-link to="/user"
-                        class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95" 
-                        :class="isActiveRoute('/user') 
-                          ? 'bg-gray-800 text-white' 
-                          : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
-                        @click="sidebarOpen = false">
-                        <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
-                        User Settings
-                      </router-link>
-                      <router-link to="/setting"
-                        class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95" 
-                        :class="isActiveRoute('/setting') 
-                          ? 'bg-gray-800 text-white' 
-                          : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
-                        @click="sidebarOpen = false">
-                        <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                        Settings
-                      </router-link>
-                    </li>
-                  </ul>
+                        <li class="mt-auto">
+                            <router-link to="/setting"
+                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
+                                :class="isActiveRoute('/setting')
+                                    ? 'bg-gray-800 text-white'
+                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'">
+                                <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
+                                Settings
+                            </router-link>
+
+                            <router-link to="/user"
+                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
+                                :class="isActiveRoute('/user')
+                                    ? 'bg-gray-800 text-white'
+                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'">
+                                <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
+                                User Settings
+                            </router-link>
+                        </li>
+                    </ul>
                 </nav>
-              </div>
-            </DialogPanel>
-          </TransitionChild>
+            </div>
         </div>
-      </Dialog>
-    </TransitionRoot>
 
-    <!-- Desktop sidebar -->
-    <div :class=" [
-      'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col transition-transform duration-300 ease-in-out',
-      isDesktopSidebarHidden ? '-translate-x-full' : 'translate-x-0'
-    ]">
-      <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r px-6 pb-4" :class="[themeClasses.cardBackground, themeClasses.border]">
-        <div class="flex h-16 shrink-0 items-center">
-          <h1 class="text-xl font-bold mt-8 mb-2" :class="themeClasses.textPrimary">Health Monitoring System</h1>
+        <!-- Top bar -->
+        <div :class="[
+            'fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b px-4 shadow-sm sm:gap-x-6 sm:px-6 transition-all duration-300 ease-in-out',
+            themeClasses.cardBackground,
+            themeClasses.border,
+            isDesktopSidebarHidden ? 'lg:pl-8' : 'lg:pl-80'
+        ]">
+            <!-- Mobile menu button -->
+            <button type="button" @click="sidebarOpen = true"
+                class="-m-2.5 p-2.5 lg:hidden rounded-lg transition-all duration-150 ease-in-out transform hover:scale-110 active:scale-95"
+                :class="[themeClasses.textPrimary, isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200']">
+                <span class="sr-only">Open sidebar</span>
+                <Bars3Icon class="h-6 w-6" aria-hidden="true" />
+            </button>
+
+            <!-- Desktop sidebar toggle -->
+            <button type="button" @click="toggleDesktopSidebar"
+                class="hidden lg:block -m-2.5 p-2.5 rounded-lg transition-all duration-150 ease-in-out transform hover:scale-110 active:scale-95"
+                :class="[themeClasses.textPrimary, isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200']">
+                <span class="sr-only">Toggle sidebar</span>
+                <Bars3Icon v-if="isDesktopSidebarHidden" class="h-6 w-6" aria-hidden="true" />
+                <ArrowLeftIcon v-else class="h-6 w-6" aria-hidden="true" />
+            </button>
+
+            <!-- Separator -->
+            <div class="h-6 w-px bg-gray-900/10 lg:block" :class="isDarkMode ? 'bg-gray-600' : 'bg-gray-900/10'"
+                aria-hidden="true" />
+
+            <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+                <!-- Right side of top bar -->
+                <div class="flex flex-1 justify-end">
+                    <div class="flex items-center gap-x-4 lg:gap-x-6">
+                        <!-- Profile dropdown -->
+                        <Menu as="div" class="relative">
+                            <MenuButton
+                                class="-m-1.5 flex items-center p-1.5 rounded-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
+                                :class="[isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200']">
+                                <span class="flex items-center">
+                                    <span class="text-sm font-semibold leading-6 hidden sm:block"
+                                        :class="themeClasses.textPrimary">{{ userName }}</span>
+                                    <span class="text-xs font-semibold leading-6 sm:hidden truncate max-w-20"
+                                        :class="themeClasses.textPrimary">{{ userName.split(' ')[0] }}</span>
+                                    <ChevronDownIcon
+                                        class="ml-2 h-5 w-5 transition-transform duration-150 ease-in-out ui-open:rotate-180"
+                                        :class="themeClasses.textSecondary" aria-hidden="true" />
+                                </span>
+                            </MenuButton>
+                            <transition enter-active-class="transition ease-out duration-100"
+                                enter-from-class="transform opacity-0 scale-95"
+                                enter-to-class="transform opacity-100 scale-100"
+                                leave-active-class="transition ease-in duration-75"
+                                leave-from-class="transform opacity-100 scale-100"
+                                leave-to-class="transform opacity-0 scale-95">
+                                <MenuItems
+                                    class="absolute right-0 z-10 mt-2.5 w-40 sm:w-32 origin-top-right rounded-md py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none"
+                                    :class="[themeClasses.cardBackground, themeClasses.border]">
+                                    <MenuItem v-slot="{ active }">
+                                    <button @click="handleLogOut" :class="[
+                                        active ? (isDarkMode ? 'bg-gray-700' : 'bg-gray-50') : '',
+                                        'block w-full px-4 py-2 text-left text-sm leading-6 transition-all duration-150 ease-in-out transform active:scale-95',
+                                        themeClasses.textPrimary
+                                    ]">Sign out</button>
+                                    </MenuItem>
+                                </MenuItems>
+                            </transition>
+                        </Menu>
+                    </div>
+                </div>
+            </div>
         </div>
-        <nav class="flex flex-1 flex-col">
-          <ul role="list" class="flex flex-1 flex-col gap-y-7">
-            <li>
-              <ul role="list" class="-mx-2 space-y-2">
-                <li v-for="item in navigation" :key="item.name">
-                  <router-link :to="item.to" :class="[
-                    isActiveRoute(item.to) 
-                      ? 'bg-gray-800 text-white' 
-                      : 'text-gray-400 hover:bg-gray-800 hover:text-white',
-                    'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95'
-                  ]">
-                    <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
-                    {{ item.name }}
-                  </router-link>
-                </li>
-              </ul>
-            </li>
-            <li class="mt-auto">
-              <router-link to="/user"
-                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95" 
-                :class="isActiveRoute('/user') 
-                  ? 'bg-gray-800 text-white' 
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-white'">
-                <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
-                User Settings
-              </router-link>
-              <router-link to="/setting"
-                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95" 
-                :class="isActiveRoute('/setting') 
-                  ? 'bg-gray-800 text-white' 
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-white'">
-                <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                Settings
-              </router-link>
-            </li>
-          </ul>
-        </nav>
-      </div>
     </div>
-
-    <!-- Top bar -->
-    <div :class=" [
-      'sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b px-4 shadow-sm sm:gap-x-6 sm:px-6 transition-all duration-300 ease-in-out',
-      themeClasses.cardBackground,
-      themeClasses.border,
-      isDesktopSidebarHidden ? 'lg:pl-8' : 'lg:pl-80'
-    ]">
-      <!-- Mobile menu button -->
-      <button type="button" @click="sidebarOpen = true" class="-m-2.5 p-2.5 lg:hidden rounded-lg transition-all duration-150 ease-in-out transform hover:scale-110 active:scale-95" :class="[themeClasses.textPrimary, isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200']">
-        <span class="sr-only">Open sidebar</span>
-        <Bars3Icon class="h-6 w-6" aria-hidden="true" />
-      </button>
-
-      <!-- Desktop sidebar toggle -->
-      <button type="button" @click="toggleDesktopSidebar" class="hidden lg:block -m-2.5 p-2.5 rounded-lg transition-all duration-150 ease-in-out transform hover:scale-110 active:scale-95" :class="[themeClasses.textPrimary, isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200']">
-        <span class="sr-only">Toggle sidebar</span>
-        <Bars3Icon v-if="isDesktopSidebarHidden" class="h-6 w-6" aria-hidden="true" />
-        <XMarkIcon v-else class="h-6 w-6" aria-hidden="true" />
-      </button>
-
-      <!-- Separator -->
-      <div class="h-6 w-px bg-gray-900/10 lg:block" :class="isDarkMode ? 'bg-gray-600' : 'bg-gray-900/10'" aria-hidden="true" />
-
-      <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-        <!-- Right side of top bar -->
-        <div class="flex flex-1 justify-end">
-          <div class="flex items-center gap-x-4 lg:gap-x-6">
-            <!-- Profile dropdown -->
-            <Menu as="div" class="relative">
-              <MenuButton class="-m-1.5 flex items-center p-1.5 rounded-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95" :class="[isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200']">
-                <span class="flex items-center">
-                  <span class="text-sm font-semibold leading-6 hidden sm:block" :class="themeClasses.textPrimary">{{ userName }}</span>
-                  <span class="text-xs font-semibold leading-6 sm:hidden truncate max-w-20" :class="themeClasses.textPrimary">{{ userName.split(' ')[0] }}</span>
-                  <ChevronDownIcon class="ml-2 h-5 w-5 transition-transform duration-150 ease-in-out ui-open:rotate-180" :class="themeClasses.textSecondary" aria-hidden="true" />
-                </span>
-              </MenuButton>
-              <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                <MenuItems class="absolute right-0 z-10 mt-2.5 w-40 sm:w-32 origin-top-right rounded-md py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none" :class="[themeClasses.cardBackground, themeClasses.border]">
-                  <MenuItem v-slot="{ active }">
-                    <button @click="handleLogOut" :class=" [
-                      active ? (isDarkMode ? 'bg-gray-700' : 'bg-gray-50') : '',
-                      'block w-full px-4 py-2 text-left text-sm leading-6 transition-all duration-150 ease-in-out transform active:scale-95',
-                      themeClasses.textPrimary
-                    ]">Sign out</button>
-                  </MenuItem>
-                </MenuItems>
-              </transition>
-            </Menu>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
-import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid'
+import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import {
-  Dialog,
-  DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  TransitionChild,
-  TransitionRoot,
+    Dialog,
+    DialogPanel,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuItems,
+    TransitionChild,
+    TransitionRoot,
 } from '@headlessui/vue'
 import {
-  Bars3Icon,
-  XMarkIcon,
-  HomeIcon,
-  UsersIcon,
-  Cog6ToothIcon,
+    Bars3Icon,
+    ArrowLeftIcon,
+    HomeIcon,
+    UsersIcon,
+    Cog6ToothIcon,
 } from '@heroicons/vue/24/outline'
 
 // Initialize router and route for active state checking
@@ -201,8 +234,10 @@ const router = useRouter()
 const route = useRoute()
 
 const navigation = [
-  { name: 'Home', to: '/home', icon: HomeIcon },
-  // Add more navigation items here
+    { name: 'DashBoard', to: '/home', icon: HomeIcon },
+    { name: 'Data Setting', to: '/addData', icon: HomeIcon },
+    { name: 'AI Support', to: '/ai-support', icon: HomeIcon },
+    { name: 'Manual Support', to: '/manual-support', icon: HomeIcon },
 ]
 
 // Sidebar state management
@@ -219,62 +254,62 @@ const { isDarkMode, themeClasses } = useTheme()
 
 // Computed property to get user name
 const userName = computed(() => {
-  if (userData.value && userData.value.name) {
-    return userData.value.name
-  }
-  try {
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      const user = JSON.parse(storedUser)
-      return user.name || 'User'
+    if (userData.value && userData.value.name) {
+        return userData.value.name
     }
-  } catch (error) {
-    console.error('Error parsing user data in computed:', error)
-  }
-  return 'User'
+    try {
+        const storedUser = localStorage.getItem('user')
+        if (storedUser) {
+            const user = JSON.parse(storedUser)
+            return user.name || 'User'
+        }
+    } catch (error) {
+        console.error('Error parsing user data in computed:', error)
+    }
+    return 'User'
 })
 
 // Active route checking
 const isActiveRoute = (path) => {
-  return route.path === path
+    return route.path === path
 }
 
 // Desktop sidebar functions
 function toggleDesktopSidebar() {
-  isDesktopSidebarHidden.value = !isDesktopSidebarHidden.value
-  emit('update:sidebarState', isDesktopSidebarHidden.value)
+    isDesktopSidebarHidden.value = !isDesktopSidebarHidden.value
+    emit('update:sidebarState', isDesktopSidebarHidden.value)
 }
 
 // Log out function
 async function handleLogOut() {
-  try {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    localStorage.removeItem('remember_me')
-    router.push('/')
-  } catch (error) {
-    console.error('Logout error:', error)
-    router.push('/')
-  }
+    try {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        localStorage.removeItem('remember_me')
+        router.push('/')
+    } catch (error) {
+        console.error('Logout error:', error)
+        router.push('/')
+    }
 }
 
 // Load user data on component mount
 onMounted(() => {
-  try {
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      userData.value = JSON.parse(storedUser)
-      console.log('Initial user data loaded:', userData.value)
+    try {
+        const storedUser = localStorage.getItem('user')
+        if (storedUser) {
+            userData.value = JSON.parse(storedUser)
+            console.log('Initial user data loaded:', userData.value)
+        }
+    } catch (error) {
+        console.error('Error parsing user data:', error)
+        userData.value = null
     }
-  } catch (error) {
-    console.error('Error parsing user data:', error)
-    userData.value = null
-  }
-  
-  // Listen for user data updates
-  window.addEventListener('userUpdated', (event) => {
-    userData.value = event.detail
-    console.log('User data updated in sidebar:', event.detail)
-  })
+
+    // Listen for user data updates
+    window.addEventListener('userUpdated', (event) => {
+        userData.value = event.detail
+        console.log('User data updated in sidebar:', event.detail)
+    })
 })
 </script>

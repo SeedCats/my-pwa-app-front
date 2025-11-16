@@ -34,7 +34,7 @@
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <!-- Name -->
                   <div>
-                    <label for="name" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Full Name</label>
+                    <label for="name" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Name</label>
                     <input 
                       type="text" 
                       id="name" 
@@ -50,7 +50,7 @@
 
                   <!-- Email -->
                   <div>
-                    <label for="email" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Email Address</label>
+                    <label for="email" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Email</label>
                     <input 
                       type="email" 
                       id="email" 

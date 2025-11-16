@@ -4,6 +4,9 @@ import FormatSettingView from '../views/FormatSettingView.vue'
 import UserSetting from '../views/UserSettingView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
+import DataAddingView from '../views/DataAddingView.vue'
+import aiSupportView from '../views/aiSupportView.vue'
+import ManualSupportView from '../views/ManualSupportView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -33,6 +36,21 @@ const router = createRouter({
       name: 'UserSetting',
       component: UserSetting
     },
+    {
+      path: '/addData',
+      name: 'AddData',
+      component: DataAddingView
+    },
+    {
+      path: '/ai-support',
+      name: 'AiSupport',
+      component: aiSupportView
+    },
+    {
+      path: '/manual-support',
+      name: 'ManualSupport',
+      component: ManualSupportView
+    }
   ]
 })
 
