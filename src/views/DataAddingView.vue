@@ -31,20 +31,6 @@
                                         />
                                     </div>
 
-                                    <!-- Sex Input -->
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2" :class="themeClasses.textSecondary">Sex</label>
-                                        <select 
-                                            v-model="bmiForm.sex"
-                                            class="w-full px-4 py-2 rounded-lg border transition-colors"
-                                            :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']"
-                                        >
-                                            <option value="" disabled>Select...</option>
-                                            <option value="male">Male</option>
-                                            <option value="female">Female</option>
-                                        </select>
-                                    </div>
-
                                     <!-- Height Input -->
                                     <div>
                                         <label class="block text-sm font-medium mb-2" :class="themeClasses.textSecondary">Height (cm)</label>
