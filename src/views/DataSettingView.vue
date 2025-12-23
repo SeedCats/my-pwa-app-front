@@ -168,13 +168,17 @@
                                     <!-- Upload Button -->
                                     <button 
                                         @click="submitFileUpload"
-                                        :disabled="!selectedFile"
-                                        class="w-full px-4 py-2 rounded-lg font-medium text-white transition-colors"
-                                        :class="selectedFile 
+                                        :disabled="!selectedFile || isUploading"
+                                        class="w-full px-4 py-2 rounded-lg font-medium text-white transition-colors flex items-center justify-center"
+                                        :class="selectedFile && !isUploading
                                             ? 'bg-blue-600 hover:bg-blue-700' 
                                             : 'bg-gray-400 cursor-not-allowed'"
                                     >
-                                        Upload File
+                                        <svg v-if="isUploading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        {{ isUploading ? 'Uploading...' : 'Upload File' }}
                                     </button>
                                 </div>
                             </div>
@@ -189,6 +193,7 @@ import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { ref, computed, onMounted } from 'vue'
 import { saveBMIData, getLatestBMIRecord, updateBMIRecord } from '../services/bmiService'
+import { uploadHeartRateCSV } from '../services/heartRateService'
 
 const { isDarkMode, themeClasses } = useTheme()
 
@@ -203,6 +208,7 @@ const fileInput = ref(null)
 const selectedFile = ref(null)
 const isDragging = ref(false)
 const uploadStatus = ref(null)
+const isUploading = ref(false)
 
 // Computed
 const isUpdateMode = computed(() => !!(existingBMIRecord.value?._id || existingBMIRecord.value?.id))
@@ -313,10 +319,18 @@ onMounted(loadExistingBMIData)
 const triggerFileInput = () => fileInput.value.click()
 
 const validateAndSetFile = (file, errorMsg) => {
-    if (file?.type === 'text/csv') {
+    // Check for CSV by extension or MIME type (some systems use different MIME types)
+    const isCSV = file?.name?.toLowerCase().endsWith('.csv') || 
+                  file?.type === 'text/csv' || 
+                  file?.type === 'application/vnd.ms-excel' ||
+                  file?.type === 'text/plain'
+    
+    if (isCSV) {
         selectedFile.value = file
         uploadStatus.value = null
+        console.log('File selected:', file.name, file.type, file.size)
     } else if (file) {
+        console.log('Invalid file type:', file.name, file.type)
         uploadStatus.value = { type: 'error', message: errorMsg }
     }
 }
@@ -339,11 +353,33 @@ const submitFileUpload = async () => {
         uploadStatus.value = { type: 'error', message: 'No file selected' }
         return
     }
+    
+    console.log('Starting upload for:', selectedFile.value.name)
+    isUploading.value = true
+    uploadStatus.value = null
+    
     try {
-        uploadStatus.value = { type: 'success', message: `Successfully uploaded ${selectedFile.value.name}` }
-        clearFile()
-    } catch {
-        uploadStatus.value = { type: 'error', message: 'Upload failed. Please try again.' }
+        console.log('Calling uploadHeartRateCSV...')
+        const response = await uploadHeartRateCSV(selectedFile.value)
+        console.log('Upload response:', response)
+        
+        if (response.success) {
+            const { inserted, duplicatesSkipped, totalRecords } = response.data
+            uploadStatus.value = { 
+                type: 'success', 
+                message: `Successfully uploaded! ${inserted} records added${duplicatesSkipped > 0 ? `, ${duplicatesSkipped} duplicates skipped` : ''} (${totalRecords} total in file)` 
+            }
+            clearFile()
+            // Dispatch event so HomeView can refresh heart rate data
+            window.dispatchEvent(new CustomEvent('heartRateDataUpdated'))
+        } else {
+            uploadStatus.value = { type: 'error', message: response.message || 'Upload failed' }
+        }
+    } catch (error) {
+        console.error('Heart rate upload error:', error)
+        uploadStatus.value = { type: 'error', message: error.message || 'Upload failed. Please try again.' }
+    } finally {
+        isUploading.value = false
     }
 }
 </script>

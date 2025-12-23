@@ -256,6 +256,7 @@ import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import { getLatestBMIRecord } from '../services/bmiService'
+import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler)
 
@@ -267,9 +268,12 @@ const heartRateData = ref([])
 const chartData = ref(null)
 const selectedDate = ref('')
 const currentDate = ref('')
+const availableDates = ref([])
 const stats = ref({ min: 0, max: 0, avg: 0, resting: 0 })
 const bmiData = ref({ bmi: null, category: '', height: null, weight: null, age: null })
 const isBMILoading = ref(false)
+const isHeartRateLoading = ref(false)
+const hasHeartRateData = ref(false)
 
 const loadBMIData = async () => {
   isBMILoading.value = true
@@ -305,105 +309,96 @@ const bmiSliderPosition = computed(() => {
 
 const updateSidebarState = (state) => sidebarHidden.value = state
 
-// Format date from CSV timestamp
-const formatDateFromTimestamp = (timestamp) => {
-  const date = new Date(timestamp * 1000)
+// Format date for display
+const formatDateForDisplay = (dateString) => {
+  const date = new Date(dateString)
   const options = { year: 'numeric', month: 'long', day: 'numeric' }
   return date.toLocaleDateString('en-US', options)
 }
 
-// Parse CSV data
-const parseCSVData = async () => {
+// Load available dates from backend
+const loadAvailableDates = async () => {
   try {
-    const response = await fetch('/heartRate.csv')
-    if (!response.ok) return
-
-    const lines = (await response.text()).split('\n')
-    const data = []
-
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim()
-      if (!line) continue
-      try {
-        const startIdx = line.indexOf('{')
-        const endIdx = line.lastIndexOf('}')
-        if (startIdx !== -1 && endIdx !== -1) {
-          const entry = JSON.parse(line.substring(startIdx, endIdx + 1).replace(/""/g, '"'))
-          if (entry.time && typeof entry.bpm === 'number') data.push(entry)
-        }
-      } catch { /* skip invalid lines */ }
+    const response = await getHeartRateDates()
+    console.log('Available dates response:', response)
+    
+    if (response.success && response.data.dates && response.data.dates.length > 0) {
+      availableDates.value = response.data.dates
+      hasHeartRateData.value = true
+      // Set the most recent date as default
+      selectedDate.value = response.data.dates[0]
+      currentDate.value = formatDateForDisplay(response.data.dates[0])
+      return true
     }
+    // No heart rate data - set today as default date for display
+    hasHeartRateData.value = false
+    selectedDate.value = new Date().toISOString().split('T')[0]
+    currentDate.value = formatDateForDisplay(selectedDate.value)
+    return false
+  } catch (error) {
+    console.error('Error loading available dates:', error)
+    hasHeartRateData.value = false
+    // Set today as default date
+    selectedDate.value = new Date().toISOString().split('T')[0]
+    currentDate.value = formatDateForDisplay(selectedDate.value)
+    return false
+  }
+}
 
-    if (!data.length) return
-
-    data.sort((a, b) => a.time - b.time)
-    heartRateData.value = data
-
-    if (data.length > 0) {
-      currentDate.value = formatDateFromTimestamp(data[0].time)
-      selectedDate.value = new Date(data[0].time * 1000).toISOString().split('T')[0]
+// Load heart rate data from backend for selected date (aggregated format)
+const loadHeartRateData = async () => {
+  if (!selectedDate.value) return
+  
+  isHeartRateLoading.value = true
+  try {
+    const response = await getHeartRateRecords({ date: selectedDate.value })
+    
+    if (response.success && response.data.records.length > 0) {
+      const record = response.data.records[0]  // One document per day
+      
+      // Use aggregated hourly data directly
+      heartRateData.value = record.hourlyData
+      
+      // Set stats from daily stats
+      const dailyStats = record.dailyStats
+      stats.value = {
+        min: dailyStats.min,
+        max: dailyStats.max,
+        avg: dailyStats.avg,
+        resting: Math.round(dailyStats.min * 0.95),
+        count: dailyStats.count
+      }
+      
+      hasHeartRateData.value = true
+      updateChartFromAggregated(record.hourlyData)
+    } else {
+      heartRateData.value = []
+      stats.value = { min: 0, max: 0, avg: 0, resting: 0, count: 0 }
+      chartData.value = null
     }
-    updateChart()
   } catch (error) {
     console.error('Error loading heart rate data:', error)
+    heartRateData.value = []
+    stats.value = { min: 0, max: 0, avg: 0, resting: 0, count: 0 }
+    chartData.value = null
+  } finally {
+    isHeartRateLoading.value = false
   }
 }
 
-const getFilteredData = () => {
-  if (!heartRateData.value.length || !selectedDate.value) return []
-  const start = new Date(selectedDate.value).getTime() / 1000
-  return heartRateData.value.filter(d => d.time >= start && d.time < start + 86400)
-}
+// Stats are now loaded directly from aggregated data in loadHeartRateData
 
-const calculateStats = (data) => {
-  if (!data.length) {
-    stats.value = { min: 0, max: 0, avg: 0, resting: 0, normal: 0, elevated: 0, high: 0, normalDuration: '0h 0m', elevatedDuration: '0h 0m', highDuration: '0h 0m' }
-    return
-  }
-
-  const bpms = data.map(d => d.bpm)
-  const min = Math.min(...bpms)
-  const max = Math.max(...bpms)
-  const avg = Math.round(bpms.reduce((a, b) => a + b, 0) / bpms.length)
-
-  let normalCount = 0, elevatedCount = 0, highCount = 0
-  bpms.forEach(bpm => bpm <= 100 ? normalCount++ : bpm <= 120 ? elevatedCount++ : highCount++)
-
-  const total = bpms.length
-  const formatDuration = (count) => {
-    const mins = count * 5
-    return `${Math.floor(mins / 60)}h ${mins % 60}m`
-  }
-
-  stats.value = {
-    min, max, avg,
-    resting: Math.round(min * 0.95),
-    normal: Math.round((normalCount / total) * 100),
-    elevated: Math.round((elevatedCount / total) * 100),
-    high: Math.round((highCount / total) * 100),
-    normalDuration: formatDuration(normalCount),
-    elevatedDuration: formatDuration(elevatedCount),
-    highDuration: formatDuration(highCount)
-  }
-}
-
-const updateChart = () => {
-  const filtered = getFilteredData()
-  calculateStats(filtered)
-
-  if (!filtered.length) {
+const updateChartFromAggregated = (hourlyData) => {
+  if (!hourlyData || hourlyData.length === 0) {
     chartData.value = null
     return
   }
-
-  const hourlyData = Array.from({ length: 24 }, () => [])
-  filtered.forEach(d => hourlyData[new Date(d.time * 1000).getHours()].push(d.bpm))
 
   chartData.value = {
     labels: Array.from({ length: 24 }, (_, h) => `${h.toString().padStart(2, '0')}:00`),
     datasets: [{
       label: 'Heart Rate (bpm)',
-      data: hourlyData.map(h => h.length ? Math.round(h.reduce((a, b) => a + b, 0) / h.length) : null),
+      data: hourlyData.map(h => h.avg),  // Use pre-calculated averages
       borderColor: '#ef4444',
       backgroundColor: 'rgba(239, 68, 68, 0.1)',
       fill: true,
@@ -461,19 +456,24 @@ const chartOptions = computed(() => ({
   }
 }))
 
-watch(isDarkMode, updateChart, { deep: true })
+watch(isDarkMode, () => {
+  // Re-render chart when theme changes
+  if (heartRateData.value && heartRateData.value.length > 0) {
+    updateChartFromAggregated(heartRateData.value)
+  }
+})
 
 watch(selectedDate, () => {
-  updateChart()
   if (selectedDate.value) {
-    currentDate.value = new Date(selectedDate.value).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    currentDate.value = formatDateForDisplay(selectedDate.value)
+    loadHeartRateData()
   }
 })
 
 const onDateChange = () => {
-  updateChart()
   if (selectedDate.value) {
-    currentDate.value = new Date(selectedDate.value).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    currentDate.value = formatDateForDisplay(selectedDate.value)
+    loadHeartRateData()
   }
 }
 
@@ -486,13 +486,24 @@ const changeDate = (days) => {
 const previousDate = () => changeDate(-1)
 const nextDate = () => changeDate(1)
 
+const initHeartRateData = async () => {
+  const hasData = await loadAvailableDates()
+  if (hasData) {
+    await loadHeartRateData()
+  }
+}
+
 onMounted(() => {
-  parseCSVData()
+  initHeartRateData()
   loadBMIData()
   window.addEventListener('bmiDataUpdated', loadBMIData)
+  window.addEventListener('heartRateDataUpdated', initHeartRateData)
 })
 
-onUnmounted(() => window.removeEventListener('bmiDataUpdated', loadBMIData))
+onUnmounted(() => {
+  window.removeEventListener('bmiDataUpdated', loadBMIData)
+  window.removeEventListener('heartRateDataUpdated', initHeartRateData)
+})
 </script>
 
 <style scoped>
