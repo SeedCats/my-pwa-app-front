@@ -232,6 +232,9 @@ import {
 // Initialize router and route for active state checking
 const router = useRouter()
 const route = useRoute()
+const { isDarkMode, themeClasses } = useTheme()
+
+const emit = defineEmits(['update:sidebarState'])
 
 const navigation = [
     { name: 'DashBoard', to: '/home', icon: HomeIcon },
@@ -240,76 +243,39 @@ const navigation = [
     { name: 'Manual Support', to: '/manual-support', icon: HomeIcon },
 ]
 
-// Sidebar state management
+// State
 const sidebarOpen = ref(false)
 const isDesktopSidebarHidden = ref(false)
-
-// User data
 const userData = ref(null)
 
-const emit = defineEmits(['update:sidebarState'])
+const userName = computed(() => userData.value?.name || 'User')
 
-// Theme integration
-const { isDarkMode, themeClasses } = useTheme()
+const isActiveRoute = (path) => route.path === path
 
-// Computed property to get user name
-const userName = computed(() => {
-    if (userData.value && userData.value.name) {
-        return userData.value.name
-    }
-    try {
-        const storedUser = localStorage.getItem('user')
-        if (storedUser) {
-            const user = JSON.parse(storedUser)
-            return user.name || 'User'
-        }
-    } catch (error) {
-        console.error('Error parsing user data in computed:', error)
-    }
-    return 'User'
-})
-
-// Active route checking
-const isActiveRoute = (path) => {
-    return route.path === path
-}
-
-// Desktop sidebar functions
-function toggleDesktopSidebar() {
+const toggleDesktopSidebar = () => {
     isDesktopSidebarHidden.value = !isDesktopSidebarHidden.value
     emit('update:sidebarState', isDesktopSidebarHidden.value)
 }
 
-// Log out function
-async function handleLogOut() {
+const handleLogOut = async () => {
     try {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        localStorage.removeItem('remember_me')
-        router.push('/')
-    } catch (error) {
-        console.error('Logout error:', error)
-        router.push('/')
-    }
+        await fetch('/api/logout', { method: 'POST', credentials: 'include' })
+    } catch { /* ignore */ }
+    router.push('/')
 }
 
-// Load user data on component mount
-onMounted(() => {
+const loadUserData = async () => {
     try {
-        const storedUser = localStorage.getItem('user')
-        if (storedUser) {
-            userData.value = JSON.parse(storedUser)
-            console.log('Initial user data loaded:', userData.value)
+        const res = await fetch('/api/user/me', { credentials: 'include' })
+        if (res.ok) {
+            const json = await res.json()
+            userData.value = json.data?.user || json.data || json.user || json
         }
-    } catch (error) {
-        console.error('Error parsing user data:', error)
-        userData.value = null
-    }
+    } catch { userData.value = null }
+}
 
-    // Listen for user data updates
-    window.addEventListener('userUpdated', (event) => {
-        userData.value = event.detail
-        console.log('User data updated in sidebar:', event.detail)
-    })
+onMounted(() => {
+    loadUserData()
+    window.addEventListener('userUpdated', (e) => userData.value = e.detail)
 })
 </script>

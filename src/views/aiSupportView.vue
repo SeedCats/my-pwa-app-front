@@ -20,5 +20,9 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import Sidebar from '../components/Side_and_Top_Bar.vue'
+
+const sidebarHidden = ref(false)
+const updateSidebarState = (state) => sidebarHidden.value = state
 </script>

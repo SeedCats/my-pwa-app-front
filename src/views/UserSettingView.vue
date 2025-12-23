@@ -231,133 +231,82 @@ import { useTheme } from '../composables/useTheme'
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 
 const router = useRouter()
-const sidebarHidden = ref(false)
-
-// Theme integration
 const { isDarkMode, themeClasses } = useTheme()
 
-// Form data
-const profileForm = ref({
-  name: '',
-  email: ''
-})
-
-const passwordForm = ref({
-  currentPassword: '',
-  newPassword: '',
-  confirmPassword: ''
-})
-
-// Loading states
+// State
+const sidebarHidden = ref(false)
+const profileForm = ref({ name: '', email: '' })
+const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
 const profileLoading = ref(false)
 const passwordLoading = ref(false)
 const deleteLoading = ref(false)
-
-// Messages
 const successMessage = ref('')
 const errorMessage = ref('')
-
-// Delete functionality
 const showDeletePassword = ref(false)
 const deletePassword = ref('')
 
-// Load user data
-onMounted(() => {
+const loadUserData = async () => {
   try {
-    const userData = localStorage.getItem('user')
-    if (userData) {
-      const user = JSON.parse(userData)
-      profileForm.value.name = user.name || ''
-      profileForm.value.email = user.email || ''
+    const res = await fetch('/api/user/me', { credentials: 'include' })
+    if (res.ok) {
+      const data = await res.json()
+      const user = data.data || data.user || data
+      profileForm.value = { name: user.name || '', email: user.email || '' }
     }
-  } catch (error) {
-    console.error('Error loading user data:', error)
-  }
-})
-
-const updateSidebarState = (state) => {
-  sidebarHidden.value = state
+  } catch { /* ignore */ }
 }
 
-const clearMessages = () => {
-  successMessage.value = ''
-  errorMessage.value = ''
-  console.log('Messages cleared')
-}
+onMounted(loadUserData)
 
-// Update profile
+const updateSidebarState = (state) => sidebarHidden.value = state
+const clearMessages = () => { successMessage.value = ''; errorMessage.value = '' }
+const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
+
 const updateProfile = async () => {
   clearMessages()
   profileLoading.value = true
   
   try {
-    const token = localStorage.getItem('token')
     const response = await fetch('/api/user/profile', {
       method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(profileForm.value)
     })
     
     const data = await response.json()
-    console.log('Update profile response:', data)
     
     if (response.ok && data.success) {
-      const updatedUser = data.data.user
-      
-      localStorage.setItem('user', JSON.stringify(updatedUser))
-      
-      window.dispatchEvent(new CustomEvent('userUpdated', { 
-        detail: updatedUser 
-      }))
-      
+      window.dispatchEvent(new CustomEvent('userUpdated', { detail: data.data.user }))
       successMessage.value = data.message || 'Profile updated successfully!'
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      
-      console.log('Updated user data:', updatedUser)
-      console.log('Profile success message set:', successMessage.value)
     } else {
       errorMessage.value = data.message || 'Failed to update profile'
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      
-      console.log('Profile error message set:', errorMessage.value)
     }
-  } catch (error) {
-    console.error('Profile update error:', error)
+    scrollToTop()
+  } catch {
     errorMessage.value = 'Network error. Please try again.'
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    scrollToTop()
   } finally {
     profileLoading.value = false
   }
 }
 
-// Update password
 const updatePassword = async () => {
   clearMessages()
   
   if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
     errorMessage.value = 'New passwords do not match'
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    
+    scrollToTop()
     return
   }
   
   passwordLoading.value = true
   
   try {
-    const token = localStorage.getItem('token')
     const response = await fetch('/api/user/password', {
       method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
         currentPassword: passwordForm.value.currentPassword,
         newPassword: passwordForm.value.newPassword
@@ -368,93 +317,52 @@ const updatePassword = async () => {
     
     if (response.ok && data.success) {
       successMessage.value = 'Password updated successfully!'
-      passwordForm.value = {
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      }
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      
-      console.log('Password success message set:', successMessage.value)
+      passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
     } else {
       errorMessage.value = data.message || 'Failed to update password'
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      
-      console.log('Password error message set:', errorMessage.value)
     }
-  } catch (error) {
-    console.error('Password update error:', error)
+    scrollToTop()
+  } catch {
     errorMessage.value = 'Network error. Please try again.'
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    scrollToTop()
   } finally {
     passwordLoading.value = false
   }
 }
 
-// Delete account
 const deleteAccount = async () => {
   deleteLoading.value = true
   
   try {
-    const token = localStorage.getItem('token')
     const response = await fetch('/api/user/delete', {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        password: deletePassword.value
-      })
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ password: deletePassword.value })
     })
     
     const data = await response.json()
-    console.log('Delete account response:', data)
     
     if (response.ok && data.success) {
       errorMessage.value = ''
-      
       successMessage.value = data.message || 'Account deleted successfully!'
-      
       showDeletePassword.value = false
       deletePassword.value = ''
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      
-      console.log('Success message set:', successMessage.value)
-      
-      setTimeout(() => {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        localStorage.removeItem('remember_me')
-        
-        router.push('/')
-      }, 3000)
-      
+      scrollToTop()
+      setTimeout(() => router.push('/'), 3000)
     } else {
       successMessage.value = ''
-      
       errorMessage.value = data.message || 'Failed to delete account'
       showDeletePassword.value = false
       deletePassword.value = ''
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      
-      console.log('Error message set:', errorMessage.value)
+      scrollToTop()
     }
-  } catch (error) {
-    console.error('Account deletion error:', error)
-    
+  } catch {
     successMessage.value = ''
-    
     errorMessage.value = 'Network error. Please try again.'
     showDeletePassword.value = false
     deletePassword.value = ''
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    scrollToTop()
   } finally {
     deleteLoading.value = false
   }

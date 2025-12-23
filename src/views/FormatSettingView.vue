@@ -127,11 +127,6 @@ import { useTheme } from '../composables/useTheme'
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 
 const sidebarHidden = ref(false)
-
-// Theme integration
 const { isDarkMode, autoTheme, themeClasses, setTheme, toggleAutoTheme } = useTheme()
-
-const updateSidebarState = (state) => {
-  sidebarHidden.value = state
-}
+const updateSidebarState = (state) => sidebarHidden.value = state
 </script>

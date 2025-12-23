@@ -1,13 +1,11 @@
 <template>
-    <div :class="themeClasses.background">
-        <div class="min-h-screen" :class="themeClasses.background">
-            <Sidebar @update:sidebarState="updateSidebarState" />
-            <div :class="[
-                'transition-all duration-300 ease-in-out pt-16',
-                sidebarHidden ? 'lg:ml-0' : 'lg:ml-72'
-            ]">
-                <main>
-                    <div class="px-3 sm:px-4 md:px-6 lg:px-8 pb-6">
+    <div class="min-h-screen" :class="themeClasses.background">
+        <Sidebar @update:sidebarState="updateSidebarState" />
+        <div :class="[
+            'transition-all duration-300 ease-in-out pt-16',
+            sidebarHidden ? 'lg:ml-0' : 'lg:ml-72'
+        ]">
+            <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-6">
                         <!-- Header -->
                         <div class="mb-4 pt-4">
                             <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">Data Setting</h1>
@@ -181,9 +179,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </main>
-            </div>
+            </main>
         </div>
     </div>
 </template>
@@ -194,79 +190,65 @@ import { useTheme } from '../composables/useTheme'
 import { ref, computed, onMounted } from 'vue'
 import { saveBMIData, getLatestBMIRecord, updateBMIRecord } from '../services/bmiService'
 
-const sidebarHidden = ref(false)
 const { isDarkMode, themeClasses } = useTheme()
 
-// BMI Form State
-const bmiForm = ref({
-    age: '',
-    sex: '',
-    height: '',
-    weight: ''
-})
-
-// Existing BMI record (if any)
+// State
+const sidebarHidden = ref(false)
+const bmiForm = ref({ age: '', height: '', weight: '' })
 const existingBMIRecord = ref(null)
-
-// Loading and status states
 const isLoading = ref(false)
 const isLoadingData = ref(false)
-const submitStatus = ref(null) // { type: 'success' | 'error', message: string }
-
-// Check if we're in update mode (has existing record with _id or id)
-const isUpdateMode = computed(() => !!(existingBMIRecord.value?._id || existingBMIRecord.value?.id))
-
-// File Upload State
+const submitStatus = ref(null)
 const fileInput = ref(null)
 const selectedFile = ref(null)
 const isDragging = ref(false)
 const uploadStatus = ref(null)
 
-// Calculate BMI
+// Computed
+const isUpdateMode = computed(() => !!(existingBMIRecord.value?._id || existingBMIRecord.value?.id))
+
 const calculatedBMI = computed(() => {
-    if (!bmiForm.value.height || !bmiForm.value.weight) return null
-    const height = parseFloat(bmiForm.value.height) / 100
-    const weight = parseFloat(bmiForm.value.weight)
-    if (height <= 0 || weight <= 0) return null
-    return (weight / (height * height)).toFixed(1)
+    const { height, weight } = bmiForm.value
+    if (!height || !weight) return null
+    const h = parseFloat(height) / 100, w = parseFloat(weight)
+    return (h > 0 && w > 0) ? (w / (h * h)).toFixed(1) : null
 })
 
-// Get BMI Category
 const bmiCategory = computed(() => {
-    if (!calculatedBMI.value) return ''
     const bmi = parseFloat(calculatedBMI.value)
+    if (!bmi) return ''
     if (bmi < 18.5) return 'Underweight'
     if (bmi < 25) return 'Normal'
     if (bmi < 30) return 'Overweight'
     return 'Obese'
 })
 
-// Get BMI Category Color
 const bmiCategoryColor = computed(() => {
-    if (!calculatedBMI.value) return ''
     const bmi = parseFloat(calculatedBMI.value)
-    if (bmi < 18.5) return isDarkMode.value ? 'text-blue-400' : 'text-blue-600'
-    if (bmi < 25) return isDarkMode.value ? 'text-green-400' : 'text-green-600'
-    if (bmi < 30) return isDarkMode.value ? 'text-yellow-400' : 'text-yellow-600'
-    return isDarkMode.value ? 'text-red-400' : 'text-red-600'
+    if (!bmi) return ''
+    const colors = {
+        underweight: ['text-blue-400', 'text-blue-600'],
+        normal: ['text-green-400', 'text-green-600'],
+        overweight: ['text-yellow-400', 'text-yellow-600'],
+        obese: ['text-red-400', 'text-red-600']
+    }
+    const key = bmi < 18.5 ? 'underweight' : bmi < 25 ? 'normal' : bmi < 30 ? 'overweight' : 'obese'
+    return isDarkMode.value ? colors[key][0] : colors[key][1]
 })
 
-// Sidebar state update
-const updateSidebarState = (state) => {
-    sidebarHidden.value = state
-}
+const updateSidebarState = (state) => sidebarHidden.value = state
 
-// Load existing BMI data on mount
 const loadExistingBMIData = async () => {
     isLoadingData.value = true
     try {
-        const response = await getLatestBMIRecord()
-        if (response.success && response.data) {
-            existingBMIRecord.value = response.data
-            // Pre-fill the form with existing data
-            bmiForm.value.height = response.data.height?.toString() || ''
-            bmiForm.value.weight = response.data.weight?.toString() || ''
-            bmiForm.value.age = response.data.age?.toString() || ''
+        const { success, data } = await getLatestBMIRecord()
+        if (success && data) {
+            existingBMIRecord.value = data
+            bmiForm.value = {
+                height: data.height?.toString() || '',
+                weight: data.weight?.toString() || '',
+                age: data.age?.toString() || ''
+            }
         }
     } catch (error) {
         console.log('No existing BMI data found:', error.message)
@@ -275,169 +257,107 @@ const loadExistingBMIData = async () => {
     }
 }
 
-// BMI Submit - Creates new or updates existing record
 const submitBMIData = async () => {
     if (!bmiForm.value.height || !bmiForm.value.weight) {
-        submitStatus.value = {
-            type: 'error',
-            message: 'Please fill in height and weight'
-        }
+        submitStatus.value = { type: 'error', message: 'Please fill in height and weight' }
         return
     }
     
     isLoading.value = true
     submitStatus.value = null
     
+    const ageValue = bmiForm.value.age ? parseInt(bmiForm.value.age, 10) : null
+    
+    const bmiData = {
+        weight: parseFloat(bmiForm.value.weight),
+        height: parseFloat(bmiForm.value.height),
+        bmi: parseFloat(calculatedBMI.value),
+        category: bmiCategory.value,
+        age: ageValue
+    }
+    
+    console.log('Submitting BMI data:', bmiData)
+    
     try {
-        const bmiData = {
-            weight: parseFloat(bmiForm.value.weight),
-            height: parseFloat(bmiForm.value.height),
-            bmi: parseFloat(calculatedBMI.value),
-            category: bmiCategory.value,
-            age: bmiForm.value.age || null
-        }
-        
-        let response
-        
-        if (isUpdateMode.value) {
-            // Update existing record - use _id or id
-            const recordId = existingBMIRecord.value._id || existingBMIRecord.value.id
-            console.log('Updating BMI record with ID:', recordId)
-            response = await updateBMIRecord(recordId, bmiData)
-        } else {
-            // Create new record
-            console.log('Creating new BMI record')
-            response = await saveBMIData(bmiData)
-        }
+        const recordId = existingBMIRecord.value?._id || existingBMIRecord.value?.id
+        const response = isUpdateMode.value 
+            ? await updateBMIRecord(recordId, bmiData) 
+            : await saveBMIData(bmiData)
         
         if (response.success) {
-            // Update the existing record reference with new data
-            // The response.data contains the saved/updated record
             if (response.data) {
-                // Handle both _id and id from response
-                existingBMIRecord.value = {
-                    ...response.data,
-                    _id: response.data._id || response.data.id
-                }
-                console.log('Updated existingBMIRecord:', existingBMIRecord.value)
+                existingBMIRecord.value = { ...response.data, _id: response.data._id || response.data.id }
             }
-            
             submitStatus.value = {
                 type: 'success',
-                message: isUpdateMode.value 
-                    ? 'BMI data updated successfully!' 
-                    : 'BMI data saved successfully!'
+                message: `BMI data ${isUpdateMode.value ? 'updated' : 'saved'} successfully!`
             }
-            
-            // Dispatch event to notify other components (like HomeView)
             window.dispatchEvent(new CustomEvent('bmiDataUpdated'))
         } else {
-            submitStatus.value = {
-                type: 'error',
-                message: response.message || 'Failed to save BMI data'
-            }
+            submitStatus.value = { type: 'error', message: response.message || 'Failed to save BMI data' }
         }
     } catch (error) {
         console.error('BMI submission error:', error)
-        submitStatus.value = {
-            type: 'error',
-            message: error.message || 'Failed to save BMI data. Please try again.'
-        }
+        submitStatus.value = { type: 'error', message: error.message || 'Failed to save BMI data. Please try again.' }
     } finally {
         isLoading.value = false
-        
-        // Auto-hide success message after 3 seconds
         if (submitStatus.value?.type === 'success') {
-            setTimeout(() => {
-                submitStatus.value = null
-            }, 3000)
+            setTimeout(() => submitStatus.value = null, 3000)
         }
     }
 }
 
-// Initialize on mount
-onMounted(() => {
-    loadExistingBMIData()
-})
+onMounted(loadExistingBMIData)
 
 // File Upload Handlers
-const triggerFileInput = () => {
-    fileInput.value.click()
-}
+const triggerFileInput = () => fileInput.value.click()
 
-const handleFileSelect = (event) => {
-    const file = event.target.files[0]
-    if (file && file.type === 'text/csv') {
+const validateAndSetFile = (file, errorMsg) => {
+    if (file?.type === 'text/csv') {
         selectedFile.value = file
         uploadStatus.value = null
     } else if (file) {
-        uploadStatus.value = { 
-            type: 'error', 
-            message: 'Please select a valid CSV file' 
-        }
+        uploadStatus.value = { type: 'error', message: errorMsg }
     }
 }
 
-const handleFileDrop = (event) => {
+const handleFileSelect = (e) => validateAndSetFile(e.target.files[0], 'Please select a valid CSV file')
+
+const handleFileDrop = (e) => {
     isDragging.value = false
-    const file = event.dataTransfer.files[0]
-    if (file && file.type === 'text/csv') {
-        selectedFile.value = file
-        uploadStatus.value = null
-    } else if (file) {
-        uploadStatus.value = { 
-            type: 'error', 
-            message: 'Please drop a valid CSV file' 
-        }
-    }
+    validateAndSetFile(e.dataTransfer.files[0], 'Please drop a valid CSV file')
 }
 
 const clearFile = () => {
     selectedFile.value = null
     uploadStatus.value = null
-    if (fileInput.value) {
-        fileInput.value.value = ''
-    }
+    if (fileInput.value) fileInput.value.value = ''
 }
 
 const submitFileUpload = async () => {
     if (!selectedFile.value) {
-        uploadStatus.value = { 
-            type: 'error', 
-            message: 'No file selected' 
-        }
+        uploadStatus.value = { type: 'error', message: 'No file selected' }
         return
     }
-
     try {
-        // Simulate file upload
-        console.log('Uploading file:', selectedFile.value.name)
-        uploadStatus.value = { 
-            type: 'success', 
-            message: `Successfully uploaded ${selectedFile.value.name}` 
-        }
-        selectedFile.value = null
-        if (fileInput.value) {
-            fileInput.value.value = ''
-        }
-    } catch (error) {
-        uploadStatus.value = { 
-            type: 'error', 
-            message: 'Upload failed. Please try again.' 
-        }
+        uploadStatus.value = { type: 'success', message: `Successfully uploaded ${selectedFile.value.name}` }
+        clearFile()
+    } catch {
+        uploadStatus.value = { type: 'error', message: 'Upload failed. Please try again.' }
     }
 }
 </script>
 
 <style scoped>
-/* Hide number input spinners */
 .no-spinner::-webkit-outer-spin-button,
 .no-spinner::-webkit-inner-spin-button {
     -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
 
 .no-spinner {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 </style>

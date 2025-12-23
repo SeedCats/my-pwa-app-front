@@ -1,13 +1,11 @@
 <template>
-  <div :class="themeClasses.background">
-    <div class="min-h-full" :class="themeClasses.background">
-      <Sidebar @update:sidebarState="updateSidebarState" />
-      <div :class="[
-        'transition-all duration-300 ease-in-out pt-16',
-        sidebarHidden ? 'lg:ml-0' : 'lg:ml-72'
-      ]">
-        <main>
-          <div class="px-3 sm:px-4 md:px-6 lg:px-6 pb-4">
+  <div class="min-h-full" :class="themeClasses.background">
+    <Sidebar @update:sidebarState="updateSidebarState" />
+    <div :class="[
+      'transition-all duration-300 ease-in-out pt-16',
+      sidebarHidden ? 'lg:ml-0' : 'lg:ml-72'
+    ]">
+      <main class="px-3 sm:px-4 md:px-6 lg:px-6 pb-4">
 
             <!-- BMI Information Section -->
             <div class="mb-8 pt-4">
@@ -246,9 +244,7 @@
                 </div>
               </router-link>
             </div>
-          </div>
         </main>
-      </div>
     </div>
   </div>
 </template>
@@ -263,93 +259,51 @@ import { getLatestBMIRecord } from '../services/bmiService'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler)
 
-const sidebarHidden = ref(false)
 const { isDarkMode, themeClasses } = useTheme()
+
+// State
+const sidebarHidden = ref(false)
 const heartRateData = ref([])
 const chartData = ref(null)
-const selectedDate = ref('') // Selected date in YYYY-MM-DD format
+const selectedDate = ref('')
 const currentDate = ref('')
-const stats = ref({
-  min: 0,
-  max: 0,
-  avg: 0,
-  resting: 0,
-})
-
-// BMI Data from API
-const bmiData = ref({
-  bmi: null,
-  category: '',
-  height: null,
-  weight: null,
-  age: null
-})
+const stats = ref({ min: 0, max: 0, avg: 0, resting: 0 })
+const bmiData = ref({ bmi: null, category: '', height: null, weight: null, age: null })
 const isBMILoading = ref(false)
 
-// Load BMI data from API
 const loadBMIData = async () => {
   isBMILoading.value = true
   try {
-    const response = await getLatestBMIRecord()
-    
-    if (response.success && response.data) {
-      bmiData.value = {
-        bmi: response.data.bmi,
-        category: response.data.category,
-        height: response.data.height,
-        weight: response.data.weight,
-        age: response.data.age || null,
-        createdAt: response.data.createdAt,
-        updatedAt: response.data.updatedAt
-      }
-    } else {
-      // No BMI data found
-      bmiData.value = {
-        bmi: null,
-        category: '',
-        height: null,
-        weight: null,
-        age: null
-      }
-    }
+    const { success, data } = await getLatestBMIRecord()
+    bmiData.value = success && data ? {
+      bmi: data.bmi,
+      category: data.category,
+      height: data.height,
+      weight: data.weight,
+      age: data.age || null,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt
+    } : { bmi: null, category: '', height: null, weight: null, age: null }
   } catch (error) {
     console.error('Failed to load BMI data:', error)
-    bmiData.value = {
-      bmi: null,
-      category: '',
-      height: null,
-      weight: null,
-      age: null
-    }
+    bmiData.value = { bmi: null, category: '', height: null, weight: null, age: null }
   } finally {
     isBMILoading.value = false
   }
 }
 
-// BMI Category styling
 const bmiCategoryStyle = computed(() => {
-  const category = bmiData.value.category
-  if (category === 'Underweight') return 'bg-blue-500'
-  if (category === 'Normal') return 'bg-green-500'
-  if (category === 'Overweight') return 'bg-yellow-500'
-  if (category === 'Obese') return 'bg-orange-500'
-  return 'bg-gray-500'
+  const styles = { Underweight: 'bg-blue-500', Normal: 'bg-green-500', Overweight: 'bg-yellow-500', Obese: 'bg-orange-500' }
+  return styles[bmiData.value.category] || 'bg-gray-500'
 })
 
-// BMI slider position (percentage)
 const bmiSliderPosition = computed(() => {
   const bmi = parseFloat(bmiData.value.bmi)
   if (!bmi) return 50
-  // Map BMI range 15-35 to 0-100%
-  const minBMI = 15
-  const maxBMI = 35
-  const position = ((bmi - minBMI) / (maxBMI - minBMI)) * 100
-  return Math.max(0, Math.min(100, position))
+  return Math.max(0, Math.min(100, ((bmi - 15) / 20) * 100))
 })
 
-const updateSidebarState = (state) => {
-  sidebarHidden.value = state
-}
+const updateSidebarState = (state) => sidebarHidden.value = state
 
 // Format date from CSV timestamp
 const formatDateFromTimestamp = (timestamp) => {
@@ -361,72 +315,33 @@ const formatDateFromTimestamp = (timestamp) => {
 // Parse CSV data
 const parseCSVData = async () => {
   try {
-    console.log('Loading heart rate data from CSV...')
-
     const response = await fetch('/heartRate.csv')
-    console.log('Fetch response status:', response.status)
+    if (!response.ok) return
 
-    if (!response.ok) {
-      console.error('Failed to fetch CSV:', response.statusText)
-      return
-    }
-
-    const csvText = await response.text()
-    console.log('CSV file size:', csvText.length, 'bytes')
-
-    const lines = csvText.split('\n')
-    console.log('Total lines:', lines.length)
-
+    const lines = (await response.text()).split('\n')
     const data = []
-    let parseCount = 0
-    let failCount = 0
 
-    // Parse all lines from CSV
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim()
       if (!line) continue
-
       try {
-        // Find the JSON object in the line
         const startIdx = line.indexOf('{')
         const endIdx = line.lastIndexOf('}')
-
         if (startIdx !== -1 && endIdx !== -1) {
-          let jsonStr = line.substring(startIdx, endIdx + 1)
-          // Unescape double quotes
-          jsonStr = jsonStr.replace(/""/g, '"')
-
-          const entry = JSON.parse(jsonStr)
-          if (entry.time && typeof entry.bpm === 'number') {
-            data.push(entry)
-            parseCount++
-          }
+          const entry = JSON.parse(line.substring(startIdx, endIdx + 1).replace(/""/g, '"'))
+          if (entry.time && typeof entry.bpm === 'number') data.push(entry)
         }
-      } catch (e) {
-        failCount++
-      }
+      } catch { /* skip invalid lines */ }
     }
 
-    console.log('Parsed CSV: ', parseCount, 'records, Failed:', failCount)
-
-    if (data.length === 0) {
-      console.error('No data parsed from CSV!')
-      return
-    }
+    if (!data.length) return
 
     data.sort((a, b) => a.time - b.time)
     heartRateData.value = data
 
-    console.log('Data loaded successfully')
-    console.log('First entry:', heartRateData.value[0])
-    console.log('Last entry:', heartRateData.value[heartRateData.value.length - 1])
-
-    // Set date from first data point
     if (data.length > 0) {
       currentDate.value = formatDateFromTimestamp(data[0].time)
-      // Initialize selectedDate to first data point date
-      const firstDate = new Date(data[0].time * 1000)
-      selectedDate.value = firstDate.toISOString().split('T')[0]
+      selectedDate.value = new Date(data[0].time * 1000).toISOString().split('T')[0]
     }
     updateChart()
   } catch (error) {
@@ -434,32 +349,15 @@ const parseCSVData = async () => {
   }
 }
 
-// Filter data for selected date
 const getFilteredData = () => {
-  if (heartRateData.value.length === 0 || !selectedDate.value) return []
-
-  const selectedDateObj = new Date(selectedDate.value)
-  const selectedDateStart = selectedDateObj.getTime() / 1000
-  const selectedDateEnd = selectedDateStart + 86400 // 24 hours later
-
-  return heartRateData.value.filter(d => d.time >= selectedDateStart && d.time < selectedDateEnd)
+  if (!heartRateData.value.length || !selectedDate.value) return []
+  const start = new Date(selectedDate.value).getTime() / 1000
+  return heartRateData.value.filter(d => d.time >= start && d.time < start + 86400)
 }
 
-// Calculate statistics
 const calculateStats = (data) => {
-  if (data.length === 0) {
-    stats.value = {
-      min: 0,
-      max: 0,
-      avg: 0,
-      resting: 0,
-      normal: 0,
-      elevated: 0,
-      high: 0,
-      normalDuration: '0h 0m',
-      elevatedDuration: '0h 0m',
-      highDuration: '0h 0m'
-    }
+  if (!data.length) {
+    stats.value = { min: 0, max: 0, avg: 0, resting: 0, normal: 0, elevated: 0, high: 0, normalDuration: '0h 0m', elevatedDuration: '0h 0m', highDuration: '0h 0m' }
     return
   }
 
@@ -468,119 +366,61 @@ const calculateStats = (data) => {
   const max = Math.max(...bpms)
   const avg = Math.round(bpms.reduce((a, b) => a + b, 0) / bpms.length)
 
-  // Count categories
-  let normalCount = 0
-  let elevatedCount = 0
-  let highCount = 0
-
-  bpms.forEach(bpm => {
-    if (bpm <= 100) normalCount++
-    else if (bpm <= 120) elevatedCount++
-    else highCount++
-  })
+  let normalCount = 0, elevatedCount = 0, highCount = 0
+  bpms.forEach(bpm => bpm <= 100 ? normalCount++ : bpm <= 120 ? elevatedCount++ : highCount++)
 
   const total = bpms.length
-  const normalPct = Math.round((normalCount / total) * 100)
-  const elevatedPct = Math.round((elevatedCount / total) * 100)
-  const highPct = Math.round((highCount / total) * 100)
-
-  // Estimate duration (assuming one measurement per ~5 minutes)
-  const measurementInterval = 5 * 60 // 5 minutes in seconds
-  const normalMinutes = normalCount * measurementInterval / 60
-  const elevatedMinutes = elevatedCount * measurementInterval / 60
-  const highMinutes = highCount * measurementInterval / 60
-
-  const formatDuration = (minutes) => {
-    const hours = Math.floor(minutes / 60)
-    const mins = Math.round(minutes % 60)
-    return `${hours}h ${mins}m`
+  const formatDuration = (count) => {
+    const mins = count * 5
+    return `${Math.floor(mins / 60)}h ${mins % 60}m`
   }
 
   stats.value = {
-    min,
-    max,
-    avg,
-    resting: Math.round(min * 0.95), // Estimate resting as ~95% of min
-    normal: normalPct,
-    elevated: elevatedPct,
-    high: highPct,
-    normalDuration: formatDuration(normalMinutes),
-    elevatedDuration: formatDuration(elevatedMinutes),
-    highDuration: formatDuration(highMinutes)
+    min, max, avg,
+    resting: Math.round(min * 0.95),
+    normal: Math.round((normalCount / total) * 100),
+    elevated: Math.round((elevatedCount / total) * 100),
+    high: Math.round((highCount / total) * 100),
+    normalDuration: formatDuration(normalCount),
+    elevatedDuration: formatDuration(elevatedCount),
+    highDuration: formatDuration(highCount)
   }
 }
 
-// Update chart
 const updateChart = () => {
   const filtered = getFilteredData()
   calculateStats(filtered)
 
-  if (filtered.length === 0) {
-    console.warn('No filtered data available')
+  if (!filtered.length) {
     chartData.value = null
     return
   }
 
-  console.log('Filtered data count:', filtered.length)
-
-  // Group data by hour for 24-hour view (0:00 to 23:00)
-  let labels = []
-  let dataPoints = []
-
-  const hourlyData = {}
-
-  // Initialize all 24 hours
-  for (let h = 0; h < 24; h++) {
-    hourlyData[h] = []
-  }
-
-  // Group data by hour
-  filtered.forEach(d => {
-    const date = new Date(d.time * 1000)
-    const hour = date.getHours()
-    hourlyData[hour].push(d.bpm)
-  })
-
-  // Create labels and data points for all 24 hours
-  for (let h = 0; h < 24; h++) {
-    labels.push(`${h.toString().padStart(2, '0')}:00`)
-    if (hourlyData[h].length > 0) {
-      const avgBpm = Math.round(hourlyData[h].reduce((a, b) => a + b, 0) / hourlyData[h].length)
-      dataPoints.push(avgBpm)
-    } else {
-      dataPoints.push(null) // Show as gap if no data for that hour
-    }
-  }
-
-  console.log('Chart labels:', labels.length, 'dataPoints:', dataPoints.length)
+  const hourlyData = Array.from({ length: 24 }, () => [])
+  filtered.forEach(d => hourlyData[new Date(d.time * 1000).getHours()].push(d.bpm))
 
   chartData.value = {
-    labels,
-    datasets: [
-      {
-        label: 'Heart Rate (bpm)',
-        data: dataPoints,
-        borderColor: '#ef4444',
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointRadius: 3,
-        pointBackgroundColor: '#ef4444',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointHoverRadius: 5
-      }
-    ]
+    labels: Array.from({ length: 24 }, (_, h) => `${h.toString().padStart(2, '0')}:00`),
+    datasets: [{
+      label: 'Heart Rate (bpm)',
+      data: hourlyData.map(h => h.length ? Math.round(h.reduce((a, b) => a + b, 0) / h.length) : null),
+      borderColor: '#ef4444',
+      backgroundColor: 'rgba(239, 68, 68, 0.1)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 3,
+      pointBackgroundColor: '#ef4444',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointHoverRadius: 5
+    }]
   }
 }
 
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
-  interaction: {
-    mode: 'index',
-    intersect: false
-  },
+  interaction: { mode: 'index', intersect: false },
   plugins: {
     legend: {
       display: true,
@@ -588,10 +428,7 @@ const chartOptions = computed(() => ({
         color: isDarkMode.value ? '#9ca3af' : '#6b7280',
         usePointStyle: true,
         padding: 20,
-        font: {
-          size: 12,
-          weight: 'bold'
-        }
+        font: { size: 12, weight: 'bold' }
       }
     },
     tooltip: {
@@ -602,16 +439,10 @@ const chartOptions = computed(() => ({
       borderWidth: 1,
       padding: 12,
       displayColors: true,
-      titleFont: {
-        size: 14
-      },
-      bodyFont: {
-        size: 14
-      },
+      titleFont: { size: 14 },
+      bodyFont: { size: 14 },
       callbacks: {
-        label: function (context) {
-          return context.parsed.y ? `${context.parsed.y} bpm` : 'No data'
-        }
+        label: (ctx) => ctx.parsed.y ? `${ctx.parsed.y} bpm` : 'No data'
       }
     }
   },
@@ -620,81 +451,48 @@ const chartOptions = computed(() => ({
       beginAtZero: false,
       min: 40,
       max: 140,
-      ticks: {
-        color: isDarkMode.value ? '#9ca3af' : '#6b7280',
-        font: {
-          size: 14
-        },
-        callback: function (value) {
-          return value
-        }
-      },
-      grid: {
-        color: isDarkMode.value ? '#374151' : '#e5e7eb',
-        drawBorder: false
-      }
+      ticks: { color: isDarkMode.value ? '#9ca3af' : '#6b7280', font: { size: 14 } },
+      grid: { color: isDarkMode.value ? '#374151' : '#e5e7eb', drawBorder: false }
     },
     x: {
-      ticks: {
-        color: isDarkMode.value ? '#9ca3af' : '#6b7280'
-      },
-      grid: {
-        display: false,
-        drawBorder: false
-      }
+      ticks: { color: isDarkMode.value ? '#9ca3af' : '#6b7280' },
+      grid: { display: false, drawBorder: false }
     }
   }
 }))
 
-watch(isDarkMode, () => {
-  updateChart()
-}, { deep: true })
+watch(isDarkMode, updateChart, { deep: true })
 
 watch(selectedDate, () => {
   updateChart()
   if (selectedDate.value) {
-    const date = new Date(selectedDate.value)
-    currentDate.value = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    currentDate.value = new Date(selectedDate.value).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
   }
 })
 
 const onDateChange = () => {
   updateChart()
   if (selectedDate.value) {
-    const date = new Date(selectedDate.value)
-    currentDate.value = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    currentDate.value = new Date(selectedDate.value).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
   }
 }
 
-const previousDate = () => {
+const changeDate = (days) => {
   const date = new Date(selectedDate.value)
-  date.setDate(date.getDate() - 1)
+  date.setDate(date.getDate() + days)
   selectedDate.value = date.toISOString().split('T')[0]
 }
 
-const nextDate = () => {
-  const date = new Date(selectedDate.value)
-  date.setDate(date.getDate() + 1)
-  selectedDate.value = date.toISOString().split('T')[0]
-}
-
-// Handler for BMI data updates from other components
-const handleBMIUpdate = () => {
-  loadBMIData()
-}
+const previousDate = () => changeDate(-1)
+const nextDate = () => changeDate(1)
 
 onMounted(() => {
   parseCSVData()
   loadBMIData()
-  
-  // Listen for BMI updates from DataSettingView
-  window.addEventListener('bmiDataUpdated', handleBMIUpdate)
+  window.addEventListener('bmiDataUpdated', loadBMIData)
 })
 
-onUnmounted(() => {
-  // Clean up event listener
-  window.removeEventListener('bmiDataUpdated', handleBMIUpdate)
-})
+onUnmounted(() => window.removeEventListener('bmiDataUpdated', loadBMIData))
 </script>
 
 <style scoped>

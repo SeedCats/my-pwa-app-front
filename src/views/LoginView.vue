@@ -119,99 +119,57 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useTheme } from '../composables/useTheme'
 
 const router = useRouter()
 
-// Check if user is already logged in on component mount
-onMounted(() => {
-  const token = localStorage.getItem('token')
-  const user = localStorage.getItem('user')
-
-  if (token && user) {
-    // User is already logged in, redirect to home
-    router.push('/home')
-  }
+// Check if already authenticated via API
+onMounted(async () => {
+  try {
+    const res = await fetch('/api/user/me', { credentials: 'include' })
+    if (res.ok) router.push('/home')
+  } catch { /* not authenticated */ }
 })
 
-// Reactive data
+// State
 const loading = ref(false)
 const error = ref('')
 const success = ref('')
+const loginForm = ref({ email: '', password: '', remember: false })
 
-// Form data
-const loginForm = ref({
-  email: '',
-  password: '',
-  remember: false
-})
-
-// Login function that handles API request with detailed status logging
 async function handleLogin() {
-  // Clear previous messages
   error.value = ''
   success.value = ''
   loading.value = true
 
-  // Clear any existing auth data
-  localStorage.removeItem('token')
-  localStorage.removeItem('user')
-  localStorage.removeItem('remember_me')
-
   try {
-    // Make API request to backend
     const response = await fetch('/api/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(loginForm.value),
     })
 
-    let responseData
-    try {
-      responseData = await response.json()
-    } catch (parseError) {
-      console.error('Failed to parse JSON response:', parseError)
+    const data = await response.json().catch(() => null)
+    if (!data) {
       error.value = 'Invalid response from server'
       return
     }
 
-    if (response.ok && responseData.success) {
-      success.value = responseData.message || 'Login successful! Redirecting...'
-
-      localStorage.setItem('token', responseData.data.token)
-      localStorage.setItem('user', JSON.stringify(responseData.data.user))
-      localStorage.setItem('remember_me', 'true')
-
-
-      // Redirect to home page after a short delay
-      setTimeout(() => {
-        router.push('/home')
-      }, 1000)
-
+    if (response.ok && data.success) {
+      success.value = data.message || 'Login successful! Redirecting...'
+      setTimeout(() => router.push('/home'), 1000)
     } else {
-      // Login failed
-      error.value = responseData.message || 'Login failed. Please check your credentials.'
+      error.value = data.message || 'Login failed. Please check your credentials.'
     }
-
   } catch (err) {
     console.error('Login error:', err)
-
-    // Handle different types of network errors
-    if (err.name === 'TypeError' && err.message.includes('fetch')) {
-      error.value = 'Cannot connect to server. Please check your internet connection.'
-    } else if (err.name === 'AbortError') {
-      error.value = 'Request timeout. Please try again.'
-    } else {
-      error.value = 'Network error. Please check your connection and try again.'
-    }
+    error.value = err.name === 'TypeError' && err.message.includes('fetch')
+      ? 'Cannot connect to server. Please check your internet connection.'
+      : 'Network error. Please check your connection and try again.'
   } finally {
     loading.value = false
   }
 }
 
-function handleRegister() {
-  router.push('/register')
-}
+const handleRegister = () => router.push('/register')
 </script>

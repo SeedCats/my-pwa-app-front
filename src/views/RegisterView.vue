@@ -153,31 +153,19 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useTheme } from '../composables/useTheme'
 
 const router = useRouter()
 
-// Reactive data
+// State
 const loading = ref(false)
 const error = ref('')
 const success = ref('')
+const registerForm = ref({ name: '', email: '', password: '', confirmPassword: '', acceptTerms: false })
 
-// Form data
-const registerForm = ref({
-  name: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
-  acceptTerms: false
-})
-
-// Register function that handles API request
 async function handleRegister() {
-  // Clear previous messages
   error.value = ''
   success.value = ''
 
-  // Validate password match
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
     error.value = 'Password does not match'
     return
@@ -186,12 +174,9 @@ async function handleRegister() {
   loading.value = true
 
   try {
-    // Make API request to backend
     const response = await fetch('/api/user/register', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: registerForm.value.name,
         email: registerForm.value.email,
@@ -199,45 +184,27 @@ async function handleRegister() {
       }),
     })
 
-    let responseData
-    try {
-      responseData = await response.json()
-    } catch (parseError) {
-      console.error('Failed to parse JSON response:', parseError)
+    const data = await response.json().catch(() => null)
+    if (!data) {
       error.value = 'Invalid response from server'
       return
     }
 
-    if (response.ok && responseData.success) {
-      success.value = responseData.message || 'Account created successfully! Redirecting to login...'
-
-      // Redirect to login page after a short delay
-      setTimeout(() => {
-        router.push('/')
-      }, 2000)
-
+    if (response.ok && data.success) {
+      success.value = data.message || 'Account created successfully! Redirecting to login...'
+      setTimeout(() => router.push('/'), 2000)
     } else {
-      // Registration failed
-      error.value = responseData.message || 'Registration failed. Please try again.'
+      error.value = data.message || 'Registration failed. Please try again.'
     }
-
   } catch (err) {
     console.error('Registration error:', err)
-
-    // Handle different types of network errors
-    if (err.name === 'TypeError' && err.message.includes('fetch')) {
-      error.value = 'Cannot connect to server. Please check your internet connection.'
-    } else if (err.name === 'AbortError') {
-      error.value = 'Request timeout. Please try again.'
-    } else {
-      error.value = 'Network error. Please check your connection and try again.'
-    }
+    error.value = err.name === 'TypeError' && err.message.includes('fetch')
+      ? 'Cannot connect to server. Please check your internet connection.'
+      : 'Network error. Please check your connection and try again.'
   } finally {
     loading.value = false
   }
 }
 
-function handleLogin() {
-  router.push('/')
-}
+const handleLogin = () => router.push('/')
 </script>
