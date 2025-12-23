@@ -19,57 +19,86 @@
                   </div>
                 </div>
 
+                <!-- Loading State -->
+                <div v-if="isBMILoading" class="text-center py-8">
+                  <svg class="animate-spin h-8 w-8 mx-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <p :class="themeClasses.textSecondary" class="mt-2">Loading BMI data...</p>
+                </div>
+
+                <!-- No Data Message -->
+                <div v-else-if="!bmiData.bmi" class="text-center py-8">
+                  <p :class="themeClasses.textSecondary" class="mb-4">No BMI data available</p>
+                  <router-link to="/addData" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Add BMI Data
+                  </router-link>
+                </div>
+
                 <!-- BMI Value and Status -->
-                <div class="text-center mb-8">
-                  <div class="text-6xl font-bold mb-2" :class="themeClasses.textPrimary">24.5</div>
-                  <div class="inline-block bg-green-500 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4">Normal</div>
-                </div>
+                <div v-else>
+                  <div class="text-center mb-8">
+                    <div class="text-6xl font-bold mb-2" :class="themeClasses.textPrimary">{{ bmiData.bmi }}</div>
+                    <div class="inline-block text-white px-4 py-1 rounded-full text-sm font-semibold mb-4" :class="bmiCategoryStyle">{{ bmiData.category }}</div>
+                  </div>
 
-                <!-- BMI Slider -->
-                <div class="mb-8">
-                  <div class="relative h-2 bg-gradient-to-r from-blue-400 via-green-400 to-orange-500 rounded-full mb-2"></div>
-                  <div class="flex justify-between text-xs" :class="themeClasses.textSecondary">
-                    <span>18.5</span>
-                    <span>24.0</span>
-                    <span>29.0</span>
-                  </div>
-                </div>
-
-                <!-- BMI Categories -->
-                <div class="grid grid-cols-4 gap-2 mb-8 text-center text-xs">
-                  <div class="flex flex-col items-center">
-                    <div class="w-4 h-4 rounded-full bg-blue-400 mb-2"></div>
-                    <span :class="themeClasses.textSecondary">Underweight</span>
-                  </div>
-                  <div class="flex flex-col items-center">
-                    <div class="w-4 h-4 rounded-full bg-green-400 mb-2"></div>
-                    <span :class="themeClasses.textSecondary">Normal</span>
-                  </div>
-                  <div class="flex flex-col items-center">
-                    <div class="w-4 h-4 rounded-full bg-yellow-400 mb-2"></div>
-                    <span :class="themeClasses.textSecondary">Overweight</span>
-                  </div>
-                  <div class="flex flex-col items-center">
-                    <div class="w-4 h-4 rounded-full bg-orange-500 mb-2"></div>
-                    <span :class="themeClasses.textSecondary">Obese</span>
-                  </div>
-                </div>
-
-                <!-- Data Analysis Section -->
-                <div class="border-t pt-6" :class="themeClasses.border">
-                  <h4 class="text-lg font-semibold mb-6" :class="themeClasses.textPrimary">Data Analysis</h4>
-                  <div class="space-y-4">
-                    <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                      <span :class="themeClasses.textSecondary">Height (cm)</span>
-                      <span class="text-lg font-semibold" :class="themeClasses.textPrimary">--</span>
+                  <!-- BMI Slider -->
+                  <div class="mb-8">
+                    <div class="relative h-2 bg-gradient-to-r from-blue-400 via-green-400 via-yellow-400 to-orange-500 rounded-full mb-2">
+                      <!-- BMI Indicator -->
+                      <div 
+                        class="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-gray-800 rounded-full shadow-lg"
+                        :style="{ left: bmiSliderPosition + '%' }"
+                      ></div>
                     </div>
-                    <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                      <span :class="themeClasses.textSecondary">Weight (kg)</span>
-                      <span class="text-lg font-semibold" :class="themeClasses.textPrimary">--</span>
+                    <div class="flex justify-between text-xs" :class="themeClasses.textSecondary">
+                      <span>18.5</span>
+                      <span>24.0</span>
+                      <span>29.0</span>
                     </div>
-                    <div class="flex justify-between items-center">
-                      <span :class="themeClasses.textSecondary">BMI Range (kg/m²)</span>
-                      <span class="text-lg font-semibold" :class="themeClasses.textPrimary">18.5 - 24.9</span>
+                  </div>
+
+                  <!-- BMI Categories -->
+                  <div class="grid grid-cols-4 gap-2 mb-8 text-center text-xs">
+                    <div class="flex flex-col items-center">
+                      <div class="w-4 h-4 rounded-full bg-blue-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-blue-400': bmiData.category === 'Underweight' }"></div>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Underweight' }]">Underweight</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                      <div class="w-4 h-4 rounded-full bg-green-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-green-400': bmiData.category === 'Normal' }"></div>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Normal' }]">Normal</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                      <div class="w-4 h-4 rounded-full bg-yellow-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-yellow-400': bmiData.category === 'Overweight' }"></div>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Overweight' }]">Overweight</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                      <div class="w-4 h-4 rounded-full bg-orange-500 mb-2" :class="{ 'ring-2 ring-offset-2 ring-orange-500': bmiData.category === 'Obese' }"></div>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Obese' }]">Obese</span>
+                    </div>
+                  </div>
+
+                  <!-- Data Analysis Section -->
+                  <div class="border-t pt-6" :class="themeClasses.border">
+                    <h4 class="text-lg font-semibold mb-6" :class="themeClasses.textPrimary">Data Analysis</h4>
+                    <div class="space-y-4">
+                      <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
+                        <span :class="themeClasses.textSecondary">Age</span>
+                        <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.age || '--' }}</span>
+                      </div>
+                      <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
+                        <span :class="themeClasses.textSecondary">Height (cm)</span>
+                        <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.height || '--' }}</span>
+                      </div>
+                      <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
+                        <span :class="themeClasses.textSecondary">Weight (kg)</span>
+                        <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.weight || '--' }}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span :class="themeClasses.textSecondary">BMI Range (kg/m²)</span>
+                        <span class="text-lg font-semibold" :class="themeClasses.textPrimary">18.5 - 24.9</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -89,15 +118,15 @@
               <div class="flex justify-center gap-4 mb-4 items-center">
                 <button @click="previousDate" class="px-4 py-2 rounded-lg transition-colors"
                   :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
-                <input type="date" v-model="selectedDate" @change="onDateChange" class="px-4 py-2 rounded-lg border"
-                  :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']" />
+                <input type="date" v-model="selectedDate" @change="onDateChange" class="px-4 py-2 rounded-lg border date-picker-input"
+                  :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white dark-date-picker' : 'text-gray-800']" />
                 <button @click="nextDate" class="px-4 py-2 rounded-lg transition-colors"
                   :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                   </svg>
                 </button>
@@ -227,9 +256,10 @@
 <script setup>
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'vue-chartjs'
+import { getLatestBMIRecord } from '../services/bmiService'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler)
 
@@ -244,6 +274,77 @@ const stats = ref({
   max: 0,
   avg: 0,
   resting: 0,
+})
+
+// BMI Data from API
+const bmiData = ref({
+  bmi: null,
+  category: '',
+  height: null,
+  weight: null,
+  age: null
+})
+const isBMILoading = ref(false)
+
+// Load BMI data from API
+const loadBMIData = async () => {
+  isBMILoading.value = true
+  try {
+    const response = await getLatestBMIRecord()
+    
+    if (response.success && response.data) {
+      bmiData.value = {
+        bmi: response.data.bmi,
+        category: response.data.category,
+        height: response.data.height,
+        weight: response.data.weight,
+        age: response.data.age || null,
+        createdAt: response.data.createdAt,
+        updatedAt: response.data.updatedAt
+      }
+    } else {
+      // No BMI data found
+      bmiData.value = {
+        bmi: null,
+        category: '',
+        height: null,
+        weight: null,
+        age: null
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load BMI data:', error)
+    bmiData.value = {
+      bmi: null,
+      category: '',
+      height: null,
+      weight: null,
+      age: null
+    }
+  } finally {
+    isBMILoading.value = false
+  }
+}
+
+// BMI Category styling
+const bmiCategoryStyle = computed(() => {
+  const category = bmiData.value.category
+  if (category === 'Underweight') return 'bg-blue-500'
+  if (category === 'Normal') return 'bg-green-500'
+  if (category === 'Overweight') return 'bg-yellow-500'
+  if (category === 'Obese') return 'bg-orange-500'
+  return 'bg-gray-500'
+})
+
+// BMI slider position (percentage)
+const bmiSliderPosition = computed(() => {
+  const bmi = parseFloat(bmiData.value.bmi)
+  if (!bmi) return 50
+  // Map BMI range 15-35 to 0-100%
+  const minBMI = 15
+  const maxBMI = 35
+  const position = ((bmi - minBMI) / (maxBMI - minBMI)) * 100
+  return Math.max(0, Math.min(100, position))
 })
 
 const updateSidebarState = (state) => {
@@ -577,7 +678,28 @@ const nextDate = () => {
   selectedDate.value = date.toISOString().split('T')[0]
 }
 
+// Handler for BMI data updates from other components
+const handleBMIUpdate = () => {
+  loadBMIData()
+}
+
 onMounted(() => {
   parseCSVData()
+  loadBMIData()
+  
+  // Listen for BMI updates from DataSettingView
+  window.addEventListener('bmiDataUpdated', handleBMIUpdate)
+})
+
+onUnmounted(() => {
+  // Clean up event listener
+  window.removeEventListener('bmiDataUpdated', handleBMIUpdate)
 })
 </script>
+
+<style scoped>
+/* Make date picker calendar icon visible in dark mode */
+.dark-date-picker::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+</style>

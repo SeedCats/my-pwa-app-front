@@ -10,13 +10,27 @@
                     <div class="px-3 sm:px-4 md:px-6 lg:px-8 pb-6">
                         <!-- Header -->
                         <div class="mb-4 pt-4">
-                            <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">Data Adding</h1>
+                            <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">Data Setting</h1>
                         </div>
 
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <!-- BMI Input Segment -->
                             <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-                                <h2 class="text-xl font-semibold mb-6" :class="themeClasses.textPrimary">BMI Information</h2>
+                                <div class="flex items-center justify-between mb-6">
+                                    <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">BMI Information</h2>
+                                    <span v-if="isUpdateMode" class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                        Existing Data
+                                    </span>
+                                </div>
+                                
+                                <!-- Loading existing data indicator -->
+                                <div v-if="isLoadingData" class="flex items-center justify-center py-4 mb-4">
+                                    <svg class="animate-spin h-5 w-5 text-blue-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span :class="themeClasses.textSecondary">Loading existing data...</span>
+                                </div>
                                 
                                 <div class="space-y-4">
                                     <!-- Age Input -->
@@ -26,7 +40,7 @@
                                             v-model="bmiForm.age" 
                                             type="number" 
                                             placeholder="Enter your age"
-                                            class="w-full px-4 py-2 rounded-lg border transition-colors"
+                                            class="w-full px-4 py-2 rounded-lg border transition-colors no-spinner"
                                             :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-800 placeholder-gray-400']"
                                         />
                                     </div>
@@ -38,7 +52,7 @@
                                             v-model="bmiForm.height" 
                                             type="number" 
                                             placeholder="Enter your height in cm"
-                                            class="w-full px-4 py-2 rounded-lg border transition-colors"
+                                            class="w-full px-4 py-2 rounded-lg border transition-colors no-spinner"
                                             :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-800 placeholder-gray-400']"
                                         />
                                     </div>
@@ -50,7 +64,7 @@
                                             v-model="bmiForm.weight" 
                                             type="number" 
                                             placeholder="Enter your weight in kg"
-                                            class="w-full px-4 py-2 rounded-lg border transition-colors"
+                                            class="w-full px-4 py-2 rounded-lg border transition-colors no-spinner"
                                             :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-800 placeholder-gray-400']"
                                         />
                                     </div>
@@ -64,12 +78,29 @@
                                         </div>
                                     </div>
 
+                                    <!-- Submit Status Message -->
+                                    <div v-if="submitStatus" class="mt-4 p-3 rounded-lg text-sm" :class="[
+                                        submitStatus.type === 'success' 
+                                            ? isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-800'
+                                            : isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-800'
+                                    ]">
+                                        {{ submitStatus.message }}
+                                    </div>
+
                                     <!-- Submit Button -->
                                     <button 
                                         @click="submitBMIData"
-                                        class="w-full mt-6 px-4 py-2 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                                        :disabled="isLoading || !calculatedBMI"
+                                        class="w-full mt-6 px-4 py-2 rounded-lg font-medium text-white transition-colors flex items-center justify-center"
+                                        :class="isLoading || !calculatedBMI 
+                                            ? 'bg-gray-400 cursor-not-allowed' 
+                                            : isUpdateMode ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'"
                                     >
-                                        Save
+                                        <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        {{ isLoading ? (isUpdateMode ? 'Updating...' : 'Saving...') : (isUpdateMode ? 'Update' : 'Save') }}
                                     </button>
                                 </div>
                             </div>
@@ -160,7 +191,8 @@
 <script setup>
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { saveBMIData, getLatestBMIRecord, updateBMIRecord } from '../services/bmiService'
 
 const sidebarHidden = ref(false)
 const { isDarkMode, themeClasses } = useTheme()
@@ -172,6 +204,17 @@ const bmiForm = ref({
     height: '',
     weight: ''
 })
+
+// Existing BMI record (if any)
+const existingBMIRecord = ref(null)
+
+// Loading and status states
+const isLoading = ref(false)
+const isLoadingData = ref(false)
+const submitStatus = ref(null) // { type: 'success' | 'error', message: string }
+
+// Check if we're in update mode (has existing record with _id or id)
+const isUpdateMode = computed(() => !!(existingBMIRecord.value?._id || existingBMIRecord.value?.id))
 
 // File Upload State
 const fileInput = ref(null)
@@ -193,8 +236,8 @@ const bmiCategory = computed(() => {
     if (!calculatedBMI.value) return ''
     const bmi = parseFloat(calculatedBMI.value)
     if (bmi < 18.5) return 'Underweight'
-    if (bmi < 24.9) return 'Normal'
-    if (bmi < 29.9) return 'Overweight'
+    if (bmi < 25) return 'Normal'
+    if (bmi < 30) return 'Overweight'
     return 'Obese'
 })
 
@@ -203,8 +246,8 @@ const bmiCategoryColor = computed(() => {
     if (!calculatedBMI.value) return ''
     const bmi = parseFloat(calculatedBMI.value)
     if (bmi < 18.5) return isDarkMode.value ? 'text-blue-400' : 'text-blue-600'
-    if (bmi < 24.9) return isDarkMode.value ? 'text-green-400' : 'text-green-600'
-    if (bmi < 29.9) return isDarkMode.value ? 'text-yellow-400' : 'text-yellow-600'
+    if (bmi < 25) return isDarkMode.value ? 'text-green-400' : 'text-green-600'
+    if (bmi < 30) return isDarkMode.value ? 'text-yellow-400' : 'text-yellow-600'
     return isDarkMode.value ? 'text-red-400' : 'text-red-600'
 })
 
@@ -213,19 +256,109 @@ const updateSidebarState = (state) => {
     sidebarHidden.value = state
 }
 
-// BMI Submit
-const submitBMIData = () => {
-    if (!bmiForm.value.age || !bmiForm.value.sex || !bmiForm.value.height || !bmiForm.value.weight) {
-        alert('Please fill in all BMI fields')
+// Load existing BMI data on mount
+const loadExistingBMIData = async () => {
+    isLoadingData.value = true
+    try {
+        const response = await getLatestBMIRecord()
+        if (response.success && response.data) {
+            existingBMIRecord.value = response.data
+            // Pre-fill the form with existing data
+            bmiForm.value.height = response.data.height?.toString() || ''
+            bmiForm.value.weight = response.data.weight?.toString() || ''
+            bmiForm.value.age = response.data.age?.toString() || ''
+        }
+    } catch (error) {
+        console.log('No existing BMI data found:', error.message)
+    } finally {
+        isLoadingData.value = false
+    }
+}
+
+// BMI Submit - Creates new or updates existing record
+const submitBMIData = async () => {
+    if (!bmiForm.value.height || !bmiForm.value.weight) {
+        submitStatus.value = {
+            type: 'error',
+            message: 'Please fill in height and weight'
+        }
         return
     }
-    console.log('BMI Data submitted:', {
-        ...bmiForm.value,
-        bmi: calculatedBMI.value,
-        category: bmiCategory.value
-    })
-    alert('BMI data saved successfully!')
+    
+    isLoading.value = true
+    submitStatus.value = null
+    
+    try {
+        const bmiData = {
+            weight: parseFloat(bmiForm.value.weight),
+            height: parseFloat(bmiForm.value.height),
+            bmi: parseFloat(calculatedBMI.value),
+            category: bmiCategory.value,
+            age: bmiForm.value.age || null
+        }
+        
+        let response
+        
+        if (isUpdateMode.value) {
+            // Update existing record - use _id or id
+            const recordId = existingBMIRecord.value._id || existingBMIRecord.value.id
+            console.log('Updating BMI record with ID:', recordId)
+            response = await updateBMIRecord(recordId, bmiData)
+        } else {
+            // Create new record
+            console.log('Creating new BMI record')
+            response = await saveBMIData(bmiData)
+        }
+        
+        if (response.success) {
+            // Update the existing record reference with new data
+            // The response.data contains the saved/updated record
+            if (response.data) {
+                // Handle both _id and id from response
+                existingBMIRecord.value = {
+                    ...response.data,
+                    _id: response.data._id || response.data.id
+                }
+                console.log('Updated existingBMIRecord:', existingBMIRecord.value)
+            }
+            
+            submitStatus.value = {
+                type: 'success',
+                message: isUpdateMode.value 
+                    ? 'BMI data updated successfully!' 
+                    : 'BMI data saved successfully!'
+            }
+            
+            // Dispatch event to notify other components (like HomeView)
+            window.dispatchEvent(new CustomEvent('bmiDataUpdated'))
+        } else {
+            submitStatus.value = {
+                type: 'error',
+                message: response.message || 'Failed to save BMI data'
+            }
+        }
+    } catch (error) {
+        console.error('BMI submission error:', error)
+        submitStatus.value = {
+            type: 'error',
+            message: error.message || 'Failed to save BMI data. Please try again.'
+        }
+    } finally {
+        isLoading.value = false
+        
+        // Auto-hide success message after 3 seconds
+        if (submitStatus.value?.type === 'success') {
+            setTimeout(() => {
+                submitStatus.value = null
+            }, 3000)
+        }
+    }
 }
+
+// Initialize on mount
+onMounted(() => {
+    loadExistingBMIData()
+})
 
 // File Upload Handlers
 const triggerFileInput = () => {
@@ -295,3 +428,16 @@ const submitFileUpload = async () => {
     }
 }
 </script>
+
+<style scoped>
+/* Hide number input spinners */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.no-spinner {
+    -moz-appearance: textfield;
+}
+</style>

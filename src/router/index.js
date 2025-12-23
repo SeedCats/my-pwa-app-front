@@ -4,7 +4,7 @@ import FormatSettingView from '../views/FormatSettingView.vue'
 import UserSetting from '../views/UserSettingView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
-import DataAddingView from '../views/DataAddingView.vue'
+import DataSettingView from '../views/DataSettingView.vue'
 import aiSupportView from '../views/aiSupportView.vue'
 import ManualSupportView from '../views/ManualSupportView.vue'
 
@@ -39,7 +39,7 @@ const router = createRouter({
     {
       path: '/addData',
       name: 'AddData',
-      component: DataAddingView
+      component: DataSettingView
     },
     {
       path: '/ai-support',
