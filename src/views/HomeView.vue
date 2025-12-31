@@ -29,7 +29,7 @@
                 <!-- No Data Message -->
                 <div v-else-if="!bmiData.bmi" class="text-center py-8">
                   <p :class="themeClasses.textSecondary" class="mb-4">No BMI data available</p>
-                  <router-link to="/addData" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <router-link to="/data-setting" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     Add BMI Data
                   </router-link>
                 </div>
@@ -112,17 +112,100 @@
                 </div>
               </div>
 
-              <!-- Date Picker -->
+              <!-- Date Picker with Available Dates Indicator -->
               <div class="flex justify-center gap-4 mb-4 items-center">
-                <button @click="previousDate" class="px-4 py-2 rounded-lg transition-colors"
+                <button @click="previousDate" class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
                   :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
                   <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
-                <input type="date" v-model="selectedDate" @change="onDateChange" class="px-4 py-2 rounded-lg border date-picker-input"
-                  :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white dark-date-picker' : 'text-gray-800']" />
-                <button @click="nextDate" class="px-4 py-2 rounded-lg transition-colors"
+                
+                <!-- Custom Date Selector -->
+                <div class="relative">
+                  <button 
+                    @click="showDatePicker = !showDatePicker"
+                    class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
+                    :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']"
+                  >
+                    <span>{{ currentDate || 'Select Date' }}</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                  </button>
+                  
+                  <!-- Date Picker Dropdown -->
+                  <div 
+                    v-if="showDatePicker" 
+                    class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-lg shadow-xl border p-4 min-w-[320px]"
+                    :class="[themeClasses.cardBackground, themeClasses.border]"
+                  >
+                    <!-- Month Navigation -->
+                    <div class="flex items-center justify-between mb-4">
+                      <button @click="previousMonth" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
+                        <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                      </button>
+                      <span class="font-semibold" :class="themeClasses.textPrimary">
+                        {{ calendarMonthYear }}
+                      </span>
+                      <button @click="nextMonth" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
+                        <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    <!-- Day Headers -->
+                    <div class="grid grid-cols-7 gap-1 mb-2">
+                      <div v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day" 
+                           class="text-center text-xs font-medium py-1" :class="themeClasses.textSecondary">
+                        {{ day }}
+                      </div>
+                    </div>
+                    
+                    <!-- Calendar Days -->
+                    <div class="grid grid-cols-7 gap-1">
+                      <button
+                        v-for="day in calendarDays"
+                        :key="day.date"
+                        @click="selectDate(day)"
+                        :disabled="!day.currentMonth"
+                        class="relative p-2 text-sm rounded-lg transition-all duration-150 transform active:scale-90"
+                        :class="[
+                          day.currentMonth ? 'hover:scale-105' : 'opacity-30 cursor-not-allowed',
+                          day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
+                          day.isToday && !day.isSelected ? 'ring-2 ring-blue-400' : '',
+                          !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700 hover:shadow-md' : 'hover:bg-gray-100 hover:shadow-md') : '',
+                          day.isSelected ? '' : themeClasses.textPrimary
+                        ]"
+                      >
+                        {{ day.dayNumber }}
+                        <!-- Data Available Indicator -->
+                        <span 
+                          v-if="day.hasData && day.currentMonth" 
+                          class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-transform duration-150"
+                          :class="day.isSelected ? 'bg-white scale-125' : 'bg-green-500'"
+                        ></span>
+                      </button>
+                    </div>
+                    
+                    <!-- Legend -->
+                    <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs" :class="themeClasses.border">
+                      <div class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span :class="themeClasses.textSecondary">Has data</span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <span class="w-4 h-4 rounded ring-2 ring-blue-400"></span>
+                        <span :class="themeClasses.textSecondary">Today</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <button @click="nextDate" class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
                   :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
                   <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -188,8 +271,8 @@
 
             <!-- Quick Actions Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Log Heart Rate Card -->
-              <router-link to="/addData" class="block transform transition-transform duration-200 hover:scale-105">
+              <!-- Data Setting Card -->
+              <router-link to="/data-setting" class="block transform transition-transform duration-200 hover:scale-105">
                 <div class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow"
                   :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-blue-300']">
                   <div class="flex items-center mb-4">
@@ -199,12 +282,12 @@
                       </svg>
                     </div>
                     <div>
-                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">Log Heart Rate</h3>
+                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">Data Setting</h3>
                       <p class="text-xs" :class="themeClasses.textSecondary">Quick Add</p>
                     </div>
                   </div>
                   <p class="text-sm mb-4 leading-relaxed" :class="themeClasses.textSecondary">
-                    Record your heart rate data immediately to help us better track your health status.
+                    Record your data immediately to help us better track your health status.
                   </p>
                   <div class="flex items-center text-blue-600 text-xs font-medium">
                     <span>Add Record</span>
@@ -257,6 +340,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import { Line } from 'vue-chartjs'
 import { getLatestBMIRecord } from '../services/bmiService'
 import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
+import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedHeartRateDates } from '../stores/userStore'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler)
 
@@ -275,11 +359,23 @@ const isBMILoading = ref(false)
 const isHeartRateLoading = ref(false)
 const hasHeartRateData = ref(false)
 
+// Calendar state
+const showDatePicker = ref(false)
+const calendarMonth = ref(new Date().getMonth())
+const calendarYear = ref(new Date().getFullYear())
+
 const loadBMIData = async () => {
+  // Check cache first
+  const cached = getCachedBmiData()
+  if (cached) {
+    bmiData.value = cached
+    return
+  }
+
   isBMILoading.value = true
   try {
     const { success, data } = await getLatestBMIRecord()
-    bmiData.value = success && data ? {
+    const result = success && data ? {
       bmi: data.bmi,
       category: data.category,
       height: data.height,
@@ -288,6 +384,9 @@ const loadBMIData = async () => {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt
     } : { bmi: null, category: '', height: null, weight: null, age: null }
+    
+    bmiData.value = result
+    setCachedBmiData(result)  // Cache the result
   } catch (error) {
     console.error('Failed to load BMI data:', error)
     bmiData.value = { bmi: null, category: '', height: null, weight: null, age: null }
@@ -316,18 +415,125 @@ const formatDateForDisplay = (dateString) => {
   return date.toLocaleDateString('en-US', options)
 }
 
+// Calendar computed properties
+const calendarMonthYear = computed(() => {
+  const date = new Date(calendarYear.value, calendarMonth.value, 1)
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+})
+
+const calendarDays = computed(() => {
+  const days = []
+  const firstDay = new Date(calendarYear.value, calendarMonth.value, 1)
+  const lastDay = new Date(calendarYear.value, calendarMonth.value + 1, 0)
+  const startDay = firstDay.getDay()
+  const today = new Date().toISOString().split('T')[0]
+  
+  // Previous month days
+  const prevMonthLastDay = new Date(calendarYear.value, calendarMonth.value, 0).getDate()
+  for (let i = startDay - 1; i >= 0; i--) {
+    const dayNum = prevMonthLastDay - i
+    const date = new Date(calendarYear.value, calendarMonth.value - 1, dayNum).toISOString().split('T')[0]
+    days.push({
+      dayNumber: dayNum,
+      date: date,
+      currentMonth: false,
+      isToday: date === today,
+      isSelected: date === selectedDate.value,
+      hasData: availableDates.value.includes(date)
+    })
+  }
+  
+  // Current month days
+  for (let i = 1; i <= lastDay.getDate(); i++) {
+    const date = new Date(calendarYear.value, calendarMonth.value, i).toISOString().split('T')[0]
+    days.push({
+      dayNumber: i,
+      date: date,
+      currentMonth: true,
+      isToday: date === today,
+      isSelected: date === selectedDate.value,
+      hasData: availableDates.value.includes(date)
+    })
+  }
+  
+  // Next month days
+  const remaining = 42 - days.length
+  for (let i = 1; i <= remaining; i++) {
+    const date = new Date(calendarYear.value, calendarMonth.value + 1, i).toISOString().split('T')[0]
+    days.push({
+      dayNumber: i,
+      date: date,
+      currentMonth: false,
+      isToday: date === today,
+      isSelected: date === selectedDate.value,
+      hasData: availableDates.value.includes(date)
+    })
+  }
+  
+  return days
+})
+
+// Calendar methods
+const previousMonth = () => {
+  if (calendarMonth.value === 0) {
+    calendarMonth.value = 11
+    calendarYear.value--
+  } else {
+    calendarMonth.value--
+  }
+}
+
+const nextMonth = () => {
+  if (calendarMonth.value === 11) {
+    calendarMonth.value = 0
+    calendarYear.value++
+  } else {
+    calendarMonth.value++
+  }
+}
+
+const selectDate = (day) => {
+  if (!day.currentMonth) return
+  selectedDate.value = day.date
+  currentDate.value = formatDateForDisplay(day.date)
+  showDatePicker.value = false
+  loadHeartRateData()
+}
+
 // Load available dates from backend
 const loadAvailableDates = async () => {
+  // Check cache first
+  const cached = getCachedHeartRateDates()
+  if (cached) {
+    availableDates.value = cached
+    hasHeartRateData.value = cached.length > 0
+    if (cached.length > 0) {
+      selectedDate.value = cached[0]
+      currentDate.value = formatDateForDisplay(cached[0])
+      const recentDate = new Date(cached[0])
+      calendarMonth.value = recentDate.getMonth()
+      calendarYear.value = recentDate.getFullYear()
+      return true
+    }
+    selectedDate.value = new Date().toISOString().split('T')[0]
+    currentDate.value = formatDateForDisplay(selectedDate.value)
+    return false
+  }
+
   try {
     const response = await getHeartRateDates()
-    console.log('Available dates response:', response)
     
     if (response.success && response.data.dates && response.data.dates.length > 0) {
       availableDates.value = response.data.dates
+      setCachedHeartRateDates(response.data.dates)  // Cache the result
       hasHeartRateData.value = true
       // Set the most recent date as default
       selectedDate.value = response.data.dates[0]
       currentDate.value = formatDateForDisplay(response.data.dates[0])
+      // Set calendar to the month of most recent data
+      const recentDate = new Date(response.data.dates[0])
+      calendarMonth.value = recentDate.getMonth()
+      calendarYear.value = recentDate.getFullYear()
       return true
     }
     // No heart rate data - set today as default date for display
@@ -466,25 +672,74 @@ watch(isDarkMode, () => {
 watch(selectedDate, () => {
   if (selectedDate.value) {
     currentDate.value = formatDateForDisplay(selectedDate.value)
-    loadHeartRateData()
   }
 })
-
-const onDateChange = () => {
-  if (selectedDate.value) {
-    currentDate.value = formatDateForDisplay(selectedDate.value)
-    loadHeartRateData()
-  }
-}
 
 const changeDate = (days) => {
   const date = new Date(selectedDate.value)
   date.setDate(date.getDate() + days)
   selectedDate.value = date.toISOString().split('T')[0]
+  currentDate.value = formatDateForDisplay(selectedDate.value)
+  // Update calendar to show the new month if needed
+  calendarMonth.value = date.getMonth()
+  calendarYear.value = date.getFullYear()
+  loadHeartRateData()
 }
 
 const previousDate = () => changeDate(-1)
 const nextDate = () => changeDate(1)
+
+// Close date picker when clicking outside
+const closeDatePicker = (event) => {
+  if (showDatePicker.value && !event.target.closest('.relative')) {
+    showDatePicker.value = false
+  }
+}
+
+// Force reload BMI data (bypassing cache)
+const forceReloadBMIData = async () => {
+  isBMILoading.value = true
+  try {
+    const { success, data } = await getLatestBMIRecord()
+    const result = success && data ? {
+      bmi: data.bmi,
+      category: data.category,
+      height: data.height,
+      weight: data.weight,
+      age: data.age || null,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt
+    } : { bmi: null, category: '', height: null, weight: null, age: null }
+    
+    bmiData.value = result
+    setCachedBmiData(result)
+  } catch (error) {
+    console.error('Failed to load BMI data:', error)
+    bmiData.value = { bmi: null, category: '', height: null, weight: null, age: null }
+  } finally {
+    isBMILoading.value = false
+  }
+}
+
+// Force reload heart rate dates (bypassing cache)
+const forceReloadHeartRateData = async () => {
+  try {
+    const response = await getHeartRateDates()
+    if (response.success && response.data.dates && response.data.dates.length > 0) {
+      availableDates.value = response.data.dates
+      setCachedHeartRateDates(response.data.dates)
+      hasHeartRateData.value = true
+      selectedDate.value = response.data.dates[0]
+      currentDate.value = formatDateForDisplay(response.data.dates[0])
+      const recentDate = new Date(response.data.dates[0])
+      calendarMonth.value = recentDate.getMonth()
+      calendarYear.value = recentDate.getFullYear()
+      await loadHeartRateData()
+    }
+  } catch (error) {
+    console.error('Error loading available dates:', error)
+  }
+}
 
 const initHeartRateData = async () => {
   const hasData = await loadAvailableDates()
@@ -496,13 +751,15 @@ const initHeartRateData = async () => {
 onMounted(() => {
   initHeartRateData()
   loadBMIData()
-  window.addEventListener('bmiDataUpdated', loadBMIData)
-  window.addEventListener('heartRateDataUpdated', initHeartRateData)
+  window.addEventListener('bmiDataUpdated', forceReloadBMIData)
+  window.addEventListener('heartRateDataUpdated', forceReloadHeartRateData)
+  document.addEventListener('click', closeDatePicker)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('bmiDataUpdated', loadBMIData)
-  window.removeEventListener('heartRateDataUpdated', initHeartRateData)
+  window.removeEventListener('bmiDataUpdated', forceReloadBMIData)
+  window.removeEventListener('heartRateDataUpdated', forceReloadHeartRateData)
+  document.removeEventListener('click', closeDatePicker)
 })
 </script>
 

@@ -30,12 +30,25 @@ export function useTheme() {
   }
 
   const applyTheme = (theme) => {
+    const root = document.documentElement
+    const body = document.body
+
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark')
+      root.classList.add('dark')
+      body.classList.add('dark')
     } else {
-      document.documentElement.classList.remove('dark')
+      root.classList.remove('dark')
+      body.classList.remove('dark')
     }
-    
+
+    // expose a CSS variable for other non-tailwind styles to react immediately
+    try {
+      root.style.setProperty('--app-color-scheme', theme)
+    } catch (e) {
+      // ignore in restricted environments
+    }
+
+    // notify other parts of the app
     window.dispatchEvent(new CustomEvent('themeChanged', { 
       detail: { 
         theme, 

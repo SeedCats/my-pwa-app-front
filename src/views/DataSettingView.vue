@@ -100,6 +100,32 @@
                                         </svg>
                                         {{ isLoading ? (isUpdateMode ? 'Updating...' : 'Saving...') : (isUpdateMode ? 'Update' : 'Save') }}
                                     </button>
+
+                                    <!-- Delete BMI Button -->
+                                    <button 
+                                        v-if="isUpdateMode"
+                                        @click="deleteBMIData"
+                                        :disabled="isDeletingBMI"
+                                        class="w-full mt-3 px-4 py-2 rounded-lg font-medium text-white transition-colors flex items-center justify-center bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                    >
+                                        <svg v-if="isDeletingBMI" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <svg v-else class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        {{ isDeletingBMI ? 'Deleting...' : 'Delete BMI Data' }}
+                                    </button>
+
+                                    <!-- BMI Delete Status Message -->
+                                    <div v-if="deleteBMIStatus" class="mt-3 p-3 rounded-lg text-sm" :class="[
+                                        deleteBMIStatus.type === 'success' 
+                                            ? isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-800'
+                                            : isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-800'
+                                    ]">
+                                        {{ deleteBMIStatus.message }}
+                                    </div>
                                 </div>
                             </div>
 
@@ -180,6 +206,34 @@
                                         </svg>
                                         {{ isUploading ? 'Uploading...' : 'Upload File' }}
                                     </button>
+
+                                    <!-- Delete All Records Button -->
+                                    <button 
+                                        @click="deleteAllHeartRateData"
+                                        :disabled="isDeleting || !hasHeartRateData"
+                                        class="w-full px-4 py-2 rounded-lg font-medium text-white transition-colors flex items-center justify-center"
+                                        :class="!isDeleting && hasHeartRateData
+                                            ? 'bg-red-600 hover:bg-red-700' 
+                                            : 'bg-gray-400 cursor-not-allowed'"
+                                    >
+                                        <svg v-if="isDeleting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <svg v-else class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        {{ isDeleting ? 'Deleting...' : 'Delete All Records' }}
+                                    </button>
+
+                                    <!-- Delete Status -->
+                                    <div v-if="deleteStatus" class="p-3 rounded-lg text-sm" :class="[
+                                        deleteStatus.type === 'success' 
+                                            ? isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-800'
+                                            : isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-800'
+                                    ]">
+                                        {{ deleteStatus.message }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -192,8 +246,9 @@
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { ref, computed, onMounted } from 'vue'
-import { saveBMIData, getLatestBMIRecord, updateBMIRecord } from '../services/bmiService'
-import { uploadHeartRateCSV } from '../services/heartRateService'
+import { saveBMIData, getLatestBMIRecord, updateBMIRecord, deleteAllBMIRecords } from '../services/bmiService'
+import { uploadHeartRateCSV, deleteAllHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
+import { invalidateBmiCache, invalidateHeartRateCache } from '../stores/userStore'
 
 const { isDarkMode, themeClasses } = useTheme()
 
@@ -209,6 +264,11 @@ const selectedFile = ref(null)
 const isDragging = ref(false)
 const uploadStatus = ref(null)
 const isUploading = ref(false)
+const isDeleting = ref(false)
+const deleteStatus = ref(null)
+const hasHeartRateData = ref(false)
+const isDeletingBMI = ref(false)
+const deleteBMIStatus = ref(null)
 
 // Computed
 const isUpdateMode = computed(() => !!(existingBMIRecord.value?._id || existingBMIRecord.value?.id))
@@ -298,6 +358,7 @@ const submitBMIData = async () => {
                 type: 'success',
                 message: `BMI data ${isUpdateMode.value ? 'updated' : 'saved'} successfully!`
             }
+            invalidateBmiCache()  // Invalidate cache so HomeView fetches fresh data
             window.dispatchEvent(new CustomEvent('bmiDataUpdated'))
         } else {
             submitStatus.value = { type: 'error', message: response.message || 'Failed to save BMI data' }
@@ -313,7 +374,105 @@ const submitBMIData = async () => {
     }
 }
 
-onMounted(loadExistingBMIData)
+// Delete BMI data
+const deleteBMIData = async () => {
+    if (!confirm('Are you sure you want to delete your BMI data? This action cannot be undone.')) {
+        return
+    }
+    
+    isDeletingBMI.value = true
+    deleteBMIStatus.value = null
+    
+    try {
+        const response = await deleteAllBMIRecords()
+        
+        if (response.success) {
+            deleteBMIStatus.value = { 
+                type: 'success', 
+                message: 'BMI Data is deleted'
+            }
+            // Clear the form and reset state
+            bmiForm.value = { age: '', height: '', weight: '' }
+            existingBMIRecord.value = null
+            invalidateBmiCache()
+            window.dispatchEvent(new CustomEvent('bmiDataUpdated'))
+        } else {
+            deleteBMIStatus.value = { type: 'error', message: response.message || 'Failed to delete data' }
+        }
+    } catch (error) {
+        console.error('BMI delete error:', error)
+        deleteBMIStatus.value = { type: 'error', message: error.message || 'Failed to delete data. Please try again.' }
+    } finally {
+        isDeletingBMI.value = false
+        if (deleteBMIStatus.value?.type === 'success') {
+            setTimeout(() => deleteBMIStatus.value = null, 3000)
+        }
+    }
+}
+
+// Check if heart rate data exists
+const checkHeartRateData = async () => {
+    try {
+        const response = await getHeartRateDates()
+        console.log('Heart rate dates response:', response)
+        
+        // Check if there are dates available (backend returns data.dates array)
+        if (
+            response &&
+            response.success &&
+            response.data &&
+            Array.isArray(response.data.dates) &&
+            response.data.dates.length > 0
+        ) {
+            hasHeartRateData.value = true
+        } else {
+            hasHeartRateData.value = false
+        }
+        console.log('hasHeartRateData:', hasHeartRateData.value)
+    } catch (error) {
+        console.log('Failed to check heart rate data:', error.message)
+        hasHeartRateData.value = false
+    }
+}
+
+// Delete all heart rate data
+const deleteAllHeartRateData = async () => {
+    if (!confirm('Are you sure you want to delete all heart rate records? This action cannot be undone.')) {
+        return
+    }
+    
+    isDeleting.value = true
+    deleteStatus.value = null
+    
+    try {
+        const response = await deleteAllHeartRateRecords()
+        
+        if (response.success) {
+            deleteStatus.value = { 
+                type: 'success', 
+                message: response.message || 'All heart rate data deleted successfully!'
+            }
+            hasHeartRateData.value = false
+            invalidateHeartRateCache()
+            window.dispatchEvent(new CustomEvent('heartRateDataUpdated'))
+        } else {
+            deleteStatus.value = { type: 'error', message: response.message || 'Failed to delete data' }
+        }
+    } catch (error) {
+        console.error('Heart rate delete error:', error)
+        deleteStatus.value = { type: 'error', message: error.message || 'Failed to delete data. Please try again.' }
+    } finally {
+        isDeleting.value = false
+        if (deleteStatus.value?.type === 'success') {
+            setTimeout(() => deleteStatus.value = null, 3000)
+        }
+    }
+}
+
+onMounted(() => {
+    loadExistingBMIData()
+    checkHeartRateData()
+})
 
 // File Upload Handlers
 const triggerFileInput = () => fileInput.value.click()
@@ -364,14 +523,17 @@ const submitFileUpload = async () => {
         console.log('Upload response:', response)
         
         if (response.success) {
-            const { inserted, duplicatesSkipped, totalRecords } = response.data
+            const { inserted = 0, duplicatesSkipped = 0, totalRecords = 0 } = response.data || {}
             uploadStatus.value = { 
                 type: 'success', 
                 message: `Successfully uploaded! ${inserted} records added${duplicatesSkipped > 0 ? `, ${duplicatesSkipped} duplicates skipped` : ''} (${totalRecords} total in file)` 
             }
             clearFile()
+            invalidateHeartRateCache()  // Invalidate cache so HomeView fetches fresh data
             // Dispatch event so HomeView can refresh heart rate data
             window.dispatchEvent(new CustomEvent('heartRateDataUpdated'))
+            // Re-check heart rate data to enable delete button
+            await checkHeartRateData()
         } else {
             uploadStatus.value = { type: 'error', message: response.message || 'Upload failed' }
         }

@@ -40,9 +40,7 @@
                                             <ul role="list" class="-mx-2 space-y-2">
                                                 <li v-for="item in navigation" :key="item.name">
                                                     <router-link :to="item.to" :class="[
-                                                        isActiveRoute(item.to)
-                                                            ? 'bg-gray-800 text-white'
-                                                            : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                                                        'text-gray-400 hover:bg-gray-800 hover:text-white',
                                                         'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95'
                                                     ]" @click="sidebarOpen = false">
                                                         <component :is="item.icon" class="size-6 shrink-0"
@@ -111,19 +109,13 @@
                         </li>
                         <li class="mt-auto">
                             <router-link to="/setting"
-                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
-                                :class="isActiveRoute('/setting')
-                                    ? 'bg-gray-800 text-white'
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'">
+                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95 text-gray-400 hover:bg-gray-800 hover:text-white">
                                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                                 Settings
                             </router-link>
 
                             <router-link to="/user"
-                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
-                                :class="isActiveRoute('/user')
-                                    ? 'bg-gray-800 text-white'
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'">
+                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95 text-gray-400 hover:bg-gray-800 hover:text-white">
                                 <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
                                 User Settings
                             </router-link>
@@ -210,6 +202,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
+import { clearAllCaches } from '../stores/userStore'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import {
     Dialog,
@@ -229,7 +222,7 @@ import {
     Cog6ToothIcon,
 } from '@heroicons/vue/24/outline'
 
-// Initialize router and route for active state checking
+// Initialize router for navigation
 const router = useRouter()
 const route = useRoute()
 const { isDarkMode, themeClasses } = useTheme()
@@ -238,7 +231,7 @@ const emit = defineEmits(['update:sidebarState'])
 
 const navigation = [
     { name: 'DashBoard', to: '/home', icon: HomeIcon },
-    { name: 'Data Setting', to: '/addData', icon: HomeIcon },
+    { name: 'Data Setting', to: '/data-setting', icon: HomeIcon },
     { name: 'AI Support', to: '/ai-support', icon: HomeIcon },
     { name: 'Manual Support', to: '/manual-support', icon: HomeIcon },
 ]
@@ -250,6 +243,7 @@ const userData = ref(null)
 
 const userName = computed(() => userData.value?.name || 'User')
 
+// Helper to check active route for styling
 const isActiveRoute = (path) => route.path === path
 
 const toggleDesktopSidebar = () => {
@@ -261,6 +255,7 @@ const handleLogOut = async () => {
     try {
         await fetch('/api/logout', { method: 'POST', credentials: 'include' })
     } catch { /* ignore */ }
+    clearAllCaches()  // Clear all cached data on logout
     router.push('/')
 }
 

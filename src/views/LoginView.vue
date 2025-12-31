@@ -60,25 +60,32 @@
             </div>
           </div>
 
-          <!-- Remember Me -->
+          <!-- Remember Me Toggle Switch -->
           <div class="flex items-center justify-between">
-            <div class="flex gap-3 items-center">
-              <div class="flex h-6 shrink-0 items-center">
-                <div class="group grid size-4 sm:size-5 grid-cols-1">
-                  <input id="remember-me" name="remember-me" type="checkbox" v-model="loginForm.remember"
-                    class="col-start-1 row-start-1 appearance-none rounded-md border-2 border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto transition-colors duration-200" />
-                  <svg
-                    class="pointer-events-none col-start-1 row-start-1 size-3 sm:size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                    viewBox="0 0 14 14" fill="none">
-                    <path class="opacity-0 group-has-checked:opacity-100" d="M3 8L6 11L11 3.5" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round" />
-                    <path class="opacity-0 group-has-indeterminate:opacity-100" d="M3 7H11" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </div>
+            <label for="remember-me" class="flex items-center cursor-pointer group">
+              <!-- Toggle Switch -->
+              <div class="relative">
+                <input id="remember-me" name="remember-me" type="checkbox" v-model="loginForm.remember"
+                  class="sr-only peer" />
+                <!-- Track -->
+                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-gradient-to-r peer-checked:from-indigo-500 peer-checked:to-purple-500 transition-all duration-300 ease-in-out shadow-inner"></div>
+                <!-- Thumb -->
+                <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-all duration-300 ease-in-out peer-checked:translate-x-5 peer-checked:shadow-lg"></div>
               </div>
-              <label for="remember-me" class="block text-sm sm:text-base text-gray-700 font-medium">Remember
-                me</label>
+              <!-- Label -->
+              <span class="ml-3 text-sm sm:text-base text-gray-700 font-medium group-hover:text-indigo-600 transition-colors duration-200 select-none">
+                Remember me
+              </span>
+            </label>
+            <!-- Info tooltip -->
+            <div class="relative group/tooltip">
+              <svg class="w-4 h-4 text-gray-400 hover:text-indigo-500 cursor-help transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div class="absolute right-0 bottom-6 w-48 p-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-10 shadow-lg">
+                Stay account for 7 days
+                <div class="absolute -bottom-1 right-2 w-2 h-2 bg-gray-800 rotate-45"></div>
+              </div>
             </div>
           </div>
 
@@ -121,9 +128,17 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const REMEMBER_EMAIL_KEY = 'rememberedEmail'
 
 // Check if already authenticated via API
 onMounted(async () => {
+  // Load remembered email if exists
+  const rememberedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY)
+  if (rememberedEmail) {
+    loginForm.value.email = rememberedEmail
+    loginForm.value.remember = true
+  }
+
   try {
     const res = await fetch('/api/user/me', { credentials: 'include' })
     if (res.ok) router.push('/home')
@@ -156,6 +171,13 @@ async function handleLogin() {
     }
 
     if (response.ok && data.success) {
+      // Handle "Remember Me" - save email to localStorage
+      if (loginForm.value.remember) {
+        localStorage.setItem(REMEMBER_EMAIL_KEY, loginForm.value.email)
+      } else {
+        localStorage.removeItem(REMEMBER_EMAIL_KEY)
+      }
+      
       success.value = data.message || 'Login successful! Redirecting...'
       setTimeout(() => router.push('/home'), 1000)
     } else {
