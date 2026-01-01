@@ -131,7 +131,7 @@
 
                             <!-- File Upload Segment -->
                             <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-                                <h2 class="text-xl font-semibold mb-6" :class="themeClasses.textPrimary">Upload CSV File</h2>
+                                <h2 class="text-xl font-semibold mb-6" :class="themeClasses.textPrimary">Upload CSV File for Heart Rate Data</h2>
                                 
                                 <div class="space-y-4">
                                     <!-- File Upload Area -->

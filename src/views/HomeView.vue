@@ -113,110 +113,119 @@
               </div>
 
               <!-- Date Picker with Available Dates Indicator -->
-              <div class="flex justify-center gap-4 mb-4 items-center">
-                <button @click="previousDate" class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
-                  :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-                  <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                  </svg>
-                </button>
-                
-                <!-- Custom Date Selector -->
-                <div class="relative">
-                  <button 
-                    @click="showDatePicker = !showDatePicker"
-                    class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
-                    :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']"
-                  >
-                    <span>{{ currentDate || 'Select Date' }}</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              <template v-if="hasHeartRateData">
+                <div class="flex justify-center gap-4 mb-4 items-center">
+                  <button @click="previousDate" class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+                    :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
+                    <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
                   </button>
                   
-                  <!-- Date Picker Dropdown -->
-                  <div 
-                    v-if="showDatePicker" 
-                    class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-lg shadow-xl border p-4 min-w-[320px]"
-                    :class="[themeClasses.cardBackground, themeClasses.border]"
-                  >
-                    <!-- Month Navigation -->
-                    <div class="flex items-center justify-between mb-4">
-                      <button @click="previousMonth" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
-                        <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                      </button>
-                      <span class="font-semibold" :class="themeClasses.textPrimary">
-                        {{ calendarMonthYear }}
-                      </span>
-                      <button @click="nextMonth" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
-                        <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                      </button>
-                    </div>
+                  <!-- Custom Date Selector -->
+                  <div class="relative">
+                    <button 
+                      @click="showDatePicker = !showDatePicker"
+                      class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
+                      :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']"
+                    >
+                      <span>{{ currentDate || 'Select Date' }}</span>
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                    </button>
                     
-                    <!-- Day Headers -->
-                    <div class="grid grid-cols-7 gap-1 mb-2">
-                      <div v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day" 
-                           class="text-center text-xs font-medium py-1" :class="themeClasses.textSecondary">
-                        {{ day }}
+                    <!-- Date Picker Dropdown -->
+                    <div 
+                      v-if="showDatePicker" 
+                      class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-lg shadow-xl border p-4 min-w-[320px]"
+                      :class="[themeClasses.cardBackground, themeClasses.border]"
+                    >
+                      <!-- Month Navigation -->
+                      <div class="flex items-center justify-between mb-4">
+                        <button @click="previousMonth" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
+                          <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                          </svg>
+                        </button>
+                        <span class="font-semibold" :class="themeClasses.textPrimary">
+                          {{ calendarMonthYear }}
+                        </span>
+                        <button @click="nextMonth" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
+                          <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                          </svg>
+                        </button>
                       </div>
-                    </div>
-                    
-                    <!-- Calendar Days -->
-                    <div class="grid grid-cols-7 gap-1">
-                      <button
-                        v-for="day in calendarDays"
-                        :key="day.date"
-                        @click="selectDate(day)"
-                        :disabled="!day.currentMonth"
-                        class="relative p-2 text-sm rounded-lg transition-all duration-150 transform active:scale-90"
-                        :class="[
-                          day.currentMonth ? 'hover:scale-105' : 'opacity-30 cursor-not-allowed',
-                          day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
-                          day.isToday && !day.isSelected ? 'ring-2 ring-blue-400' : '',
-                          !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700 hover:shadow-md' : 'hover:bg-gray-100 hover:shadow-md') : '',
-                          day.isSelected ? '' : themeClasses.textPrimary
-                        ]"
-                      >
-                        {{ day.dayNumber }}
-                        <!-- Data Available Indicator -->
-                        <span 
-                          v-if="day.hasData && day.currentMonth" 
-                          class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-transform duration-150"
-                          :class="day.isSelected ? 'bg-white scale-125' : 'bg-green-500'"
-                        ></span>
-                      </button>
-                    </div>
-                    
-                    <!-- Legend -->
-                    <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs" :class="themeClasses.border">
-                      <div class="flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                        <span :class="themeClasses.textSecondary">Has data</span>
+                      
+                      <!-- Day Headers -->
+                      <div class="grid grid-cols-7 gap-1 mb-2">
+                        <div v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day" 
+                             class="text-center text-xs font-medium py-1" :class="themeClasses.textSecondary">
+                          {{ day }}
+                        </div>
                       </div>
-                      <div class="flex items-center gap-1">
-                        <span class="w-4 h-4 rounded ring-2 ring-blue-400"></span>
-                        <span :class="themeClasses.textSecondary">Today</span>
+                      
+                      <!-- Calendar Days -->
+                      <div class="grid grid-cols-7 gap-1">
+                        <button
+                          v-for="day in calendarDays"
+                          :key="day.date"
+                          @click="selectDate(day)"
+                          :disabled="!day.currentMonth"
+                          class="relative p-2 text-sm rounded-lg transition-all duration-150 transform active:scale-90"
+                          :class="[
+                            day.currentMonth ? 'hover:scale-105' : 'opacity-30 cursor-not-allowed',
+                            day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
+                            day.isToday && !day.isSelected ? 'ring-2 ring-blue-400' : '',
+                            !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700 hover:shadow-md' : 'hover:bg-gray-100 hover:shadow-md') : '',
+                            day.isSelected ? '' : themeClasses.textPrimary
+                          ]"
+                        >
+                          {{ day.dayNumber }}
+                          <!-- Data Available Indicator -->
+                          <span 
+                            v-if="day.hasData && day.currentMonth" 
+                            class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-transform duration-150"
+                            :class="day.isSelected ? 'bg-white scale-125' : 'bg-green-500'"
+                          ></span>
+                        </button>
+                      </div>
+                      
+                      <!-- Legend -->
+                      <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs" :class="themeClasses.border">
+                        <div class="flex items-center gap-1">
+                          <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                          <span :class="themeClasses.textSecondary">Has data</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                          <span class="w-4 h-4 rounded ring-2 ring-blue-400"></span>
+                          <span :class="themeClasses.textSecondary">Today</span>
+                        </div>
                       </div>
                     </div>
                   </div>
+                  
+                  <button @click="nextDate" class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+                    :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
+                    <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </button>
                 </div>
-                
-                <button @click="nextDate" class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
-                  :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-                  <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </button>
-              </div>
 
-              <!-- Main Heart Rate Stats -->
-              <div class="text-center mb-6">
-                <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
-                <div class="text-lg mb-4" :class="themeClasses.textSecondary">Average bpm</div>
+                <!-- Main Heart Rate Stats -->
+                <div class="text-center mb-6">
+                  <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
+                  <div class="text-lg mb-4" :class="themeClasses.textSecondary">Average bpm</div>
+                </div>
+              </template>
+
+              <div v-else class="text-center py-8">
+                <p :class="themeClasses.textSecondary" class="mb-4">No heart rate data available</p>
+                <router-link to="/data-setting" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  Add Heart Rate Data
+                </router-link>
               </div>
             </div>
 
