@@ -72,14 +72,3 @@ export const getBMIStats = async () => {
     const response = await fetch('/api/data/bmi/stats', { method: 'GET', headers: getHeaders(), credentials: 'include' })
     return handleResponse(response)
 }
-
-export default {
-    saveBMIData,
-    getBMIRecords,
-    getLatestBMIRecord,
-    getBMIRecordById,
-    updateBMIRecord,
-    deleteBMIRecord,
-    deleteAllBMIRecords,
-    getBMIStats
-}

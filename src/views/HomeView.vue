@@ -43,7 +43,7 @@
 
                   <!-- BMI Slider -->
                   <div class="mb-8">
-                    <div class="relative h-2 bg-gradient-to-r from-blue-400 via-green-400 via-yellow-400 to-orange-500 rounded-full mb-2">
+                    <div class="relative h-2 bg-gradient-to-r from-blue-400 via-green-400 to-orange-500 rounded-full mb-2">
                       <!-- BMI Indicator -->
                       <div 
                         class="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-gray-800 rounded-full shadow-lg"

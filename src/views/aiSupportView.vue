@@ -1324,7 +1324,6 @@ const sendMessage = async () => {
         try {
             // shared chunk handler for streaming parts
             const handleChunk = (chunk) => {
-                console.log('Received chunk in view:', chunk)
                 if (chunk.type === 'text-delta') {
                     appendChunkContent(tempAi, stripCitations(chunk.text || ''))
                     streamingBuffer = tempAi.content
@@ -1365,15 +1364,11 @@ const sendMessage = async () => {
                 maxSources: finalMaxSources.value
             }
 
-            console.log('SDK options being passed to Grok:', sdkOptions)
-
             if (selectedFileVal) {
                 response = await sendMessageToGrokWithFile(selectedFileVal, messageToSend, conversationHistory, handleChunk, sdkOptions)
             } else {
                 response = await sendMessageToGrok(messageToSend, conversationHistory, handleChunk, sdkOptions)
             }
-
-            console.log('Grok response:', response)
 
             // Determine final content: prefer streamingBuffer, fall back to response.message
             const urlLike = (str) => typeof str === 'string' && /^(https?:\/\/|www\.)/.test(str.trim())
@@ -1589,7 +1584,7 @@ const loadHealthData = async () => {
                     setCachedBmiData(bmiResult)
                 }
             } catch (error) {
-                console.log('No BMI data available')
+                // No BMI data available
             }
         }
 
@@ -1601,7 +1596,7 @@ const loadHealthData = async () => {
                     setCachedHeartRateDates(response.data.dates)
                 }
             } catch (error) {
-                console.log('No heart rate data available')
+                // No heart rate data available
             }
         }
     } catch (error) {

@@ -87,12 +87,3 @@ export const deleteHeartRateByDate = async (date) => {
     })
     return handleResponse(response)
 }
-
-export default {
-    uploadHeartRateCSV,
-    getHeartRateRecords,
-    getHeartRateDates,
-    getHeartRateStats,
-    deleteAllHeartRateRecords,
-    deleteHeartRateByDate
-}

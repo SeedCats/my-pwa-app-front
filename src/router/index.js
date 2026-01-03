@@ -5,7 +5,7 @@ import UserSetting from '../views/UserSettingView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import DataSettingView from '../views/DataSettingView.vue'
-import aiSupportView from '../views/AISupportView.vue'
+import AISupportView from '../views/AISupportView.vue'
 import ManualSupportView from '../views/ManualSupportView.vue'
 import { checkAuth } from '../stores/userStore.js'
 
@@ -51,7 +51,7 @@ const router = createRouter({
     {
       path: '/ai-support',
       name: 'AiSupport',
-      component: aiSupportView,
+      component: AISupportView,
       meta: { requiresAuth: true }
     },
     {

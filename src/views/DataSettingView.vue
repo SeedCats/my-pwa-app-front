@@ -317,7 +317,7 @@ const loadExistingBMIData = async () => {
             }
         }
     } catch (error) {
-        console.log('No existing BMI data found:', error.message)
+        // No existing BMI data
     } finally {
         isLoadingData.value = false
     }
@@ -341,8 +341,6 @@ const submitBMIData = async () => {
         category: bmiCategory.value,
         age: ageValue
     }
-    
-    console.log('Submitting BMI data:', bmiData)
     
     try {
         const recordId = existingBMIRecord.value?._id || existingBMIRecord.value?.id
@@ -414,7 +412,6 @@ const deleteBMIData = async () => {
 const checkHeartRateData = async () => {
     try {
         const response = await getHeartRateDates()
-        console.log('Heart rate dates response:', response)
         
         // Check if there are dates available (backend returns data.dates array)
         if (
@@ -428,9 +425,7 @@ const checkHeartRateData = async () => {
         } else {
             hasHeartRateData.value = false
         }
-        console.log('hasHeartRateData:', hasHeartRateData.value)
     } catch (error) {
-        console.log('Failed to check heart rate data:', error.message)
         hasHeartRateData.value = false
     }
 }
@@ -487,9 +482,7 @@ const validateAndSetFile = (file, errorMsg) => {
     if (isCSV) {
         selectedFile.value = file
         uploadStatus.value = null
-        console.log('File selected:', file.name, file.type, file.size)
     } else if (file) {
-        console.log('Invalid file type:', file.name, file.type)
         uploadStatus.value = { type: 'error', message: errorMsg }
     }
 }
@@ -513,14 +506,11 @@ const submitFileUpload = async () => {
         return
     }
     
-    console.log('Starting upload for:', selectedFile.value.name)
     isUploading.value = true
     uploadStatus.value = null
     
     try {
-        console.log('Calling uploadHeartRateCSV...')
         const response = await uploadHeartRateCSV(selectedFile.value)
-        console.log('Upload response:', response)
         
         if (response.success) {
             const { inserted = 0, duplicatesSkipped = 0, totalRecords = 0 } = response.data || {}

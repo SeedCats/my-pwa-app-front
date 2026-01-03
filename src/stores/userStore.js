@@ -41,10 +41,8 @@ export const checkAuth = async (forceRefresh = false) => {
     }
 
     const data = await response.json()
-    const isAuth = data.success === true && data.data?.user
-
-    state.isAuthenticated = !!isAuth
-    state.user = isAuth ? data.data.user : null
+    state.isAuthenticated = !!(data.success === true && data.data?.user)
+    state.user = data.data?.user || null
     state.lastAuthCheck = Date.now()
 
     return state.isAuthenticated

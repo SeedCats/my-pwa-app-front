@@ -51,7 +51,7 @@ export default defineConfig({
             "type": "image/png",
             "form_factor": "wide",
             "label": "Homepage"
-          },
+          }
         ]
       }
 

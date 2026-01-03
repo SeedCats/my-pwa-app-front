@@ -400,14 +400,4 @@ const retryWithSanitizedContent = async (id, msgObj) => {
     }
 }
 
-export default { 
-    sendMessageToGrok, 
-    sendMessageToGrokWithFile, 
-    fetchAichatList, 
-    fetchAichatById, 
-    createAichat, 
-    appendMessagesToAichat, 
-    deleteAichat, 
-    updateAichatTitle, 
-    updateAichatLastMessage 
-}
+
