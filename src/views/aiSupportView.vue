@@ -42,7 +42,7 @@
                                 <!-- Welcome Message -->
                                 <div v-if="visibleMessages.length === 0"
                                     class="flex items-center justify-center h-full">
-                                    <div class="text-center py-8">
+                                    <div class="text-center py-8 max-w-2xl mx-auto">
                                         <div
                                             class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                                             <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -52,8 +52,28 @@
                                         </div>
                                         <h3 class="text-lg font-semibold mb-2" :class="themeClasses.textPrimary">Welcome
                                             to AI Support!</h3>
-                                        <p class="text-sm" :class="themeClasses.textSecondary">Start a conversation with
+                                        <p class="text-sm mb-6" :class="themeClasses.textSecondary">Start a conversation with
                                             AI. Ask me anything!</p>
+                                        
+                                        <!-- Suggested Prompts -->
+                                        <div v-if="suggestedPrompts.length > 0" class="mt-6">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <button
+                                                    v-for="(prompt, idx) in suggestedPrompts"
+                                                    :key="idx"
+                                                    @click="usePrompt(prompt)"
+                                                    class="group text-left p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105 hover:shadow-md"
+                                                    :class="isDarkMode ? 'bg-gray-800 border-gray-700 hover:border-blue-500 hover:bg-gray-750' : 'bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50'"
+                                                >
+                                                    <div class="flex items-start">
+                                                        <svg class="w-5 h-5 mt-0.5 mr-2 flex-shrink-0" :class="isDarkMode ? 'text-blue-400' : 'text-blue-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                        </svg>
+                                                        <span class="text-sm" :class="isDarkMode ? 'text-gray-200 group-hover:text-white' : 'text-gray-700 group-hover:text-gray-900'">{{ prompt }}</span>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -69,6 +89,13 @@
                                             : themeClasses.cardBackground + ' border ' + themeClasses.border + ' rounded-bl-none',
                                         (message.role !== 'user' && isDarkMode) ? 'text-white' : ''
                                     ]">
+                                        <!-- File attachment indicator for user messages -->
+                                        <div v-if="message.role === 'user' && message.fileName" class="mb-2 pb-2 border-b border-blue-400 flex items-center">
+                                            <svg class="w-4 h-4 mr-1.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            <span class="text-xs font-medium truncate">📎 {{ message.fileName }}</span>
+                                        </div>
                                         <p :class="['text-sm whitespace-pre-wrap', message.role === 'user' ? 'break-words' : 'break-normal', (message.role !== 'user' && isDarkMode) ? 'text-white' : '']">{{
                                             cleanContent(message.content) || (message.role === 'assistant' ? '...' : '')
                                             }}</p>
@@ -79,32 +106,34 @@
                                             <span class="animate-pulse text-gray-500">▊</span>
                                         </div>
 
-                                        <!-- Tool calls indicator (hidden for user messages; show 'None' when empty) -->
-                                        <div v-if="message && message.role !== 'user'" class="mt-2 text-xs opacity-75">
-                                            <div class="flex items-center space-x-1">
-                                                <span>
-                                                    <strong class="mr-1">Used tools:</strong>
-                                                    <span>{{ formatToolList(message.toolCalls) }}</span>
-                                                </span>
-                                            </div>
-                                        </div>
-
                                         <!-- Sources / Citations (shown separately, not as main content) -->
                                         <div v-if="message && message.sources && message.sources.length > 0"
-                                            class="mt-2 text-xs opacity-75">
-                                            <div class="flex items-center space-x-2">
-                                                <div>
-                                                    <div class="text-xs font-medium">Sources:</div>
-                                                    <ul class="list-disc ml-4">
-                                                        <li v-for="(s, si) in message.sources" :key="si">
-                                                            <a :href="s" target="_blank" rel="noopener noreferrer"
-                                                                class="underline text-blue-600">{{ s }}</a>
-                                                        </li>
-                                                    </ul>
-                                                    <div v-if="typeof message.foundSources !== 'undefined' && typeof message.requestedSources !== 'undefined' && message.foundSources < message.requestedSources" class="text-xs mt-1 text-gray-500">
-                                                        {{ message.foundSources }} of {{ message.requestedSources }} sources were returned.
-                                                    </div>
-                                                </div>
+                                            class="mt-3 pt-3 border-t overflow-hidden" :class="isDarkMode ? 'border-gray-600' : 'border-gray-300'">
+                                            <div class="text-xs font-semibold mb-2" :class="isDarkMode ? 'text-gray-300' : 'text-gray-700'">
+                                                <svg class="w-4 h-4 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                </svg>
+                                                Sources:
+                                            </div>
+                                            <ul class="space-y-1.5">
+                                                <li v-for="(source, si) in message.sources" :key="si" class="flex items-start break-words">
+                                                    <span class="text-xs mr-1.5 mt-0.5 flex-shrink-0" :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'">•</span>
+                                                    <a :href="source.url || source" 
+                                                       target="_blank" 
+                                                       rel="noopener noreferrer"
+                                                       class="text-xs underline hover:no-underline flex-1 break-all overflow-wrap-anywhere"
+                                                       :class="isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'"
+                                                       style="word-break: break-word; overflow-wrap: anywhere;">
+                                                        <span v-if="source.title" class="break-words">{{ source.title }}</span>
+                                                        <span v-else class="break-all">{{ source.url || source }}</span>
+                                                        <span v-if="source.title && source.url" class="text-gray-500 ml-1 whitespace-nowrap">({{ getDomain(source.url) }})</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                            <div v-if="typeof message.foundSources !== 'undefined' && typeof message.requestedSources !== 'undefined' && message.foundSources < message.requestedSources" 
+                                                 class="text-xs mt-2 italic" 
+                                                 :class="isDarkMode ? 'text-gray-500' : 'text-gray-500'">
+                                                {{ message.foundSources }} of {{ message.requestedSources }} sources found
                                             </div>
                                         </div>
 
@@ -203,19 +232,6 @@
                                         {{ isTyping ? 'Sending...' : 'Send' }}
                                     </button>
                                 </form>
-
-                                <!-- API Key Warning -->
-                                <div v-if="!hasApiKey"
-                                    class="mt-3 p-3 rounded-lg text-sm bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                                    <div class="flex items-center">
-                                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        Please add your API key.
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -312,9 +328,9 @@
                                 <div class="relative">
                                     <button
                                         @click.prevent="confirmDeleteAll = !confirmDeleteAll"
-                                        :disabled="historyLoading || chatList.length === 0"
-                                        :aria-disabled="historyLoading || chatList.length === 0"
-                                        title="Delete all conversations"
+                                        :disabled="historyLoading || chatList.length === 0 || isChatBusy"
+                                        :aria-disabled="historyLoading || chatList.length === 0 || isChatBusy"
+                                        :title="isChatBusy ? 'Please wait until the current response is finished' : 'Delete all conversations'"
                                         class="inline-flex items-center px-3 py-1 text-sm rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:from-red-600 hover:to-red-700 transition-transform transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
@@ -323,7 +339,16 @@
                                         <span class="ml-2 hidden sm:inline font-medium">Delete All</span>
                                     </button>
 
-                                    <div v-if="confirmDeleteAll" class="absolute right-0 mt-2 w-64 p-3 rounded-lg shadow-lg" :class="[themeClasses.cardBackground, themeClasses.border]">
+                                    <!-- Backdrop for click-outside -->
+                                    <div v-if="confirmDeleteAll" 
+                                         @click.self="confirmDeleteAll = false" 
+                                         class="fixed inset-0 z-40" 
+                                         style="background: transparent;"></div>
+
+                                    <div v-if="confirmDeleteAll" 
+                                         @click.stop
+                                         class="absolute right-0 mt-2 w-64 p-3 rounded-lg shadow-lg z-50" 
+                                         :class="[themeClasses.cardBackground, themeClasses.border]">
                                         <div class="text-sm mb-2" :class="isDarkMode ? 'text-gray-200' : 'text-gray-800'">
                                             <strong>Are you sure?</strong> This will permanently delete <span class="font-semibold">all</span> conversations.
                                         </div>
@@ -393,14 +418,43 @@
                                             :disabled="isChatBusy" :aria-disabled="isChatBusy"
                                             :title="isChatBusy ? 'Finish current response before loading another chat' : 'Load'"
                                             :class="isChatBusy ? 'px-2 py-1 text-sm rounded bg-blue-400 text-white cursor-not-allowed' : 'px-2 py-1 text-sm rounded bg-blue-600 text-white'">Load</button>
-                                        <button @click.prevent="deleteChat(chat._id)" title="Delete"
-                                            class="px-2 py-1 text-sm rounded bg-red-100 text-red-700 hover:bg-red-200 border">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
+                                        <div class="relative">
+                                            <button @click.prevent="confirmDeleteId = parseId(chat._id || chat.id)" 
+                                                :disabled="isChatBusy" 
+                                                :aria-disabled="isChatBusy"
+                                                :title="isChatBusy ? 'Please wait until the current response is finished' : 'Delete'"
+                                                :class="isChatBusy ? 'px-2 py-1 text-sm rounded bg-red-100 text-red-400 cursor-not-allowed border opacity-50' : 'px-2 py-1 text-sm rounded bg-red-100 text-red-700 hover:bg-red-200 border'">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                            
+                                            <!-- Backdrop for click-outside -->
+                                            <div v-if="confirmDeleteId === parseId(chat._id || chat.id)" 
+                                                 @click.self="confirmDeleteId = null" 
+                                                 class="fixed inset-0 z-40" 
+                                                 style="background: transparent;"></div>
+
+                                            <!-- Confirmation popup for single delete -->
+                                            <div v-if="confirmDeleteId === parseId(chat._id || chat.id)" 
+                                                 @click.stop
+                                                 class="absolute right-0 top-full mt-2 w-64 p-3 rounded-lg shadow-lg z-50" 
+                                                 :class="[themeClasses.cardBackground, themeClasses.border]">
+                                                <div class="text-sm mb-2" :class="isDarkMode ? 'text-gray-200' : 'text-gray-800'">
+                                                    <strong>Delete conversation?</strong><br>
+                                                    This cannot be undone.
+                                                </div>
+                                                <div class="flex justify-end space-x-2">
+                                                    <button @click.prevent="confirmDeleteId = null" 
+                                                            class="px-3 py-1 text-sm rounded" 
+                                                            :class="isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'">Cancel</button>
+                                                    <button @click.prevent="deleteChat(chat._id, true)" 
+                                                            class="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700">Delete</button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -434,7 +488,10 @@
 import { ref, nextTick, computed, onMounted, onBeforeUnmount } from 'vue'
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
-import { sendMessageToGrok, sendMessageToGrokWithFile, fetchAichatList, fetchAichatById, createAichat, appendMessagesToAichat, deleteAichat, updateAichatTitle, updateAichatLastMessage } from '../services/grokService' 
+import { sendMessageToGrok, sendMessageToGrokWithFile, fetchAichatList, fetchAichatById, createAichat, appendMessagesToAichat, deleteAichat, updateAichatTitle, updateAichatLastMessage } from '../services/grokService'
+import { useUserStore, getCachedBmiData, getCachedHeartRateDates, setCachedBmiData, setCachedHeartRateDates } from '../stores/userStore'
+import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
+import { getLatestBMIRecord } from '../services/bmiService' 
 
 const { isDarkMode, themeClasses } = useTheme()
 
@@ -450,6 +507,7 @@ const fileInput = ref(null)
 
 const showHistoryPanel = ref(true)
 const confirmDeleteAll = ref(false)
+const confirmDeleteId = ref(null)
 const chatList = ref([])
 const historyLoading = ref(false)
 const historyError = ref('')
@@ -473,11 +531,6 @@ const parseId = (idCandidate) => {
 const visibleMessages = computed(() => {
     const base = Array.isArray(messages.value) ? messages.value : []
     return base.filter(m => m && !(m.role === 'assistant' && m.isStreaming))
-})
-
-// Computed
-const hasApiKey = computed(() => {
-    return import.meta.env.VITE_GROK_API_KEY && import.meta.env.VITE_GROK_API_KEY !== 'your_grok_api_key_here'
 })
 
 // Whether the chat UI is busy (sending or receiving a streaming response)
@@ -526,6 +579,108 @@ watch(() => ({ ...aiSettings }), (nv) => {
     try { localStorage.setItem('aiSettings', JSON.stringify(nv)) } catch (e) { /* ignore */ }
 }, { deep: true })
 
+// Generate suggested prompts based on user health data
+const suggestedPrompts = computed(() => {
+    const bmiData = getCachedBmiData()
+    const heartRateDates = getCachedHeartRateDates()
+    
+    // Only show prompts if there's actual health data available
+    const hasBmiData = bmiData && bmiData.bmi
+    const hasHeartRateData = heartRateDates && heartRateDates.length > 0
+    
+    if (!hasBmiData && !hasHeartRateData) {
+        return [] // No prompts if no health data
+    }
+    
+    const bmiPrompts = []
+    const heartRatePrompts = []
+    
+    // Generate 2 BMI-related prompts if BMI data exists
+    if (hasBmiData) {
+        const bmi = parseFloat(bmiData.bmi)
+        
+        if (bmi < 18.5) {
+            bmiPrompts.push("What are healthy ways to gain weight?")
+            bmiPrompts.push("What diet should I follow to increase my weight safely?")
+        } else if (bmi >= 18.5 && bmi < 25) {
+            bmiPrompts.push("How can I maintain my healthy weight?")
+            bmiPrompts.push("What exercises are best for my current BMI?")
+        } else if (bmi >= 25 && bmi < 30) {
+            bmiPrompts.push("What are effective strategies for healthy weight loss?")
+            bmiPrompts.push("How can I create a sustainable weight loss plan?")
+        } else if (bmi >= 30) {
+            bmiPrompts.push("What exercises are safe for obese individuals?")
+            bmiPrompts.push("How can I start a weight loss journey safely?")
+        }
+    }
+    
+    // Generate 2 heart rate-related prompts if heart rate data exists
+    if (hasHeartRateData) {
+        heartRatePrompts.push("What do my heart rate trends indicate?")
+        heartRatePrompts.push("What's a healthy resting heart rate for me?")
+    }
+    
+    // Combine prompts: 2 BMI + 2 Heart Rate
+    const allPrompts = [...bmiPrompts, ...heartRatePrompts]
+    
+    return allPrompts.slice(0, 4) // Show max 4 prompts
+})
+
+// Use a suggested prompt
+const usePrompt = async (prompt) => {
+    if (isChatBusy.value) return
+    
+    // Determine if this is a heart rate prompt or BMI prompt
+    const heartRateKeywords = ['heart rate', 'cardiovascular', 'resting heart']
+    const isHeartRatePrompt = heartRateKeywords.some(keyword => 
+        prompt.toLowerCase().includes(keyword)
+    )
+    
+    // Build health data context to append to the prompt
+    const healthContext = []
+    const bmiData = getCachedBmiData()
+    const heartRateDates = getCachedHeartRateDates()
+    
+    if (isHeartRatePrompt) {
+        // For heart rate prompts, fetch and include all heart rate statistics
+        if (heartRateDates && heartRateDates.length > 0) {
+            try {
+                // Fetch the most recent heart rate data
+                const response = await getHeartRateRecords({ date: heartRateDates[0] })
+                if (response.success && response.data.records.length > 0) {
+                    const record = response.data.records[0]
+                    const dailyStats = record.dailyStats
+                    const resting = Math.round(dailyStats.min * 0.95)
+                    
+                    // Include all heart rate metrics
+                    healthContext.push(`Resting Heart Rate: ${resting} bpm`)
+                    healthContext.push(`Max Heart Rate: ${dailyStats.max} bpm`)
+                    healthContext.push(`Min Heart Rate: ${dailyStats.min} bpm`)
+                    healthContext.push(`Average Heart Rate: ${dailyStats.avg} bpm`)
+                }
+            } catch (error) {
+                console.error('Failed to fetch heart rate stats:', error)
+            }
+        }
+    } else {
+        // For BMI prompts, only include BMI data
+        if (bmiData && bmiData.bmi) {
+            healthContext.push(`BMI: ${bmiData.bmi}`)
+            if (bmiData.weight) healthContext.push(`Weight: ${bmiData.weight}kg`)
+            if (bmiData.height) healthContext.push(`Height: ${bmiData.height}cm`)
+        }
+    }
+    
+    // Append health data to prompt when sending
+    const messageWithData = healthContext.length > 0 
+        ? `${prompt}\n\nMy data: ${healthContext.join(', ')}`
+        : prompt
+    
+    newMessage.value = messageWithData
+    // Send the message immediately
+    await sendMessage()
+}
+
 // Reset staged settings (does not apply until user clicks Done)
 const resetAiSettings = () => {
     stagedSettings.temperature = 1.0
@@ -549,10 +704,10 @@ const finalMaxSources = computed(() => {
 })
 
 // Pagination options for history selector
-// Use the visible total (max of server-reported total and local cached chatList length)
 const totalPages = computed(() => {
-    const visibleTotal = Math.max(historyTotal.value || 0, (chatList.value || []).length || 0)
-    return Math.max(1, Math.ceil(visibleTotal / historyPerPage.value))
+    const total = historyTotal.value || 0
+    const perPage = historyPerPage.value || 3
+    return Math.max(1, Math.ceil(total / perPage))
 })
 
 const historyPageOptions = computed(() => {
@@ -565,11 +720,9 @@ const showPagination = computed(() => {
     return ((chatList.value || []).length > historyPerPage.value) || (totalPages.value > 1)
 })
 
-// Ensure pagination reacts immediately when chatList changes locally
-watch(() => (chatList.value || []).length, (len) => {
+// Ensure pagination reacts immediately when historyTotal changes
+watch(historyTotal, () => {
     try {
-        // Keep historyTotal in sync with local list so totalPages updates
-        if ((historyTotal.value || 0) < len) historyTotal.value = len
         // Clamp the current page within bounds
         if (historyPage.value > totalPages.value) historyPage.value = totalPages.value
     } catch (e) { console.warn('pagination watch error:', e) }
@@ -577,6 +730,15 @@ watch(() => (chatList.value || []).length, (len) => {
 
 // Methods
 const updateSidebarState = (state) => sidebarHidden.value = state
+
+const getDomain = (url) => {
+    try {
+        const urlObj = new URL(url)
+        return urlObj.hostname.replace(/^www\./, '')
+    } catch (e) {
+        return url
+    }
+}
 
 const formatTime = (timestamp) => {
     if (!timestamp) return ''
@@ -745,7 +907,11 @@ const loadChatIntoConversation = async (id) => {
             const loaded = Array.isArray(res.data.messages) ? res.data.messages.map(m => ({
                 role: normalizeRole(m.role),
                 content: cleanContent(m.content || ''),
-                timestamp: m.timestamp ? new Date(m.timestamp) : new Date()
+                timestamp: m.timestamp ? new Date(m.timestamp) : new Date(),
+                toolCalls: m.toolCalls || [],
+                sources: m.sources || [],
+                foundSources: m.foundSources,
+                requestedSources: m.requestedSources
             })) : []
 
             // Remove immediate duplicate messages (same trimmed content) which caused double-rendering/side-swapped issues
@@ -781,18 +947,35 @@ const loadChatIntoConversation = async (id) => {
     }
 }
 
-const deleteChat = async (id) => {
+const deleteChat = async (id, skipConfirm = false) => {
     if (!id) return
-    const ok = confirm('Delete this conversation? This cannot be undone.')
-    if (!ok) return
+    if (!skipConfirm) {
+        // Should not reach here anymore since we use custom popup
+        const ok = confirm('Delete this conversation? This cannot be undone.')
+        if (!ok) return
+    }
+    confirmDeleteId.value = null // Close the confirmation popup
     historyLoading.value = true
     historyError.value = ''
     try {
         const res = await deleteAichat(id)
         if (res && res.success) {
-            // remove from local list
+            // Decrement total count
+            historyTotal.value = Math.max(0, (historyTotal.value || 0) - 1)
+            
+            // Remove from local list
             chatList.value = (chatList.value || []).filter(c => parseId(c._id || c.id) !== parseId(id))
-            // if the deleted chat is currently loaded, clear it
+            
+            // If current page becomes empty and we're not on page 1, go to previous page
+            if (chatList.value.length === 0 && historyPage.value > 1) {
+                historyPage.value = historyPage.value - 1
+                await loadChatList(historyPage.value)
+            } else {
+                // Reload current page to show updated list
+                await loadChatList(historyPage.value)
+            }
+            
+            // If the deleted chat is currently loaded, clear it
             if (parseId(chatId.value) === parseId(id)) {
                 chatId.value = null
                 messages.value = []
@@ -899,26 +1082,43 @@ onBeforeUnmount(() => {
 const cleanContent = (content) => {
     if (!content) return content
     let t = content.toString()
+    
     // Normalize non-breaking spaces to normal spaces
     t = t.replace(/\u00A0/g, ' ')
+    
     // Remove zero-width spaces and soft hyphens that can cause odd breaks
     t = t.replace(/[\u200B-\u200D\uFEFF\u00AD]/g, '')
-    // Normalize spacing around slashes (e.g. "5 km /h" -> "5 km/h")
-    t = t.replace(/\s*\/\s*/g, '/')
+    
     // Collapse multiple spaces/tabs into a single space (preserve newlines)
     t = t.replace(/[ \t]+/g, ' ')
-
-    // Remove spaces inside contiguous digit sequences (e.g. "202 5" -> "2025")
-    try { t = t.replace(/(?<=\d)\s+(?=\d)/g, '') } catch (err) { /* ignore lookbehind issues */ }
-
-    // Collapse spaced acronym fragments like "H K T" or "HK T" -> "HKT"
-    t = t.replace(/\b(?:[A-Z]{1,3}\s+){1,3}[A-Z]{1,3}\b/g, (m) => {
-        const joined = m.replace(/\s+/g, '')
-        return (joined.length >= 2 && joined.length <= 4) ? joined : m
-    })
-
+    
+    // Remove spaces before punctuation (comma, period, exclamation, question, colon, semicolon)
+    t = t.replace(/\s+([,.!?:;])/g, '$1')
+    
+    // Fix spacing around degree symbols (e.g. "19 °C" -> "19°C")
+    t = t.replace(/\s*(°)\s*/g, '$1')
+    
+    // Remove spaces inside numbers (e.g. "202 6" -> "2026")
+    t = t.replace(/(\d)\s+(\d)/g, '$1$2')
+    
+    // Fix hyphens with spaces (e.g. "real -time" -> "real-time", "10 - 20" -> "10-20")
+    t = t.replace(/\s+-\s+/g, '-')
+    t = t.replace(/(\w)\s+-/g, '$1-')
+    t = t.replace(/-\s+(\w)/g, '-$1')
+    
+    // Remove spaces around slashes (e.g. "km /h" -> "km/h")
+    t = t.replace(/\s*\/\s*/g, '/')
+    
+    // Fix common domain spacing issues (e.g. "h ko.gov.hk" -> "hko.gov.hk")
+    t = t.replace(/\b([a-z])\s+([a-z]{1,3})\.(gov|com|org|net|edu)/gi, '$1$2.$3')
+    
+    // Fix possessive apostrophes with spaces (e.g. "Hong Kong 's" -> "Hong Kong's")
+    t = t.replace(/\s+'/g, "'")
+    t = t.replace(/'\s+([st])\b/g, "'$1")
+    
     // Trim leading/trailing spaces on each line while preserving line breaks
     t = t.split('\n').map(line => line.trim()).join('\n')
+    
     return t
 }
 
@@ -969,12 +1169,6 @@ const appendChunkContent = (aiMessage, text) => {
 }
 
 // Format tool list, showing 'None' when empty or only falsy names
-const formatToolList = (toolCalls) => {
-    if (!toolCalls || toolCalls.length === 0) return 'None'
-    const names = toolCalls.map(t => (t && t.toolName) || '').filter(Boolean)
-    return names.length > 0 ? names.join(', ') : 'None'
-}
-
 // Get a short preview string for a chat, prefer lastMessage if available
 const getChatPreview = (chat) => {
     if (!chat) return ''
@@ -1011,7 +1205,8 @@ const sendMessage = async () => {
     const userMessage = {
         role: 'user',
         content: newMessage.value.trim(),
-        timestamp: new Date()
+        timestamp: new Date(),
+        fileName: selectedFile.value ? selectedFile.value.name : null
     }
 
     if (!Array.isArray(messages.value)) messages.value = []
@@ -1027,7 +1222,13 @@ const sendMessage = async () => {
 
     // Persist user message: create chat if missing, otherwise append user message
     try {
-        const serialMsg = { role: userMessage.role, content: userMessage.content, timestamp: (userMessage.timestamp instanceof Date) ? userMessage.timestamp.toISOString() : userMessage.timestamp }
+        const serialMsg = { 
+            role: userMessage.role, 
+            content: userMessage.content, 
+            timestamp: (userMessage.timestamp instanceof Date) ? userMessage.timestamp.toISOString() : userMessage.timestamp,
+            toolCalls: userMessage.toolCalls || [],
+            sources: userMessage.sources || []
+        }
         if (!chatId.value) {
             // create new chat with this initial message and WAIT for id so subsequent assistant append can use it
             try {
@@ -1037,16 +1238,11 @@ const sendMessage = async () => {
                     if (createdId) {
                         chatId.value = createdId
 
-                        // The server may place new chats on a different page. Compute the expected page for the new chat
+                        // Update total count for pagination and reload current page
                         try {
-                            const currentLocalCount = (chatList.value || []).length || 0
-                            const newTotal = Math.max(historyTotal.value || 0, currentLocalCount) + 1
-                            historyTotal.value = newTotal
-                            const per = Math.max(1, historyPerPage.value)
-                            const newPage = Math.max(1, Math.ceil(newTotal / per))
-                            historyPage.value = newPage
-                            // load that page so the UI reflects server ordering immediately
-                            await loadChatList(newPage)
+                            historyTotal.value = (historyTotal.value || 0) + 1
+                            // Reload current page to refresh the list
+                            await loadChatList(historyPage.value)
                         } catch (e) {
                             console.warn('post-create pagination adjust error:', e)
                         }
@@ -1139,7 +1335,11 @@ const sendMessage = async () => {
                     try {
                         if (chunk.url && streamingSources.length < finalMaxSources.value) {
                             const url = chunk.url.trim()
-                            if (!streamingSources.includes(url)) streamingSources.push(url)
+                            const title = chunk.title || url
+                            // Check if this URL already exists
+                            if (!streamingSources.find(s => s.url === url)) {
+                                streamingSources.push({ url, title })
+                            }
                         }
                     } catch (e) { console.warn('handleChunk source push error:', e) }
                 }
@@ -1182,14 +1382,19 @@ const sendMessage = async () => {
                 const cleaned = stripCitations(response.message)
                 if (cleaned && (!urlLike(cleaned) || streamingSources.length === 0)) {
                     finalContent = cleaned
-                } else {
-                    try {
-                        if (response.message) {
-                            const url = response.message.trim()
-                            if (!streamingSources.includes(url) && streamingSources.length < finalMaxSources.value) streamingSources.push(url)
-                        }
-                    } catch (e) { console.warn('response message push error:', e) }
                 }
+            }
+
+            // Merge sources from response if available (for non-streaming or additional sources)
+            if (response && response.sources && Array.isArray(response.sources)) {
+                response.sources.forEach(src => {
+                    if (streamingSources.length >= finalMaxSources.value) return
+                    const url = typeof src === 'string' ? src : src.url
+                    const title = typeof src === 'string' ? src : (src.title || src.url)
+                    if (url && !streamingSources.find(s => s.url === url)) {
+                        streamingSources.push({ url, title })
+                    }
+                })
             }
 
             const foundSourcesCount = streamingSources.length
@@ -1238,7 +1443,11 @@ const sendMessage = async () => {
                         const serialAssistant = {
                             role: aiMessage.role,
                             content: aiMessage.content,
-                            timestamp: (aiMessage.timestamp instanceof Date) ? aiMessage.timestamp.toISOString() : aiMessage.timestamp
+                            timestamp: (aiMessage.timestamp instanceof Date) ? aiMessage.timestamp.toISOString() : aiMessage.timestamp,
+                            toolCalls: aiMessage.toolCalls || [],
+                            sources: aiMessage.sources || [],
+                            foundSources: aiMessage.foundSources,
+                            requestedSources: aiMessage.requestedSources
                         }
 
                         if (chatId.value) {
@@ -1260,7 +1469,9 @@ const sendMessage = async () => {
                             const serialUser = {
                                 role: userMessage.role,
                                 content: userMessage.content || messageToSend,
-                                timestamp: (userMessage.timestamp instanceof Date) ? userMessage.timestamp.toISOString() : userMessage.timestamp
+                                timestamp: (userMessage.timestamp instanceof Date) ? userMessage.timestamp.toISOString() : userMessage.timestamp,
+                                toolCalls: userMessage.toolCalls || [],
+                                sources: userMessage.sources || []
                             }
                             try {
                                 const createRes2 = await createAichat('New Conversation', [serialUser, serialAssistant])
@@ -1268,7 +1479,16 @@ const sendMessage = async () => {
                                     const createdId2 = parseId(createRes2.data.id || createRes2.data._id)
                                     if (createdId2) {
                                         chatId.value = createdId2
-                                        upsertChatList(createdId2, { title: createRes2.data.title || 'New Conversation', lastMessage: aiMessage.content, updatedAt: aiMessage.timestamp })
+                                        
+                                        // Update total count for pagination and reload current page
+                                        try {
+                                            historyTotal.value = (historyTotal.value || 0) + 1
+                                            // Reload current page to refresh the list
+                                            await loadChatList(historyPage.value)
+                                        } catch (e) {
+                                            console.warn('post-create2 pagination adjust error:', e)
+                                        }
+                                        
                                         // persist lastMessage field on server for the newly created chat (best effort)
                                         try {
                                 const res = await updateAichatLastMessage(createdId2, { role: aiMessage.role, content: aiMessage.content, timestamp: aiMessage.timestamp })
@@ -1349,11 +1569,50 @@ const startNewChat = async () => {
     await scrollToBottom()
 }
 
-onMounted(() => {
-    // Check if API key is configured
-    if (!hasApiKey.value) {
-        console.warn('API key not configured. Please add VITE_GROK_API_KEY to your .env file.')
+// Load health data for suggested prompts if not already cached
+const loadHealthData = async () => {
+    try {
+        // Load BMI data if not cached
+        if (!getCachedBmiData()) {
+            try {
+                const { success, data } = await getLatestBMIRecord()
+                if (success && data) {
+                    const bmiResult = {
+                        bmi: data.bmi,
+                        category: data.category,
+                        height: data.height,
+                        weight: data.weight,
+                        age: data.age || null,
+                        createdAt: data.createdAt,
+                        updatedAt: data.updatedAt
+                    }
+                    setCachedBmiData(bmiResult)
+                }
+            } catch (error) {
+                console.log('No BMI data available')
+            }
+        }
+
+        // Load heart rate dates if not cached
+        if (!getCachedHeartRateDates()) {
+            try {
+                const response = await getHeartRateDates()
+                if (response.success && response.data.dates && response.data.dates.length > 0) {
+                    setCachedHeartRateDates(response.data.dates)
+                }
+            } catch (error) {
+                console.log('No heart rate data available')
+            }
+        }
+    } catch (error) {
+        console.error('Error loading health data:', error)
     }
+}
+
+onMounted(() => {
+    // Load health data for suggested prompts
+    loadHealthData()
+    
     // Auto-load history when the panel is shown by default
     if (showHistoryPanel.value) {
         loadChatList(1).catch(e => console.warn('Failed to load chat history on mount:', e))
