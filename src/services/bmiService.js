@@ -1,6 +1,6 @@
 // BMI Service - API calls for BMI data management
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || ''
 const getHeaders = () => ({ 'Content-Type': 'application/json' })
 
 const handleResponse = async (response) => {
