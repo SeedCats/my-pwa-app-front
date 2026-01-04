@@ -133,6 +133,26 @@ const API_URL = import.meta.env.VITE_API_URL || ''
 
 // Check if already authenticated via API
 onMounted(async () => {
+  // Clear all localStorage except login-related items
+  const keysToKeep = [REMEMBER_EMAIL_KEY, 'theme', 'darkMode']
+  const currentStorage = {}
+  
+  // Save items we want to keep
+  keysToKeep.forEach(key => {
+    const value = localStorage.getItem(key)
+    if (value !== null) {
+      currentStorage[key] = value
+    }
+  })
+  
+  // Clear all localStorage
+  localStorage.clear()
+  
+  // Restore kept items
+  Object.keys(currentStorage).forEach(key => {
+    localStorage.setItem(key, currentStorage[key])
+  })
+  
   // Load remembered email if exists
   const rememberedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY)
   if (rememberedEmail) {

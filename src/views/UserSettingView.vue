@@ -333,14 +333,8 @@ const updatePassword = async () => {
         console.error('Logout error:', err)
       }
       
-      // Show success message briefly before redirect
-      successMessage.value = 'Password updated successfully! Redirecting to login...'
-      scrollToTop()
-      
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        router.push('/login')
-      }, 2000)
+      // Force page reload to login page to clear all state
+      window.location.href = '/'
     } else {
       errorMessage.value = data.message || 'Failed to update password'
       scrollToTop()
