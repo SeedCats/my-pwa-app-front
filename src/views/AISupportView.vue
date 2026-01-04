@@ -176,24 +176,24 @@
                                 <input ref="fileInput" type="file" @change="handleFileChange"
                                     accept=".txt,.csv,.json,.md" class="hidden" />
 
-                                <form @submit.prevent="sendMessage" class="flex items-center space-x-1 sm:space-x-3">
-                                    <div v-if="selectedFile" class="flex-shrink-0 mr-1 sm:mr-2">
-                                        <div class="inline-flex items-center max-w-xs rounded-full px-3 py-1 text-sm border"
+                                <form @submit.prevent="sendMessage" class="flex items-center gap-1 sm:gap-2">
+                                    <div v-if="selectedFile" class="flex-shrink-0">
+                                        <div class="inline-flex items-center max-w-[120px] sm:max-w-xs rounded-full px-2 py-1 text-xs border"
                                             :class="isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-100 border-gray-200 text-gray-800'">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            <svg class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="1.6" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M21.44 11.05l-8.49 8.49a5 5 0 01-7.07-7.07l8.49-8.49a3.5 3.5 0 014.95 4.95L10.83 17.83a2 2 0 01-2.83-2.83l8.49-8.49" />
                                             </svg>
-                                            <span class="ml-2 truncate" style="max-width: 200px">{{ selectedFile.name
+                                            <span class="ml-1 sm:ml-2 truncate text-xs">{{ selectedFile.name
                                                 }}</span>
                                             <button type="button" @click.prevent="removeSelectedFile"
-                                                class="ml-3 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-red-500">✕</button>
+                                                class="ml-1 sm:ml-2 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-red-500 flex-shrink-0">✕</button>
                                         </div>
                                     </div>
 
                                     <input v-model="newMessage" type="text" placeholder="Type your message here..."
-                                        class="flex-1 px-2 sm:px-4 py-2 rounded-lg border transition-colors text-sm sm:text-base" :class="[
+                                        class="flex-1 min-w-0 px-3 py-2 rounded-lg border transition-colors text-sm" :class="[
                                             themeClasses.cardBackground,
                                             themeClasses.border,
                                             isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-800 placeholder-gray-400'
@@ -201,10 +201,10 @@
 
                                     <button type="button" @click.prevent="openFilePicker" aria-label="Attach file"
                                         :class="[
-                                            'inline-flex items-center justify-center px-2 sm:px-3 py-2 rounded-md transition-colors border focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-blue-400/30 hover:bg-gray-100 hover:border-gray-200 min-h-[44px]',
+                                            'flex-shrink-0 inline-flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-lg transition-colors border focus:outline-none focus:ring-2 focus:ring-blue-500/30',
                                             isDarkMode
                                                 ? 'bg-white hover:bg-gray-100 border-gray-200 text-gray-800'
-                                                : 'bg-transparent text-gray-700'
+                                                : 'bg-transparent hover:bg-gray-100 text-gray-700 border-gray-300'
                                         ]">
                                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="1.8" xmlns="http://www.w3.org/2000/svg">
@@ -214,11 +214,11 @@
                                     </button>
 
                                     <button type="submit" :disabled="!newMessage.trim() || isTyping"
-                                        class="px-4 sm:px-6 py-2 sm:py-2 rounded-lg font-medium text-white transition-colors flex items-center touch-manipulation min-h-[44px] active:scale-95"
+                                        class="flex-shrink-0 w-10 h-10 sm:w-auto sm:px-5 sm:py-2 rounded-lg font-medium text-white transition-colors inline-flex items-center justify-center"
                                         :class="newMessage.trim() && !isTyping
-                                            ? 'bg-blue-600 hover:bg-blue-700'
+                                            ? 'bg-blue-600 hover:bg-blue-700 active:scale-95'
                                             : 'bg-gray-400 cursor-not-allowed'">
-                                        <svg v-if="isTyping" class="animate-spin -ml-1 mr-2 h-4 w-4"
+                                        <svg v-if="isTyping" class="animate-spin h-5 w-5 sm:h-4 sm:w-4 sm:mr-2"
                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                                 stroke-width="4"></circle>
@@ -226,7 +226,7 @@
                                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                             </path>
                                         </svg>
-                                        <svg v-else class="w-4 h-4 sm:mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                        <svg v-else class="w-5 h-5 sm:w-4 sm:h-4 sm:mr-2" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                                         </svg>
                                         <span class="hidden sm:inline">{{ isTyping ? 'Sending...' : 'Send' }}</span>
@@ -1616,6 +1616,9 @@ const loadHealthData = async () => {
 }
 
 onMounted(() => {
+    // Scroll to top when entering the page
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    
     // Load health data for suggested prompts
     loadHealthData()
     

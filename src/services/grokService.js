@@ -1,4 +1,5 @@
 // Grok AI Service - Backend API Proxy
+import { fetchWithAuth } from '../utils/fetchWithAuth'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -102,7 +103,7 @@ const processGrokResponse = async (response, onChunk) => {
 
 export const sendMessageToGrok = async (message, conversationHistory = [], onChunk, options = {}) => {
     try {
-        const response = await fetch(`${API_URL}/api/grok/chat`, {
+        const response = await fetchWithAuth(`${API_URL}/api/grok/chat`, {
             method: 'POST',
             credentials: 'include',
             headers: { 
@@ -137,7 +138,7 @@ export const sendMessageToGrokWithFile = async (file, message, conversationHisto
             }
         }
 
-        const response = await fetch(`${API_URL}/api/grok/chat`, {
+        const response = await fetchWithAuth(`${API_URL}/api/grok/chat`, {
             method: 'POST',
             credentials: 'include',
             headers: { 
@@ -190,7 +191,7 @@ const readFileContent = async (file) => {
 
 export const fetchAichatList = async (page = 1, limit = 20) => {
     try {
-        const res = await fetch(`${API_URL}/api/ai/chat?page=${page}&limit=${limit}`, { credentials: 'include' })
+        const res = await fetchWithAuth(`${API_URL}/api/ai/chat?page=${page}&limit=${limit}`, { credentials: 'include' })
         if (!res.ok) {
             const err = await res.json().catch(() => ({ message: res.statusText }))
             throw new Error(err.message || 'Failed to fetch chat list')
@@ -204,7 +205,7 @@ export const fetchAichatList = async (page = 1, limit = 20) => {
 
 export const fetchAichatById = async (id) => {
     try {
-        const res = await fetch(`${API_URL}/api/ai/chat/${id}`, { credentials: 'include' })
+        const res = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, { credentials: 'include' })
         if (!res.ok) {
             const err = await res.json().catch(() => ({ message: res.statusText }))
             throw new Error(err.message || 'Failed to fetch chat')
@@ -218,7 +219,7 @@ export const fetchAichatById = async (id) => {
 
 export const createAichat = async (title = 'New Conversation', messages = []) => {
     try {
-        const res = await fetch(`${API_URL}/api/ai/chat`, {
+        const res = await fetchWithAuth(`${API_URL}/api/ai/chat`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
@@ -237,7 +238,7 @@ export const createAichat = async (title = 'New Conversation', messages = []) =>
 
 export const appendMessagesToAichat = async (id, messages = []) => {
     try {
-        const res = await fetch(`${API_URL}/api/ai/chat/${id}`, {
+        const res = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
             method: 'PUT',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
@@ -256,7 +257,7 @@ export const appendMessagesToAichat = async (id, messages = []) => {
 
 export const deleteAichat = async (id) => {
     try {
-        const res = await fetch(`${API_URL}/api/ai/chat/${id}`, {
+        const res = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
             method: 'DELETE',
             credentials: 'include'
         })
@@ -273,7 +274,7 @@ export const deleteAichat = async (id) => {
 
 export const updateAichatTitle = async (id, title) => {
     try {
-        const res = await fetch(`${API_URL}/api/ai/chat/${id}`, {
+        const res = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
             method: 'PUT',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
@@ -298,7 +299,7 @@ export const updateAichatLastMessage = async (id, lastMessage = null) => {
     if (!msgObj) return { success: false, message: 'Nothing to update' }
 
     try {
-        const res = await fetch(`${API_URL}/api/ai/chat/${id}`, {
+        const res = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
             method: 'PUT',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
@@ -382,7 +383,7 @@ const retryWithSanitizedContent = async (id, msgObj) => {
         
         if (!short || short === msgObj.content) return null
         
-        const retryRes = await fetch(`${API_URL}/api/ai/chat/${id}`, {
+        const retryRes = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
             method: 'PUT',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
