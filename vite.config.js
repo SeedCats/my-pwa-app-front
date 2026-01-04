@@ -61,7 +61,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',  // Proxy API requests to the backend server
+        target: 'http://localhost:5000' || 'https://my-pwa-app-back.onrender.com',  // Proxy API requests to the backend server
         changeOrigin: true
       }
     }
