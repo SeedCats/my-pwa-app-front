@@ -251,10 +251,13 @@ const loadUserData = async () => {
     const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
     if (res.ok) {
       const data = await res.json()
-      const user = data.data || data.user || data
+      const user = data.data?.user || data.user || data.data || data
+      console.log('User data loaded:', user)
       profileForm.value = { name: user.name || '', email: user.email || '' }
     }
-  } catch { /* ignore */ }
+  } catch (err) {
+    console.error('Failed to load user data:', err)
+  }
 }
 
 onMounted(loadUserData)
@@ -317,12 +320,31 @@ const updatePassword = async () => {
     const data = await response.json()
     
     if (response.ok && data.success) {
-      successMessage.value = 'Password updated successfully!'
+      // Clear the password form
       passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
+      
+      // Logout to clear cookies/tokens
+      try {
+        await fetch(`${API_URL}/api/logout`, {
+          method: 'POST',
+          credentials: 'include'
+        })
+      } catch (err) {
+        console.error('Logout error:', err)
+      }
+      
+      // Show success message briefly before redirect
+      successMessage.value = 'Password updated successfully! Redirecting to login...'
+      scrollToTop()
+      
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        router.push('/login')
+      }, 2000)
     } else {
       errorMessage.value = data.message || 'Failed to update password'
+      scrollToTop()
     }
-    scrollToTop()
   } catch {
     errorMessage.value = 'Network error. Please try again.'
     scrollToTop()

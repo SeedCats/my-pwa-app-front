@@ -16,9 +16,9 @@
                 <!-- Chat Container -->
                 <div class="max-w-9xl mx-auto">
                     <div class="relative">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="text-lg font-semibold" :class="[themeClasses.textPrimary, isDarkMode ? 'text-white' : 'text-gray-900']">{{ currentTitle }}</div>
-                            <div class="flex items-center space-x-2">
+                        <div class="flex items-center justify-between mb-2 gap-2">
+                            <div class="text-base sm:text-lg font-semibold truncate" :class="[themeClasses.textPrimary, isDarkMode ? 'text-white' : 'text-gray-900']">{{ currentTitle }}</div>
+                            <div class="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
                                 <button @click.prevent="showSettings = !showSettings" :disabled="isChatBusy" :aria-disabled="isChatBusy" :title="isChatBusy ? 'Settings disabled while AI is responding' : 'AI Settings'" :class="['inline-flex items-center justify-center p-2 rounded-full text-sm transition-shadow duration-200 transform focus:outline-none focus:ring-2', isChatBusy ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : (isDarkMode ? 'bg-white text-gray-900 hover:shadow-md focus:ring-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-300')]" aria-label="AI Settings" role="button">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-current transform transition-transform duration-200 hover:scale-105" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                         <rect x="3" y="5" width="12" height="2" rx="1"></rect>
@@ -37,7 +37,7 @@
                         </div>
                         <div class="rounded-lg shadow-sm border" :class="[themeClasses.cardBackground, themeClasses.border]">
                             <!-- Chat Messages -->
-                            <div ref="chatContainer" class="h-128 overflow-y-auto p-4 space-y-4"
+                            <div ref="chatContainer" class="h-[60vh] sm:h-[70vh] lg:h-128 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4"
                                 :class="isDarkMode ? 'bg-gray-900' : 'bg-gray-50'">
                                 <!-- Welcome Message -->
                                 <div v-if="visibleMessages.length === 0"
@@ -83,7 +83,7 @@
                                     message && message.role === 'user' ? 'justify-end' : 'justify-start'
                                 ]">
                                     <div :class="[
-                                        'max-w-xs lg:max-w-md px-4 py-2 rounded-lg',
+                                        'max-w-[85%] sm:max-w-xs lg:max-w-md px-3 sm:px-4 py-2 rounded-lg',
                                         message.role === 'user'
                                             ? 'bg-blue-600 text-white rounded-br-none'
                                             : themeClasses.cardBackground + ' border ' + themeClasses.border + ' rounded-bl-none',
@@ -146,7 +146,7 @@
                                 <!-- Typing Indicator -->
                                 <div v-if="isTyping" class="flex justify-start">
                                     <div :class="[
-                                        'max-w-xs lg:max-w-md px-4 py-2 rounded-lg rounded-bl-none',
+                                        'max-w-[85%] sm:max-w-xs lg:max-w-md px-3 sm:px-4 py-2 rounded-lg rounded-bl-none',
                                         themeClasses.cardBackground,
                                         themeClasses.border,
                                         'border'
@@ -166,7 +166,7 @@
                             </div>
 
                             <!-- Chat Input -->
-                            <div class="p-4 border-t" :class="themeClasses.border">
+                            <div class="p-2 sm:p-4 border-t" :class="themeClasses.border">
                                 <!-- Error Message -->
                                 <div v-if="errorMessage"
                                     class="mb-3 p-3 rounded-lg text-sm bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
@@ -176,8 +176,8 @@
                                 <input ref="fileInput" type="file" @change="handleFileChange"
                                     accept=".txt,.csv,.json,.md" class="hidden" />
 
-                                <form @submit.prevent="sendMessage" class="flex items-center space-x-3">
-                                    <div v-if="selectedFile" class="flex-shrink-0 mr-2">
+                                <form @submit.prevent="sendMessage" class="flex items-center space-x-1 sm:space-x-3">
+                                    <div v-if="selectedFile" class="flex-shrink-0 mr-1 sm:mr-2">
                                         <div class="inline-flex items-center max-w-xs rounded-full px-3 py-1 text-sm border"
                                             :class="isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-100 border-gray-200 text-gray-800'">
                                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -193,7 +193,7 @@
                                     </div>
 
                                     <input v-model="newMessage" type="text" placeholder="Type your message here..."
-                                        class="flex-1 px-4 py-2 rounded-lg border transition-colors" :class="[
+                                        class="flex-1 px-2 sm:px-4 py-2 rounded-lg border transition-colors text-sm sm:text-base" :class="[
                                             themeClasses.cardBackground,
                                             themeClasses.border,
                                             isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-800 placeholder-gray-400'
@@ -201,7 +201,7 @@
 
                                     <button type="button" @click.prevent="openFilePicker" aria-label="Attach file"
                                         :class="[
-                                            'inline-flex items-center justify-center px-3 py-2 ml-2 rounded-md transition-colors border focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-blue-400/30 hover:bg-gray-100 hover:border-gray-200',
+                                            'inline-flex items-center justify-center px-2 sm:px-3 py-2 rounded-md transition-colors border focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-blue-400/30 hover:bg-gray-100 hover:border-gray-200 min-h-[44px]',
                                             isDarkMode
                                                 ? 'bg-white hover:bg-gray-100 border-gray-200 text-gray-800'
                                                 : 'bg-transparent text-gray-700'
@@ -214,7 +214,7 @@
                                     </button>
 
                                     <button type="submit" :disabled="!newMessage.trim() || isTyping"
-                                        class="px-6 py-2 rounded-lg font-medium text-white transition-colors flex items-center"
+                                        class="px-4 sm:px-6 py-2 sm:py-2 rounded-lg font-medium text-white transition-colors flex items-center touch-manipulation min-h-[44px] active:scale-95"
                                         :class="newMessage.trim() && !isTyping
                                             ? 'bg-blue-600 hover:bg-blue-700'
                                             : 'bg-gray-400 cursor-not-allowed'">
@@ -226,10 +226,10 @@
                                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                             </path>
                                         </svg>
-                                        <svg v-else class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                        <svg v-else class="w-4 h-4 sm:mr-2" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                                         </svg>
-                                        {{ isTyping ? 'Sending...' : 'Send' }}
+                                        <span class="hidden sm:inline">{{ isTyping ? 'Sending...' : 'Send' }}</span>
                                     </button>
                                 </form>
                             </div>
@@ -238,9 +238,9 @@
                 </div>
 
                 <!-- AI Settings Modal -->
-                <div v-if="showSettings" class="fixed inset-0 z-50 flex items-center justify-center">
+                <div v-if="showSettings" class="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="showSettings = false"></div>
-                    <div :class="['relative w-full max-w-md mx-auto rounded-xl p-5 shadow-xl ring-1 ring-black/6 transform transition-all duration-200', isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900']">
+                    <div :class="['relative w-full max-w-md mx-auto rounded-xl p-4 sm:p-5 shadow-xl ring-1 ring-black/6 transform transition-all duration-200 max-h-[90vh] overflow-y-auto', isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900']">
 
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-start gap-3">
