@@ -67,4 +67,9 @@ export default defineConfig({
     }
   },
 
+  // Allow previewing the PWA on the specified host for Render deployment
+  preview: {
+    allowedHosts: ['my-pwa-app-front.onrender.com']
+  }
+
 });
