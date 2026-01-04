@@ -226,6 +226,7 @@ import {
 const router = useRouter()
 const route = useRoute()
 const { isDarkMode, themeClasses } = useTheme()
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 const emit = defineEmits(['update:sidebarState'])
 
@@ -253,7 +254,7 @@ const toggleDesktopSidebar = () => {
 
 const handleLogOut = async () => {
     try {
-        await fetch('/api/logout', { method: 'POST', credentials: 'include' })
+        await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' })
     } catch { /* ignore */ }
     clearAllCaches()  // Clear all cached data on logout
     router.push('/')
@@ -261,7 +262,7 @@ const handleLogOut = async () => {
 
 const loadUserData = async () => {
     try {
-        const res = await fetch('/api/user/me', { credentials: 'include' })
+        const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
         if (res.ok) {
             const json = await res.json()
             userData.value = json.data?.user || json.data || json.user || json

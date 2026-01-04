@@ -232,6 +232,7 @@ import Sidebar from '../components/Side_and_Top_Bar.vue'
 
 const router = useRouter()
 const { isDarkMode, themeClasses } = useTheme()
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 // State
 const sidebarHidden = ref(false)
@@ -247,7 +248,7 @@ const deletePassword = ref('')
 
 const loadUserData = async () => {
   try {
-    const res = await fetch('/api/user/me', { credentials: 'include' })
+    const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
     if (res.ok) {
       const data = await res.json()
       const user = data.data || data.user || data
@@ -267,7 +268,7 @@ const updateProfile = async () => {
   profileLoading.value = true
   
   try {
-    const response = await fetch('/api/user/profile', {
+    const response = await fetch(`${API_URL}/api/user/profile`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -303,7 +304,7 @@ const updatePassword = async () => {
   passwordLoading.value = true
   
   try {
-    const response = await fetch('/api/user/password', {
+    const response = await fetch(`${API_URL}/api/user/password`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -334,7 +335,7 @@ const deleteAccount = async () => {
   deleteLoading.value = true
   
   try {
-    const response = await fetch('/api/user/delete', {
+    const response = await fetch(`${API_URL}/api/user/delete`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

@@ -155,6 +155,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 // State
 const loading = ref(false)
@@ -174,7 +175,7 @@ async function handleRegister() {
   loading.value = true
 
   try {
-    const response = await fetch('/api/user/register', {
+    const response = await fetch(`${API_URL}/api/user/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

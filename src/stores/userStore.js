@@ -1,5 +1,7 @@
 import { reactive, readonly } from 'vue'
 
+const API_URL = import.meta.env.VITE_API_URL || ''
+
 // Centralized store for user data with caching
 const state = reactive({
   isAuthenticated: null, // null = not checked yet, true/false = checked
@@ -28,7 +30,7 @@ export const checkAuth = async (forceRefresh = false) => {
   }
 
   try {
-    const response = await fetch('/api/user/me', {
+    const response = await fetch(`${API_URL}/api/user/me`, {
       method: 'GET',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' }

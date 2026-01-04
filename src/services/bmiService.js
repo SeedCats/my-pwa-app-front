@@ -1,5 +1,6 @@
 // BMI Service - API calls for BMI data management
 
+const API_URL = import.meta.env.VITE_API_URL || ''
 const getHeaders = () => ({ 'Content-Type': 'application/json' })
 
 const handleResponse = async (response) => {
@@ -22,7 +23,7 @@ const buildBMIPayload = (bmiData) => ({
 })
 
 export const saveBMIData = async (bmiData) => {
-    const response = await fetch('/api/data/bmi', {
+    const response = await fetch(`${API_URL}/api/data/bmi`, {
         method: 'POST',
         headers: getHeaders(),
         credentials: 'include',
@@ -32,7 +33,7 @@ export const saveBMIData = async (bmiData) => {
 }
 
 export const getBMIRecords = async () => {
-    const response = await fetch('/api/data/bmi', { method: 'GET', headers: getHeaders(), credentials: 'include' })
+    const response = await fetch(`${API_URL}/api/data/bmi`, { method: 'GET', headers: getHeaders(), credentials: 'include' })
     return handleResponse(response)
 }
 
@@ -44,12 +45,12 @@ export const getLatestBMIRecord = async () => {
 }
 
 export const getBMIRecordById = async (id) => {
-    const response = await fetch(`/api/data/bmi/${id}`, { method: 'GET', headers: getHeaders(), credentials: 'include' })
+    const response = await fetch(`${API_URL}/api/data/bmi/${id}`, { method: 'GET', headers: getHeaders(), credentials: 'include' })
     return handleResponse(response)
 }
 
 export const updateBMIRecord = async (id, bmiData) => {
-    const response = await fetch(`/api/data/bmi/${id}`, {
+    const response = await fetch(`${API_URL}/api/data/bmi/${id}`, {
         method: 'PUT',
         headers: getHeaders(),
         credentials: 'include',
@@ -59,16 +60,16 @@ export const updateBMIRecord = async (id, bmiData) => {
 }
 
 export const deleteBMIRecord = async (id) => {
-    const response = await fetch(`/api/data/bmi/${id}`, { method: 'DELETE', headers: getHeaders(), credentials: 'include' })
+    const response = await fetch(`${API_URL}/api/data/bmi/${id}`, { method: 'DELETE', headers: getHeaders(), credentials: 'include' })
     return handleResponse(response)
 }
 
 export const deleteAllBMIRecords = async () => {
-    const response = await fetch('/api/data/bmi', { method: 'DELETE', headers: getHeaders(), credentials: 'include' })
+    const response = await fetch(`${API_URL}/api/data/bmi`, { method: 'DELETE', headers: getHeaders(), credentials: 'include' })
     return handleResponse(response)
 }
 
 export const getBMIStats = async () => {
-    const response = await fetch('/api/data/bmi/stats', { method: 'GET', headers: getHeaders(), credentials: 'include' })
+    const response = await fetch(`${API_URL}/api/data/bmi/stats`, { method: 'GET', headers: getHeaders(), credentials: 'include' })
     return handleResponse(response)
 }

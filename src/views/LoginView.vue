@@ -129,6 +129,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const REMEMBER_EMAIL_KEY = 'rememberedEmail'
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 // Check if already authenticated via API
 onMounted(async () => {
@@ -140,7 +141,7 @@ onMounted(async () => {
   }
 
   try {
-    const res = await fetch('/api/user/me', { credentials: 'include' })
+    const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
     if (res.ok) router.push('/home')
   } catch { /* not authenticated */ }
 })
@@ -157,7 +158,7 @@ async function handleLogin() {
   loading.value = true
 
   try {
-    const response = await fetch('/api/login', {
+    const response = await fetch(`${API_URL}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

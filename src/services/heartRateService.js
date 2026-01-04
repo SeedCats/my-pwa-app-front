@@ -1,5 +1,6 @@
 // Heart Rate Service - API calls for heart rate data management
 
+const API_URL = import.meta.env.VITE_API_URL || ''
 const getHeaders = () => ({ 'Content-Type': 'application/json' })
 
 const handleResponse = async (response) => {
@@ -16,7 +17,7 @@ export const uploadHeartRateCSV = async (file) => {
     const formData = new FormData()
     formData.append('file', file)
     
-    const response = await fetch('/api/data/heartrate/upload', {
+    const response = await fetch(`${API_URL}/api/data/heartrate/upload`, {
         method: 'POST',
         credentials: 'include',
         body: formData  // No Content-Type header - browser sets it automatically
@@ -33,7 +34,7 @@ export const getHeartRateRecords = async (params = {}) => {
     if (params.page) queryParams.append('page', params.page)
     if (params.limit) queryParams.append('limit', params.limit)
     
-    const url = `/api/data/heartrate${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+    const url = `${API_URL}/api/data/heartrate${queryParams.toString() ? '?' + queryParams.toString() : ''}`
     const response = await fetch(url, { 
         method: 'GET', 
         headers: getHeaders(), 
@@ -44,7 +45,7 @@ export const getHeartRateRecords = async (params = {}) => {
 
 // Get available dates with heart rate data
 export const getHeartRateDates = async () => {
-    const response = await fetch('/api/data/heartrate/dates', { 
+    const response = await fetch(`${API_URL}/api/data/heartrate/dates`, { 
         method: 'GET', 
         headers: getHeaders(), 
         credentials: 'include' 
@@ -59,7 +60,7 @@ export const getHeartRateStats = async (params = {}) => {
     if (params.startDate) queryParams.append('startDate', params.startDate)
     if (params.endDate) queryParams.append('endDate', params.endDate)
     
-    const url = `/api/data/heartrate/stats${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+    const url = `${API_URL}/api/data/heartrate/stats${queryParams.toString() ? '?' + queryParams.toString() : ''}`
     const response = await fetch(url, { 
         method: 'GET', 
         headers: getHeaders(), 
@@ -70,7 +71,7 @@ export const getHeartRateStats = async (params = {}) => {
 
 // Delete all heart rate data
 export const deleteAllHeartRateRecords = async () => {
-    const response = await fetch('/api/data/heartrate', { 
+    const response = await fetch(`${API_URL}/api/data/heartrate`, { 
         method: 'DELETE', 
         headers: getHeaders(), 
         credentials: 'include' 
@@ -80,7 +81,7 @@ export const deleteAllHeartRateRecords = async () => {
 
 // Delete heart rate data for specific date
 export const deleteHeartRateByDate = async (date) => {
-    const response = await fetch(`/api/data/heartrate/date/${date}`, { 
+    const response = await fetch(`${API_URL}/api/data/heartrate/date/${date}`, { 
         method: 'DELETE', 
         headers: getHeaders(), 
         credentials: 'include' 
