@@ -649,14 +649,29 @@ const usePrompt = async (prompt) => {
                 const response = await getHeartRateRecords({ date: heartRateDates[0] })
                 if (response.success && response.data.records.length > 0) {
                     const record = response.data.records[0]
-                    const dailyStats = record.dailyStats
-                    const resting = Math.round(dailyStats.min * 0.95)
+                    
+                    // Calculate actual min/max from hourly data (same as HomeView)
+                    const hourlyValues = record.hourlyData.filter(h => h.avg > 0)
+                    const avgValues = hourlyValues.map(h => h.avg)
+                    const actualMin = avgValues.length > 0 
+                        ? Math.min(...avgValues)
+                        : 0
+                    const actualMax = avgValues.length > 0 
+                        ? Math.max(...avgValues)
+                        : 0
+                    const actualAvg = avgValues.length > 0
+                        ? Math.round(avgValues.reduce((sum, v) => sum + v, 0) / avgValues.length)
+                        : 0
+                    // Resting heart rate is the actual minimum from all hourly min values
+                    const resting = hourlyValues.length > 0
+                        ? Math.min(...hourlyValues.map(h => h.min))
+                        : 0
                     
                     // Include all heart rate metrics
                     healthContext.push(`Resting Heart Rate: ${resting} bpm`)
-                    healthContext.push(`Max Heart Rate: ${dailyStats.max} bpm`)
-                    healthContext.push(`Min Heart Rate: ${dailyStats.min} bpm`)
-                    healthContext.push(`Average Heart Rate: ${dailyStats.avg} bpm`)
+                    healthContext.push(`Max Heart Rate: ${actualMax} bpm`)
+                    healthContext.push(`Min Heart Rate: ${actualMin} bpm`)
+                    healthContext.push(`Average Heart Rate: ${actualAvg} bpm`)
                 }
             } catch (error) {
                 console.error('Failed to fetch heart rate stats:', error)
@@ -1238,11 +1253,12 @@ const sendMessage = async () => {
                     if (createdId) {
                         chatId.value = createdId
 
-                        // Update total count for pagination and reload current page
+                        // Update total count for pagination and navigate to page 1 to show the new conversation
                         try {
                             historyTotal.value = (historyTotal.value || 0) + 1
-                            // Reload current page to refresh the list
-                            await loadChatList(historyPage.value)
+                            // Navigate to page 1 to show the new conversation
+                            historyPage.value = 1
+                            await loadChatList(1)
                         } catch (e) {
                             console.warn('post-create pagination adjust error:', e)
                         }
@@ -1270,12 +1286,11 @@ const sendMessage = async () => {
         } else {
             try {
                 await appendMessagesToAichat(chatId.value, [serialMsg])
-                // update history list immediately with user message info, but only insert into the visible list when appropriate
+                // Navigate to page 1 and reload to ensure the updated conversation is visible
                 try {
-                    const existsLocally = (chatList.value || []).findIndex(c => parseId(c._id || c.id) === chatId.value) >= 0
-                    const shouldInsert = existsLocally || (historyPage.value === totalPages.value)
-                    upsertChatList(chatId.value, { lastMessage: userMessage.content, updatedAt: userMessage.timestamp }, { insertIfMissing: shouldInsert })
-                } catch (e) { console.warn('update local history error:', e) }
+                    historyPage.value = 1
+                    await loadChatList(1)
+                } catch (e) { console.warn('reload chat list after user message error:', e) }
                 // persist lastMessage field on server (best effort)
                 try {
                     const res = await updateAichatLastMessage(chatId.value, { role: userMessage.role, content: userMessage.content, timestamp: userMessage.timestamp })
@@ -1420,46 +1435,34 @@ const sendMessage = async () => {
                     last.sources = aiMessage.sources
                 }
 
-                // Update history list immediately to show AI message preview and updated time
-                try {
-                    if (chatId.value) {
-                        try {
-                            const existsLocally = (chatList.value || []).findIndex(c => parseId(c._id || c.id) === chatId.value) >= 0
-                            const shouldInsert = existsLocally || (historyPage.value === totalPages.value)
-                            upsertChatList(chatId.value, { lastMessage: aiMessage.content, updatedAt: aiMessage.timestamp, title: currentTitle.value }, { insertIfMissing: shouldInsert })
-                        } catch (e) { console.warn('update local history error:', e) }
-                    }
-                } catch (e) { console.warn('upsertChatList error:', e) }
-
                 // Persist assistant message by appending to the server chat
                 // If chatId isn't available (earlier create failed), create the chat now including both user and assistant messages so AI output is stored.
-                ;(async () => {
-                    try {
-                        const serialAssistant = {
-                            role: aiMessage.role,
-                            content: aiMessage.content,
-                            timestamp: (aiMessage.timestamp instanceof Date) ? aiMessage.timestamp.toISOString() : aiMessage.timestamp,
-                            toolCalls: aiMessage.toolCalls || [],
-                            sources: aiMessage.sources || [],
-                            foundSources: aiMessage.foundSources,
-                            requestedSources: aiMessage.requestedSources
-                        }
+                try {
+                    const serialAssistant = {
+                        role: aiMessage.role,
+                        content: aiMessage.content,
+                        timestamp: (aiMessage.timestamp instanceof Date) ? aiMessage.timestamp.toISOString() : aiMessage.timestamp,
+                        toolCalls: aiMessage.toolCalls || [],
+                        sources: aiMessage.sources || [],
+                        foundSources: aiMessage.foundSources,
+                        requestedSources: aiMessage.requestedSources
+                    }
 
-                        if (chatId.value) {
-                            await appendMessagesToAichat(chatId.value, [serialAssistant])
-                            // persist lastMessage field on server (best effort)
-                            try {
-                                const res = await updateAichatLastMessage(chatId.value, { role: aiMessage.role, content: aiMessage.content, timestamp: aiMessage.timestamp })
-                                if (res && res.success === false) {
-                                    if (res.message && /nothing to update/i.test(res.message)) {
-                                        console.info('updateAichatLastMessage append assistant: nothing to update')
-                                    } else if (res.status === 400) {
-                                        console.info('updateAichatLastMessage append assistant returned 400:', res.message, res.body)
-                                    } else {
-                                        console.warn('updateAichatLastMessage append assistant error:', res)
-                                    }
+                    if (chatId.value) {
+                        await appendMessagesToAichat(chatId.value, [serialAssistant])
+                        // persist lastMessage field on server (best effort)
+                        try {
+                            const res = await updateAichatLastMessage(chatId.value, { role: aiMessage.role, content: aiMessage.content, timestamp: aiMessage.timestamp })
+                            if (res && res.success === false) {
+                                if (res.message && /nothing to update/i.test(res.message)) {
+                                    console.info('updateAichatLastMessage append assistant: nothing to update')
+                                } else if (res.status === 400) {
+                                    console.info('updateAichatLastMessage append assistant returned 400:', res.message, res.body)
+                                } else {
+                                    console.warn('updateAichatLastMessage append assistant error:', res)
                                 }
-                            } catch (e) { console.warn('updateAichatLastMessage append assistant error throw:', e) }
+                            }
+                        } catch (e) { console.warn('updateAichatLastMessage append assistant error throw:', e) }
                         } else {
                             const serialUser = {
                                 role: userMessage.role,
@@ -1475,11 +1478,12 @@ const sendMessage = async () => {
                                     if (createdId2) {
                                         chatId.value = createdId2
                                         
-                                        // Update total count for pagination and reload current page
+                                        // Update total count for pagination and navigate to page 1 to show the new conversation
                                         try {
                                             historyTotal.value = (historyTotal.value || 0) + 1
-                                            // Reload current page to refresh the list
-                                            await loadChatList(historyPage.value)
+                                            // Navigate to page 1 to show the new conversation
+                                            historyPage.value = 1
+                                            await loadChatList(1)
                                         } catch (e) {
                                             console.warn('post-create2 pagination adjust error:', e)
                                         }
@@ -1504,14 +1508,21 @@ const sendMessage = async () => {
                                 console.warn('Failed to create chat with assistant message:', e2)
                             }
                         }
-                            } catch (e) {
-                        if (e && /unauthor|no token/i.test(e.message || '')) {
-                            console.info('Persist assistant message failed: unauthenticated (ignored)')
-                        } else {
-                            console.warn('Persist assistant message failed:', e)
-                        }
+                } catch (e) {
+                    if (e && /unauthor|no token/i.test(e.message || '')) {
+                        console.info('Persist assistant message failed: unauthenticated (ignored)')
+                    } else {
+                        console.warn('Persist assistant message failed:', e)
                     }
-                })()
+                }
+
+                // Update history list after persisting assistant message
+                try {
+                    if (chatId.value) {
+                        historyPage.value = 1
+                        await loadChatList(1)
+                    }
+                } catch (e) { console.warn('reload chat list after assistant message error:', e) }
 
                 // clear selected file after successful push
             selectedFile.value = null

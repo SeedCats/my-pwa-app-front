@@ -603,25 +603,31 @@ const loadHeartRateData = async () => {
       // Use aggregated hourly data directly
       heartRateData.value = record.hourlyData
       
-      // Calculate stats from hourly average values (what's shown on chart)
-      // Don't use h.min/h.max as they may be incorrect from backend
+      // Calculate stats from hourly data
       const hourlyValues = record.hourlyData.filter(h => h.avg > 0)
       
-      const actualMin = hourlyValues.length > 0 
-        ? Math.min(...hourlyValues.map(h => h.avg))
+      // Use min/max of average values (matching what's shown in the chart)
+      const avgValues = hourlyValues.map(h => h.avg)
+      const actualMin = avgValues.length > 0 
+        ? Math.min(...avgValues)
         : 0
-      const actualMax = hourlyValues.length > 0 
-        ? Math.max(...hourlyValues.map(h => h.avg))
+      const actualMax = avgValues.length > 0 
+        ? Math.max(...avgValues)
         : 0
-      const actualAvg = hourlyValues.length > 0
-        ? Math.round(hourlyValues.reduce((sum, h) => sum + h.avg, 0) / hourlyValues.length)
+      const actualAvg = avgValues.length > 0
+        ? Math.round(avgValues.reduce((sum, v) => sum + v, 0) / avgValues.length)
+        : 0
+      
+      // Calculate resting heart rate from the actual minimum values in hourly data
+      const actualRestingMin = hourlyValues.length > 0
+        ? Math.min(...hourlyValues.map(h => h.min))
         : 0
       
       stats.value = {
         min: actualMin,
         max: actualMax,
         avg: actualAvg,
-        resting: actualMin,
+        resting: actualRestingMin,
         count: record.dailyStats?.count || 0
       }
       
