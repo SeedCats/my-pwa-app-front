@@ -178,6 +178,7 @@ async function handleRegister() {
     const response = await fetch(`${API_URL}/api/user/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
         name: registerForm.value.name,
         email: registerForm.value.email,
@@ -192,8 +193,8 @@ async function handleRegister() {
     }
 
     if (response.ok && data.success) {
-      success.value = data.message || 'Account created successfully! Redirecting to login...'
-      setTimeout(() => router.push('/'), 2000)
+      success.value = data.message || 'Account created successfully! Redirecting...'
+      setTimeout(() => router.push('/home'), 1000)
     } else {
       error.value = data.message || 'Registration failed. Please try again.'
     }

@@ -58,7 +58,7 @@
                                                     ? 'bg-gray-800 text-white'
                                                     : 'text-gray-400 hover:bg-gray-800 hover:text-white'" @click="sidebarOpen = false">
                                                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                                                Settings
+                                                {{ t('nav.formatSettings') }}
                                             </router-link>
 
                                             <router-link to="/user"
@@ -67,7 +67,7 @@
                                                     ? 'bg-gray-800 text-white'
                                                     : 'text-gray-400 hover:bg-gray-800 hover:text-white'" @click="sidebarOpen = false">
                                                 <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
-                                                User Settings
+                                                {{ t('nav.userSettings') }}
                                             </router-link>
                                         </li>
                                     </ul>
@@ -111,13 +111,13 @@
                             <router-link to="/setting"
                                 class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95 text-gray-400 hover:bg-gray-800 hover:text-white">
                                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                                Settings
+                                {{ t('nav.formatSettings') }}
                             </router-link>
 
                             <router-link to="/user"
                                 class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95 text-gray-400 hover:bg-gray-800 hover:text-white">
                                 <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
-                                User Settings
+                                {{ t('nav.userSettings') }}
                             </router-link>
                         </li>
                     </ul>
@@ -157,6 +157,48 @@
                 <!-- Right side of top bar -->
                 <div class="flex flex-1 justify-end">
                     <div class="flex items-center gap-x-4 lg:gap-x-6">
+                        <!-- Language Switcher Button -->
+                        <Menu as="div" class="relative">
+                            <MenuButton
+                                class="-m-1.5 flex items-center p-1.5 rounded-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
+                                :class="[isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200']">
+                                <span class="flex items-center gap-x-2">
+                                    <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                                    </svg>
+                                    <span class="text-sm font-medium hidden sm:block" :class="themeClasses.textPrimary">{{ currentLanguageName }}</span>
+                                    <ChevronDownIcon
+                                        class="h-4 w-4 transition-transform duration-150 ease-in-out ui-open:rotate-180"
+                                        :class="themeClasses.textSecondary" aria-hidden="true" />
+                                </span>
+                            </MenuButton>
+                            <transition enter-active-class="transition ease-out duration-100"
+                                enter-from-class="transform opacity-0 scale-95"
+                                enter-to-class="transform opacity-100 scale-100"
+                                leave-active-class="transition ease-in duration-75"
+                                leave-from-class="transform opacity-100 scale-100"
+                                leave-to-class="transform opacity-0 scale-95">
+                                <MenuItems
+                                    class="absolute right-0 z-10 mt-2.5 w-40 origin-top-right rounded-md py-1 shadow-lg ring-1 ring-gray-900/5 focus:outline-none"
+                                    :class="[themeClasses.cardBackground, themeClasses.border]">
+                                    <MenuItem v-for="lang in languages" :key="lang.code" v-slot="{ active }">
+                                    <button @click="changeLanguage(lang.code)" :class="[
+                                        active ? (isDarkMode ? 'bg-gray-700' : 'bg-gray-50') : '',
+                                        currentLanguage === lang.code ? (isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50') : '',
+                                        'flex items-center w-full px-3 py-2 text-sm transition-all duration-150 ease-in-out transform active:scale-95',
+                                        themeClasses.textPrimary
+                                    ]">
+                                        <span class="text-lg mr-2">{{ lang.flag }}</span>
+                                        <span class="flex-1">{{ lang.name }}</span>
+                                        <svg v-if="currentLanguage === lang.code" class="w-4 h-4 text-blue-600 animate-fade-in" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                    </MenuItem>
+                                </MenuItems>
+                            </transition>
+                        </Menu>
+
                         <!-- Profile dropdown -->
                         <Menu as="div" class="relative">
                             <MenuButton
@@ -179,14 +221,19 @@
                                 leave-from-class="transform opacity-100 scale-100"
                                 leave-to-class="transform opacity-0 scale-95">
                                 <MenuItems
-                                    class="absolute right-0 z-10 mt-2.5 w-40 sm:w-32 origin-top-right rounded-md py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none"
+                                    class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none"
                                     :class="[themeClasses.cardBackground, themeClasses.border]">
                                     <MenuItem v-slot="{ active }">
                                     <button @click="handleLogOut" :class="[
                                         active ? (isDarkMode ? 'bg-gray-700' : 'bg-gray-50') : '',
-                                        'block w-full px-4 py-2 text-left text-sm leading-6 transition-all duration-150 ease-in-out transform active:scale-95',
+                                        'flex items-center w-full px-4 py-2 text-left text-sm font-medium leading-6 transition-all duration-150 ease-in-out transform active:scale-95',
                                         themeClasses.textPrimary
-                                    ]">Sign out</button>
+                                    ]">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                        {{ t('auth.logout') }}
+                                    </button>
                                     </MenuItem>
                                 </MenuItems>
                             </transition>
@@ -202,6 +249,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
+import { useLanguage } from '../composables/useLanguage'
 import { clearAllCaches } from '../stores/userStore'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import {
@@ -226,16 +274,17 @@ import {
 const router = useRouter()
 const route = useRoute()
 const { isDarkMode, themeClasses } = useTheme()
+const { currentLanguage, languages, changeLanguage, t } = useLanguage()
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 const emit = defineEmits(['update:sidebarState'])
 
-const navigation = [
-    { name: 'DashBoard', to: '/home', icon: HomeIcon },
-    { name: 'Data Setting', to: '/data-setting', icon: HomeIcon },
-    { name: 'AI Support', to: '/ai-support', icon: HomeIcon },
-    { name: 'Manual Support', to: '/manual-support', icon: HomeIcon },
-]
+const navigation = computed(() => [
+    { name: t('nav.home'), to: '/home', icon: HomeIcon },
+    { name: t('nav.dataSettings'), to: '/data-setting', icon: HomeIcon },
+    { name: t('nav.aiSupport'), to: '/ai-support', icon: HomeIcon },
+    { name: t('nav.manualSupport'), to: '/manual-support', icon: HomeIcon },
+])
 
 // State
 const sidebarOpen = ref(false)
@@ -243,6 +292,17 @@ const isDesktopSidebarHidden = ref(false)
 const userData = ref(null)
 
 const userName = computed(() => userData.value?.name || 'User')
+
+// Language computed properties
+const currentLanguageFlag = computed(() => {
+    const lang = languages.find(l => l.code === currentLanguage.value)
+    return lang?.flag || '🇺🇸'
+})
+
+const currentLanguageName = computed(() => {
+    const lang = languages.find(l => l.code === currentLanguage.value)
+    return lang?.name || 'English'
+})
 
 // Helper to check active route for styling
 const isActiveRoute = (path) => route.path === path

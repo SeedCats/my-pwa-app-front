@@ -9,8 +9,8 @@
         <div class="px-3 sm:px-4 md:px-6 lg:px-8 pt-4 pb-8">
           <!-- Header -->
           <div class="mb-8 pt-16">
-            <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">Account Settings</h1>
-            <p class="mt-2 text-sm" :class="themeClasses.textSecondary">Manage your account information and preferences</p>
+            <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('userSettings.title') }}</h1>
+            <p class="mt-2 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.subtitle') }}</p>
           </div>
 
           <!-- Success/Error Messages -->
@@ -26,15 +26,15 @@
             <!-- Profile Information -->
             <div class="shadow-sm rounded-lg border" :class="[themeClasses.cardBackground, themeClasses.border]">
               <div class="px-6 py-4 border-b" :class="themeClasses.border">
-                <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">Profile Information</h2>
-                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">Update your account's profile information and email address.</p>
+                <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('userSettings.profile') }}</h2>
+                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.profileDesc') }}</p>
               </div>
               
               <form @submit.prevent="updateProfile" class="p-6 space-y-6">
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <!-- Name -->
                   <div>
-                    <label for="name" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Name</label>
+                    <label for="name" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{ $t('userSettings.name') }}</label>
                     <input 
                       type="text" 
                       id="name" 
@@ -43,14 +43,14 @@
                         'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
                         isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
                       ]"
-                      placeholder="Enter your full name"
+                      :placeholder="$t('userSettings.namePlaceholder')"
                       required
                     />
                   </div>
 
                   <!-- Email -->
                   <div>
-                    <label for="email" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Email</label>
+                    <label for="email" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{ $t('userSettings.email') }}</label>
                     <input 
                       type="email" 
                       id="email" 
@@ -59,7 +59,7 @@
                         'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
                         isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
                       ]"
-                      placeholder="Enter your email address"
+                      :placeholder="$t('userSettings.emailPlaceholder')"
                       required
                     />
                   </div>
@@ -84,56 +84,56 @@
             <!-- Change Password -->
             <div class="shadow-sm rounded-lg border" :class="[themeClasses.cardBackground, themeClasses.border]">
               <div class="px-6 py-4 border-b" :class="themeClasses.border">
-                <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">Change Password</h2>
-                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">Ensure your account is using a long, random password to stay secure.</p>
+                <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('userSettings.changePassword') }}</h2>
+                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.changePasswordDesc') }}</p>
               </div>
               
               <form @submit.prevent="updatePassword" class="p-6 space-y-6">
                 <div class="grid grid-cols-1 gap-6">
                   <!-- Current Password -->
                   <div>
-                    <label for="current-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Current Password</label>
+                    <label for="current-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{ $t('userSettings.currentPassword') }}</label>
                     <input 
                       type="password" 
-                      id="current-password" 
+                      id="current-password"
                       v-model="passwordForm.currentPassword"
                       :class=" [
                         'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
                         isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
                       ]"
-                      placeholder="Enter your current password"
+                      :placeholder="$t('userSettings.currentPasswordPlaceholder')"
                       required
                     />
                   </div>
 
                   <!-- New Password -->
                   <div>
-                    <label for="new-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">New Password</label>
+                    <label for="new-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{ $t('userSettings.newPassword') }}</label>
                     <input 
                       type="password" 
-                      id="new-password" 
+                      id="new-password"
                       v-model="passwordForm.newPassword"
                       :class=" [
                         'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
                         isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
                       ]"
-                      placeholder="Enter your new password"
+                      :placeholder="$t('userSettings.newPasswordPlaceholder')"
                       required
                     />
                   </div>
 
                   <!-- Confirm New Password -->
                   <div>
-                    <label for="confirm-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">Confirm New Password</label>
+                    <label for="confirm-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{ $t('userSettings.confirmNewPassword') }}</label>
                     <input 
                       type="password" 
-                      id="confirm-password" 
+                      id="confirm-password"
                       v-model="passwordForm.confirmPassword"
                       :class=" [
                         'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
                         isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
                       ]"
-                      placeholder="Confirm your new password"
+                      :placeholder="$t('userSettings.confirmPasswordPlaceholder')"
                       required
                     />
                   </div>

@@ -9,8 +9,8 @@
         <div class="px-3 sm:px-4 md:px-6 lg:px-8 pt-4 pb-8">
           <!-- Header -->
           <div class="mb-8 pt-16">
-            <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">Settings</h1>
-            <p class="mt-2 text-sm" :class="themeClasses.textSecondary">Customize your application preferences</p>
+            <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('formatSettings.title') }}</h1>
+            <p class="mt-2 text-sm" :class="themeClasses.textSecondary">{{ $t('formatSettings.subtitle') }}</p>
           </div>
 
           <!-- Theme Settings -->
@@ -18,16 +18,16 @@
             <!-- Appearance Section -->
             <div class="rounded-lg border shadow-sm" :class="[themeClasses.cardBackground, themeClasses.border]">
               <div class="px-6 py-4 border-b" :class="themeClasses.border">
-                <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">Appearance</h2>
-                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">Choose how the application looks for you</p>
+                <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('formatSettings.appearance') }}</h2>
+                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">{{ $t('formatSettings.appearanceDesc') }}</p>
               </div>
               
               <div class="p-6">
                 <!-- Theme Toggle -->
                 <div class="flex items-center justify-between">
                   <div class="flex-1">
-                    <h3 class="text-base font-medium" :class="themeClasses.textPrimary">Theme</h3>
-                    <p class="text-sm" :class="themeClasses.textSecondary">Switch between light and dark mode</p>
+                    <h3 class="text-base font-medium" :class="themeClasses.textPrimary">{{ $t('formatSettings.theme') }}</h3>
+                    <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('formatSettings.themeDesc') }}</p>
                   </div>
                   
                   <div class="flex items-center space-x-3">
@@ -93,8 +93,8 @@
                 <!-- Auto Theme Toggle -->
                 <div class="flex items-center justify-between mt-6">
                   <div class="flex-1">
-                    <h3 class="text-base font-medium" :class="themeClasses.textPrimary">Auto Theme</h3>
-                    <p class="text-sm" :class="themeClasses.textSecondary">Automatically switch theme based on system preference</p>
+                    <h3 class="text-base font-medium" :class="themeClasses.textPrimary">{{ $t('formatSettings.autoTheme') }}</h3>
+                    <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('formatSettings.autoThemeDesc') }}</p>
                   </div>
                   
                   <button 

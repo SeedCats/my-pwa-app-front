@@ -15,10 +15,10 @@
         </div>
 
         <h2 class="text-xl sm:text-2xl lg:text-4xl font-bold tracking-tight text-gray-900 mb-1 sm:mb-2">
-          Welcome Back
+          {{ $t('auth.welcomeBack') }}
         </h2>
         <p class="text-sm sm:text-base lg:text-lg text-gray-600">
-          Sign in to your account
+          {{ $t('auth.signIn') }}
         </p>
       </div>
 
@@ -44,17 +44,17 @@
               <div class="col-span-2">
                 <div class="relative">
                   <input id="email-address" name="email" type="email" autocomplete="email" required
-                    v-model="loginForm.email" aria-label="Email address"
+                    v-model="loginForm.email" :aria-label="$t('auth.email')"
                     class="block w-full rounded-t-xl bg-white px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 border-b border-gray-200 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
-                    placeholder="Email address" />
+                    :placeholder="$t('auth.email')" />
                 </div>
               </div>
               <div class="-mt-px pt-2">
                 <div class="relative">
                   <input id="password" name="password" type="password" autocomplete="current-password" required
-                    v-model="loginForm.password" aria-label="Password"
+                    v-model="loginForm.password" :aria-label="$t('auth.password')"
                     class="block w-full rounded-b-xl bg-white px-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 transition-colors duration-200 touch-manipulation"
-                    placeholder="Password" />
+                    :placeholder="$t('auth.password')" />
                 </div>
               </div>
             </div>
@@ -74,7 +74,7 @@
               </div>
               <!-- Label -->
               <span class="ml-3 text-sm sm:text-base text-gray-700 font-medium group-hover:text-indigo-600 transition-colors duration-200 select-none">
-                Remember me
+                {{ $t('auth.rememberMe') }}
               </span>
             </label>
             <!-- Info tooltip -->
@@ -83,7 +83,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div class="absolute right-0 bottom-6 w-48 p-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-10 shadow-lg">
-                Stay account for 7 days
+                {{ $t('auth.rememberMeInfo') }}
                 <div class="absolute -bottom-1 right-2 w-2 h-2 bg-gray-800 rotate-45"></div>
               </div>
             </div>
@@ -104,7 +104,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
               </svg>
-              {{ loading ? 'Signing in...' : 'Sign in' }}
+              {{ loading ? $t('common.loading') : $t('auth.login') }}
             </button>
 
             <button type="button" @click="handleRegister" :disabled="loading"
@@ -114,7 +114,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
-              Create Account
+              {{ $t('auth.register') }}
             </button>
           </div>
         </form>

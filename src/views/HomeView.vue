@@ -13,7 +13,7 @@
                 <!-- BMI Title -->
                 <div class="flex items-center justify-center mb-6">
                   <div class="text-center">
-                    <h2 class="text-3xl font-bold" :class="themeClasses.textPrimary">BMI Information</h2>
+                    <h2 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.bmi.title') }}</h2>
                   </div>
                 </div>
 
@@ -23,14 +23,14 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <p :class="themeClasses.textSecondary" class="mt-2">Loading BMI data...</p>
+                  <p :class="themeClasses.textSecondary" class="mt-2">{{ $t('home.bmi.loading') }}</p>
                 </div>
 
                 <!-- No Data Message -->
                 <div v-else-if="!bmiData.bmi" class="text-center py-8">
-                  <p :class="themeClasses.textSecondary" class="mb-4">No BMI data available</p>
+                  <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.bmi.noData') }}</p>
                   <router-link to="/data-setting" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Add BMI Data
+                    {{ $t('home.bmi.addData') }}
                   </router-link>
                 </div>
 
@@ -61,41 +61,41 @@
                   <div class="grid grid-cols-4 gap-2 mb-8 text-center text-xs">
                     <div class="flex flex-col items-center">
                       <div class="w-4 h-4 rounded-full bg-blue-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-blue-400': bmiData.category === 'Underweight' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Underweight' }]">Underweight</span>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Underweight' }]">{{ $t('home.bmi.categories.underweight') }}</span>
                     </div>
                     <div class="flex flex-col items-center">
                       <div class="w-4 h-4 rounded-full bg-green-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-green-400': bmiData.category === 'Normal' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Normal' }]">Normal</span>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Normal' }]">{{ $t('home.bmi.categories.normal') }}</span>
                     </div>
                     <div class="flex flex-col items-center">
                       <div class="w-4 h-4 rounded-full bg-yellow-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-yellow-400': bmiData.category === 'Overweight' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Overweight' }]">Overweight</span>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Overweight' }]">{{ $t('home.bmi.categories.overweight') }}</span>
                     </div>
                     <div class="flex flex-col items-center">
                       <div class="w-4 h-4 rounded-full bg-orange-500 mb-2" :class="{ 'ring-2 ring-offset-2 ring-orange-500': bmiData.category === 'Obese' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Obese' }]">Obese</span>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Obese' }]">{{ $t('home.bmi.categories.obese') }}</span>
                     </div>
                   </div>
 
                   <!-- Data Analysis Section -->
                   <div class="border-t pt-6" :class="themeClasses.border">
-                    <h4 class="text-lg font-semibold mb-6" :class="themeClasses.textPrimary">Data Analysis</h4>
+                    <h4 class="text-lg font-semibold mb-6" :class="themeClasses.textPrimary">{{ $t('home.dataAnalysis') }}</h4>
                     <div class="space-y-4">
                       <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                        <span :class="themeClasses.textSecondary">Age</span>
+                        <span :class="themeClasses.textSecondary">{{ $t('dataSettings.age') }}</span>
                         <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.age || '--' }}</span>
                       </div>
                       <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                        <span :class="themeClasses.textSecondary">Height (cm)</span>
+                        <span :class="themeClasses.textSecondary">{{ $t('dataSettings.height') }}</span>
                         <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.height || '--' }}</span>
                       </div>
                       <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                        <span :class="themeClasses.textSecondary">Weight (kg)</span>
+                        <span :class="themeClasses.textSecondary">{{ $t('dataSettings.weight') }}</span>
                         <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.weight || '--' }}</span>
                       </div>
                       <div class="flex justify-between items-center">
-                        <span :class="themeClasses.textSecondary">BMI Range (kg/m²)</span>
-                        <span class="text-lg font-semibold" :class="themeClasses.textPrimary">18.5 - 24.9</span>
+                        <span :class="themeClasses.textSecondary">{{ $t('home.bmi.bmiRange') }}</span>
+                        <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiRangeDisplay }}</span>
                       </div>
                     </div>
                   </div>
@@ -253,26 +253,26 @@
                       </path>
                     </svg>
                   </div>
-                  <h3 class="text-xl font-semibold" :class="themeClasses.textPrimary">Today Overview</h3>
+                  <h3 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('home.todayOverview') }}</h3>
                 </div>
 
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-2 gap-4">
                   <div class="text-center p-3">
                     <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.resting }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">Resting Heart Rate</div>
+                    <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.restingHeartRate') }}</div>
                   </div>
                   <div class="text-center p-3">
                     <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.max }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">Max Heart Rate</div>
+                    <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.maxHeartRate') }}</div>
                   </div>
                   <div class="text-center p-3">
                     <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.min }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">Min Heart Rate</div>
+                    <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.minHeartRate') }}</div>
                   </div>
                   <div class="text-center p-3">
                     <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">Average Heart Rate</div>
+                    <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.averageHeartRate') }}</div>
                   </div>
                 </div>
               </div>
@@ -291,15 +291,15 @@
                       </svg>
                     </div>
                     <div>
-                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">Data Setting</h3>
-                      <p class="text-xs" :class="themeClasses.textSecondary">Quick Add</p>
+                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.dataSettings') }}</h3>
+                      <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.quickAdd') }}</p>
                     </div>
                   </div>
                   <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
-                    Record your data immediately to help us better track your health status.
+                    {{ $t('home.recordData') }}
                   </p>
                   <div class="flex items-center text-blue-600 text-xs font-medium mt-auto">
-                    <span>Add Record</span>
+                    <span>{{ $t('home.addRecord') }}</span>
                     <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
@@ -320,15 +320,15 @@
                       </svg>
                     </div>
                     <div>
-                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">AI Advice</h3>
-                      <p class="text-xs" :class="themeClasses.textSecondary">24/7 Available</p>
+                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.aiSupport') }}</h3>
+                      <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.availableAlways') }}</p>
                     </div>
                   </div>
                   <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
-                    Get personalized health advice powered by AI, based on your heart rate data and health trends.
+                    {{ $t('home.getAdvice') }}
                   </p>
                   <div class="flex items-center text-purple-600 text-xs font-medium mt-auto">
-                    <span>Get Advice</span>
+                    <span>{{ $t('home.getAdviceButton') }}</span>
                     <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
@@ -349,15 +349,15 @@
                       </svg>
                     </div>
                     <div>
-                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">Manual Support</h3>
-                      <p class="text-xs" :class="themeClasses.textSecondary">Learn More</p>
+                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.manualSupport') }}</h3>
+                      <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.learnMore') }}</p>
                     </div>
                   </div>
                   <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
-                    Access comprehensive guides and documentation to understand your health metrics better.
+                    {{ $t('home.accessGuides') }}
                   </p>
                   <div class="flex items-center text-green-600 text-xs font-medium mt-auto">
-                    <span>View Manual</span>
+                    <span>{{ $t('home.viewManual') }}</span>
                     <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
@@ -442,6 +442,17 @@ const bmiSliderPosition = computed(() => {
   const bmi = parseFloat(bmiData.value.bmi)
   if (!bmi) return 50
   return Math.max(0, Math.min(100, ((bmi - 15) / 20) * 100))
+})
+
+const bmiRangeDisplay = computed(() => {
+  const category = bmiData.value.category
+  const ranges = {
+    'Underweight': '< 18.5',
+    'Normal': '18.5 - 24.9',
+    'Overweight': '25.0 - 29.9',
+    'Obese': '≥ 30.0'
+  }
+  return ranges[category] || '18.5 - 24.9'
 })
 
 const updateSidebarState = (state) => sidebarHidden.value = state

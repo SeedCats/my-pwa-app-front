@@ -8,8 +8,8 @@
             <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-6">
                 <!-- Header -->
                 <div class="mb-6 pt-4">
-                    <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">AI Support Chat</h1>
-                    <p class="text-sm mt-2" :class="themeClasses.textSecondary">Chat with AI for assistance and support
+                    <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('aiSupport.title') }}</h1>
+                    <p class="text-sm mt-2" :class="themeClasses.textSecondary">{{ $t('aiSupport.subtitle') }}
                     </p>
                 </div>
 
@@ -17,8 +17,8 @@
                 <div class="max-w-9xl mx-auto">
                     <div class="relative">
                         <div class="flex items-center justify-between mb-2 gap-2">
-                            <div class="text-base sm:text-lg font-semibold truncate" :class="[themeClasses.textPrimary, isDarkMode ? 'text-white' : 'text-gray-900']">{{ currentTitle }}</div>
-                            <div class="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+                            <div v-if="showTitle" class="text-base sm:text-lg font-semibold truncate" :class="[themeClasses.textPrimary, isDarkMode ? 'text-white' : 'text-gray-900']">{{ currentTitle }}</div>
+                            <div class="flex items-center space-x-1 sm:space-x-2 flex-shrink-0" :class="showTitle ? '' : 'ml-auto'">
                                 <button @click.prevent="showSettings = !showSettings" :disabled="isChatBusy" :aria-disabled="isChatBusy" :title="isChatBusy ? 'Settings disabled while AI is responding' : 'AI Settings'" :class="['inline-flex items-center justify-center p-2 rounded-full text-sm transition-shadow duration-200 transform focus:outline-none focus:ring-2', isChatBusy ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : (isDarkMode ? 'bg-white text-gray-900 hover:shadow-md focus:ring-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-300')]" aria-label="AI Settings" role="button">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-current transform transition-transform duration-200 hover:scale-105" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                         <rect x="3" y="5" width="12" height="2" rx="1"></rect>
@@ -32,7 +32,7 @@
                                     </svg>
                                 </button>
 
-                                <button @click.prevent="startNewChat" :disabled="isChatBusy" :aria-disabled="isChatBusy" :title="isChatBusy ? 'Please wait until the current response is finished' : 'Start a new chat'" :class="isChatBusy ? 'px-3 py-1 text-sm rounded bg-green-400 text-white cursor-not-allowed' : 'px-3 py-1 text-sm rounded bg-green-600 text-white hover:bg-green-700'">New Chat</button>
+                                <button @click.prevent="startNewChat" :disabled="isChatBusy" :aria-disabled="isChatBusy" :title="isChatBusy ? $t('aiSupport.waitForResponse') : $t('aiSupport.newChat')" :class="isChatBusy ? 'px-3 py-1 text-sm rounded bg-green-400 text-white cursor-not-allowed' : 'px-3 py-1 text-sm rounded bg-green-600 text-white hover:bg-green-700'">{{ $t('aiSupport.newChat') }}</button>
                             </div>
                         </div>
                         <div class="rounded-lg shadow-sm border" :class="[themeClasses.cardBackground, themeClasses.border]">
@@ -50,10 +50,8 @@
                                                     d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                                             </svg>
                                         </div>
-                                        <h3 class="text-lg font-semibold mb-2" :class="themeClasses.textPrimary">Welcome
-                                            to AI Support!</h3>
-                                        <p class="text-sm mb-6" :class="themeClasses.textSecondary">Start a conversation with
-                                            AI. Ask me anything!</p>
+                                        <h3 class="text-lg font-semibold mb-2" :class="themeClasses.textPrimary">{{ $t('aiSupport.welcome') }}</h3>
+                                        <p class="text-sm mb-6" :class="themeClasses.textSecondary">{{ $t('aiSupport.welcomeDesc') }}</p>
                                         
                                         <!-- Suggested Prompts -->
                                         <div v-if="suggestedPrompts.length > 0" class="mt-6">
@@ -321,7 +319,7 @@
                     <div class="rounded-lg shadow-sm border p-4"
                         :class="[themeClasses.cardBackground, themeClasses.border]">
                         <div class="flex items-center justify-between mb-3">
-                            <h2 class="text-lg font-semibold" :class="themeClasses.textPrimary">Conversation History
+                            <h2 class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ $t('aiSupport.conversationHistory') }}
                             </h2>
                             <div class="flex items-center space-x-2">
                                 <!-- prettier delete-all with label and inline confirmation -->
@@ -336,7 +334,7 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6M10 6V4a2 2 0 012-2h0a2 2 0 012 2v2" />
                                         </svg>
-                                        <span class="ml-2 hidden sm:inline font-medium">Delete All</span>
+                                        <span class="ml-2 hidden sm:inline font-medium">{{ $t('aiSupport.deleteAll') }}</span>
                                     </button>
 
                                     <!-- Backdrop for click-outside -->
@@ -374,7 +372,7 @@
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round" stroke-linejoin="round" />
                                         <circle cx="12" cy="12" r="3" />
                                     </svg>
-                                    <span class="ml-2 font-medium">{{ showHistoryPanel ? 'Hide' : 'Show' }}</span>
+                                    <span class="ml-2 font-medium">{{ showHistoryPanel ? $t('aiSupport.hide') : $t('aiSupport.show') }}</span>
                                 </button>
 
 
@@ -384,8 +382,7 @@
                         <div v-if="showHistoryPanel">
                             <div v-if="historyLoading" class="text-sm text-gray-500">Loading…</div>
                             <div v-if="historyError" class="text-sm text-red-500">{{ historyError }}</div>
-                            <div v-if="!historyLoading && chatList.length === 0" class="text-sm text-gray-500">No past
-                                conversations.</div>
+                            <div v-if="!historyLoading && chatList.length === 0" class="text-sm text-gray-500">{{ $t('aiSupport.noPastConversations') }}</div>
                             <ul class="space-y-2">
                                 <li v-for="(chat, index) in chatList" :key="chat._id"
                                     class="flex items-start justify-between p-2 rounded border"
@@ -409,7 +406,7 @@
                                         </div>
                                         <div class="text-xs text-gray-500">{{ formatTime(chat.updatedAt ||
                                             chat.createdAt) }}</div>
-                                        <div class="text-xs text-gray-600 truncate">{{ chatPreviews[index] || '' }}</div>
+                                        <div class="text-xs truncate" :class="isDarkMode ? 'text-white' : 'text-gray-600'">{{ chatPreviews[index] || '' }}</div>
                                     </div>
                                     <div class="ml-3 flex-shrink-0 flex items-center space-x-2">
                                         <button @click.prevent="startEditing(chat)" title="Rename"
@@ -516,6 +513,7 @@ const historyPerPage = ref(3)
 const historyTotal = ref(0)
 const chatId = ref(null)
 const currentTitle = ref('New Conversation')
+const showTitle = ref(false)
 
 const parseId = (idCandidate) => {
     if (!idCandidate) return null
@@ -836,7 +834,7 @@ const upsertChatList = (id, { title, lastMessage, updatedAt } = {}, options = { 
 // Delete all conversations (with confirmation). This fetches all pages and deletes every chat found.
 const deleteAllChats = async (skipConfirm = false) => {
     if (!skipConfirm) {
-        if (!confirm('Are you sure you want to DELETE ALL conversations? This cannot be undone.')) return
+        if (!confirm($t('aiSupport.deleteAllConfirm'))) return
     }
     confirmDeleteAll.value = false
     historyLoading.value = true
@@ -948,6 +946,7 @@ const loadChatIntoConversation = async (id) => {
             chatId.value = parseId(res.data._id || res.data.id)
             // set current title to loaded chat title
             currentTitle.value = res.data.title || 'Untitled'
+            showTitle.value = true
             // loaded messages replace the current conversation; do not inject a synthetic assistant message
             await scrollToBottom()
             // keep history panel visible after loading a conversation
@@ -995,6 +994,7 @@ const deleteChat = async (id, skipConfirm = false) => {
                 chatId.value = null
                 messages.value = []
                 currentTitle.value = 'New Conversation'
+                showTitle.value = false
             }
         } else {
             historyError.value = res && res.message ? res.message : 'Failed to delete chat'
@@ -1098,6 +1098,22 @@ const cleanContent = (content) => {
     if (!content) return content
     let t = content.toString()
     
+    // Remove AI function call patterns (e.g., ai:function _call name="browse_page"><parameter name="url">...</>)
+    // This removes XML-like AI function call syntax that shouldn't be displayed to users
+    // Remove complete parameter tags with content: <parameter name="...">...</parameter>
+    t = t.replace(/<\s*parameter\s+name\s*=\s*[^>]*>[\s\S]*?<\s*\/\s*parameter\s*>/gi, '')
+    // Remove opening parameter tags
+    t = t.replace(/<\s*parameter\s+name\s*=\s*[^>]*>/gi, '')
+    // Remove closing tags: </parameter>, </x>, </x ai _call >, </xai:function_call>, etc
+    t = t.replace(/<\s*\/\s*parameter\s*>/gi, '')
+    t = t.replace(/<\s*\/\s*x\s*>/gi, '')
+    t = t.replace(/<\s*\/\s*x\s*ai\s*_?\s*call\s*>/gi, '')
+    t = t.replace(/<\s*\/\s*xai\s*:\s*function\s*_?\s*call\s*>/gi, '')
+    // Remove ai:function call patterns
+    t = t.replace(/ai:\s*function\s*_?\s*call\s+[^>]*>/gi, '')
+    t = t.replace(/<\s*ai:\s*function\s*_?\s*call[^>]*>/gi, '')
+    t = t.replace(/<\s*xai:\s*function\s*_?\s*call[^>]*>/gi, '')
+    
     // Normalize non-breaking spaces to normal spaces
     t = t.replace(/\u00A0/g, ' ')
     
@@ -1133,6 +1149,9 @@ const cleanContent = (content) => {
     
     // Trim leading/trailing spaces on each line while preserving line breaks
     t = t.split('\n').map(line => line.trim()).join('\n')
+    
+    // Remove leading and trailing blank lines
+    t = t.replace(/^\s*\n+/, '').replace(/\n+\s*$/, '')
     
     return t
 }
@@ -1244,7 +1263,9 @@ const sendMessage = async () => {
             toolCalls: userMessage.toolCalls || [],
             sources: userMessage.sources || []
         }
-        if (!chatId.value) {
+        // Double-check: only create new chat if chatId is truly null/empty
+        const currentChatId = chatId.value
+        if (!currentChatId || currentChatId === null || currentChatId === undefined || currentChatId === '') {
             // create new chat with this initial message and WAIT for id so subsequent assistant append can use it
             try {
                 const createRes = await createAichat('New Conversation', [serialMsg])
@@ -1278,6 +1299,7 @@ const sendMessage = async () => {
                         } catch (e) { console.warn('updateAichatLastMessage create error throw:', e) }
                     }
                     currentTitle.value = createRes.data.title || 'New Conversation'
+                    showTitle.value = true
                 }
             } catch (e) {
                 // non-fatal: log and continue (we'll still send message to AI)
@@ -1503,6 +1525,7 @@ const sendMessage = async () => {
                             } catch (err) { console.warn('updateAichatLastMessage create2 error throw:', err) }
                                     }
                                     currentTitle.value = createRes2.data.title || 'New Conversation'
+                                    showTitle.value = true
                                 }
                             } catch (e2) {
                                 console.warn('Failed to create chat with assistant message:', e2)
@@ -1571,6 +1594,13 @@ const startNewChat = async () => {
     selectedFile.value = null
     errorMessage.value = ''
     currentTitle.value = 'New Conversation'
+    showTitle.value = true
+    
+    // Also clear any file input
+    if (fileInput.value && 'value' in fileInput.value) {
+        fileInput.value.value = null
+    }
+    
     await nextTick()
     await scrollToBottom()
 }

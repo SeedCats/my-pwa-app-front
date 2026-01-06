@@ -67,8 +67,4 @@ export default defineConfig({
     }
   },
 
-  preview: {
-    allowedHosts: ['my-pwa-app-front.onrender.com']
-  }
-
 });
