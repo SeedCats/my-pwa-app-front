@@ -439,7 +439,7 @@
           </div>
 
           <div class="text-center mb-6">
-            <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stressStats.avg }}</div>
+            <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stressScore }}</div>
             <div class="text-lg mb-4" :class="themeClasses.textSecondary">{{ $t('home.stress.name') }}</div>
           </div>
         </template>
@@ -486,30 +486,26 @@
                   <path d="M10 2a6 6 0 100 12 6 6 0 000-12z"></path>
                 </svg>
               </div>
-              <h3 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('home.todayPressureOverview') }}
+              <h3 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('home.todayStressOverview') }}
               </h3>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 gap-4">
+            <!-- Stats Grid: Max / Min / Average -->
+            <div class="grid grid-cols-3 gap-4">
               <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ pressureScore }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.pressure.scoreLabel') }}</div>
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ typeof stressStats.max === 'number' ? stressStats.max : '--' }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.stress.max') }}</div>
               </div>
               <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ pressureCategoryLabel }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.pressure.categoryLabel') }}</div>
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ typeof stressStats.min === 'number' ? stressStats.min : '--' }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.stress.min') }}</div>
               </div>
               <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ pressureMean !== null ?
-                  pressureMean.toFixed(2) : '--' }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.pressure.average') }}</div>
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stressMeanRounded !== null ?
+                  stressMeanRounded : '--' }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.stress.average') }}</div>
               </div>
-              <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ pressureData.length }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.pressure.dataPoints') }}</div>
-              </div>
-            </div>
+            </div> 
           </div>
         </div>
 
@@ -647,7 +643,7 @@ const stats = ref({ min: 0, max: 0, avg: 0, resting: 0 })
 
 // Stress state (previously missing; avoids reading .avg of undefined in template)
 const stressData = ref([])
-const stressStats = ref({ min: 0, max: 0, avg: 0 })
+const stressStats = ref({ min: null, max: null, avg: null })
 const stressChartData = ref(null)
 const isStressLoading = ref(false)
 const hasStressData = ref(false)
@@ -669,21 +665,24 @@ const pressureMean = computed(() => {
   return pressureData.value.reduce((s, v) => s + v, 0) / pressureData.value.length
 })
 
-const pressureScore = computed(() => {
-  if (pressureMean.value === null) return '--'
-  return Math.round(((3 - pressureMean.value) / 3) * 100)
+// Real stress averages derived from the day's stress visualization
+const stressMean = computed(() => {
+  if (!stressData.value || stressData.value.length === 0) return null
+  // stressData items may be objects like { avg: number } or raw numbers
+  const vals = stressData.value.map(s => (typeof s === 'number' ? s : (s.avg ?? null))).filter(v => v !== null && !isNaN(v))
+  if (vals.length === 0) return null
+  return vals.reduce((s, v) => s + v, 0) / vals.length
 })
 
-const pressureCategoryKey = computed(() => {
-  if (pressureScore.value === '--') return ''
-  const s = pressureScore.value
-  if (s <= 33) return 'relaxed'
-  if (s <= 66) return 'light'
-  if (s <= 85) return 'moderate'
-  return 'severe'
+const stressMeanRounded = computed(() => {
+  return stressMean.value !== null ? Math.round(stressMean.value) : null
 })
 
-const pressureCategoryLabel = computed(() => pressureCategoryKey.value ? t(`home.pressure.${pressureCategoryKey.value}`) : '')
+const stressScore = computed(() => {
+  const s = stressStats.value?.avg
+  if (typeof s === 'number' && !isNaN(s)) return Math.round(s)
+  return stressMeanRounded.value !== null ? stressMeanRounded.value : '--'
+})
 
 // Calendar state
 const showDatePicker = ref(false)
@@ -720,8 +719,6 @@ const loadBMIData = async () => {
     isBMILoading.value = false
   }
 }
-
-
 
 const bmiCategoryKey = computed(() => {
   const raw = (bmiData.value.category || '').toString().toLowerCase()
@@ -1119,13 +1116,14 @@ const loadHeartRateData = async () => {
       // Fallback: if the record includes stress values in the same hourly data, derive stress from it
       if (record.hourlyData && record.hourlyData.length > 0 && (record.hourlyData[0].hasOwnProperty('stress') || record.hourlyData[0].hasOwnProperty('stress_avg') || record.hourlyData[0].hasOwnProperty('stressAvg'))) {
         const sArr = record.hourlyData.map(h => ({ avg: h.stress ?? h.stress_avg ?? h.stressAvg ?? null }))
-        const sVals = sArr.filter(h => h.avg !== null && !isNaN(h.avg)).map(h => Number(h.avg))
-        const sMin = sVals.length > 0 ? Math.min(...sVals) : 0
-        const sMax = sVals.length > 0 ? Math.max(...sVals) : 0
-        const sAvg = sVals.length > 0 ? Math.round(sVals.reduce((s, v) => s + v, 0) / sVals.length) : 0
+        const sValsAll = sArr.map(h => Number(h.avg)).filter(v => !isNaN(v))
+        const sValsNonZero = sValsAll.filter(v => v !== 0)
+        const sMin = sValsNonZero.length > 0 ? Math.min(...sValsNonZero) : null
+        const sMax = sValsAll.length > 0 ? Math.max(...sValsAll) : null
+        const sAvg = sValsNonZero.length > 0 ? Math.round(sValsNonZero.reduce((s, v) => s + v, 0) / sValsNonZero.length) : null
         stressData.value = sArr
         stressStats.value = { min: sMin, max: sMax, avg: sAvg }
-        hasStressData.value = sVals.length > 0
+        hasStressData.value = sValsAll.length > 0
         updateStressChartFromAggregated(stressData.value)
       }
 
@@ -1225,7 +1223,7 @@ const updatePressureChartFromData = (values) => {
   pressureChartData.value = {
     labels: Array.from({ length: values.length }, (_, i) => `${i.toString().padStart(2, '0')}:00`),
     datasets: [{
-      label: t('home.pressure.scoreLabel'),
+      label: t('home.stress.scoreLabel'),
       data: values,
       borderColor: '#059669',
       backgroundColor: 'rgba(5,150,105,0.06)',
@@ -1257,24 +1255,25 @@ const loadStressData = async (date) => {
     if (response.success && response.data.records && response.data.records.length > 0) {
       const record = response.data.records[0]
       stressData.value = record.hourlyData || []
-      const hourlyValues = stressData.value.filter(h => h.avg !== undefined)
-      const avgValues = hourlyValues.map(h => h.avg)
-      const actualMin = avgValues.length > 0 ? Math.min(...avgValues) : 0
-      const actualMax = avgValues.length > 0 ? Math.max(...avgValues) : 0
-      const actualAvg = avgValues.length > 0 ? Math.round(avgValues.reduce((s, v) => s + v, 0) / avgValues.length) : 0
+      const hourlyValues = stressData.value.filter(h => h.avg !== undefined && h.avg !== null)
+      const avgValuesAll = hourlyValues.map(h => Number(h.avg)).filter(v => !isNaN(v))
+      const avgValuesNonZero = avgValuesAll.filter(v => v !== 0)
+      const actualMin = avgValuesNonZero.length > 0 ? Math.min(...avgValuesNonZero) : null
+      const actualMax = avgValuesAll.length > 0 ? Math.max(...avgValuesAll) : null
+      const actualAvg = avgValuesNonZero.length > 0 ? Math.round(avgValuesNonZero.reduce((s, v) => s + v, 0) / avgValuesNonZero.length) : null
       stressStats.value = { min: actualMin, max: actualMax, avg: actualAvg }
-      hasStressData.value = true
+      hasStressData.value = avgValuesAll.length > 0
       updateStressChartFromAggregated(stressData.value)
     } else {
       stressData.value = []
-      stressStats.value = { min: 0, max: 0, avg: 0 }
+      stressStats.value = { min: null, max: null, avg: null }
       stressChartData.value = null
       hasStressData.value = false
     }
   } catch (err) {
     console.error('Error loading stress data:', err)
     stressData.value = []
-    stressStats.value = { min: 0, max: 0, avg: 0 }
+    stressStats.value = { min: null, max: null, avg: null }
     stressChartData.value = null
     hasStressData.value = false
   } finally {
