@@ -172,6 +172,7 @@
     "uploading": "Uploading...",
 
     "uploadStressOnly": "Upload as stress-only (use /stress/upload)",
+    "uploadHeartOnly": "Upload as heart-rate-only (use /heartrate/upload)",
     "uploadedSuccessfullySummary": "Uploaded and processed",
     "recordsParsed": "records parsed",
     "heartRateDays": "Heart rate",
@@ -295,7 +296,7 @@
         "1": "What's a healthy resting heart rate for me?"
       },
       "stress": {
-        "0": "How are my stress index trends?",
+        "0": "What's a healthy stress level?",
         "1": "What can I do to better manage stress?"
       }
     },

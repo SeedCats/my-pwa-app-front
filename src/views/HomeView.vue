@@ -516,8 +516,8 @@
               <div class="text-xs grid grid-cols-1 sm:grid-cols-2 gap-2" :class="themeClasses.textSecondary">
                 <div>{{ $t('home.stress.range.relaxed') }}</div>
                 <div>{{ $t('home.stress.range.light') }}</div>
-                <div>{{ $t('home.stress.range.mid') }}</div>
-                <div>{{ $t('home.stress.range.heavy') }}</div>
+                <div>{{ $t('home.stress.range.moderate') }}</div>
+                <div>{{ $t('home.stress.range.severe') }}</div>
               </div>
             </div> 
           </div>

@@ -191,10 +191,16 @@
                                         {{ uploadStatus.message }}
                                     </div>
 
-                                    <!-- Optional: Upload as stress-only -->
-                                    <div class="flex items-center gap-3">
-                                        <input id="stressOnly" type="checkbox" v-model="isStressOnlyUpload" class="w-4 h-4" />
-                                        <label for="stressOnly" :class="themeClasses.textSecondary" class="text-sm">{{ $t('dataSettings.uploadStressOnly') }}</label>
+                                    <!-- Optional: Upload type (heart-only / stress-only) -->
+                                    <div class="flex flex-col items-start gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <input id="heartOnly" type="checkbox" v-model="isHeartOnlyUpload" class="w-4 h-4" />
+                                            <label for="heartOnly" :class="themeClasses.textSecondary" class="text-sm">{{ $t('dataSettings.uploadHeartOnly') }}</label>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <input id="stressOnly" type="checkbox" v-model="isStressOnlyUpload" class="w-4 h-4" />
+                                            <label for="stressOnly" :class="themeClasses.textSecondary" class="text-sm">{{ $t('dataSettings.uploadStressOnly') }}</label>
+                                        </div>
                                     </div> 
 
                                     <!-- Upload Button -->
@@ -272,7 +278,7 @@
 <script setup>
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { saveBMIData, getLatestBMIRecord, updateBMIRecord, deleteAllBMIRecords } from '../services/bmiService' 
 import { uploadHeartRateCSV, deleteAllHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
@@ -302,6 +308,11 @@ const isDeletingBMI = ref(false)
 const deleteBMIStatus = ref(null)
 // New states
 const isStressOnlyUpload = ref(false)
+const isHeartOnlyUpload = ref(false)
+
+// Keep upload type checkboxes mutually exclusive
+watch(isHeartOnlyUpload, (val) => { if (val) isStressOnlyUpload.value = false })
+watch(isStressOnlyUpload, (val) => { if (val) isHeartOnlyUpload.value = false })
 
 
 // Computed

@@ -720,11 +720,13 @@ const usePrompt = async (prompt) => {
         }
     }
     
-    // Append health data to prompt when sending
-    const messageWithData = healthContext.length > 0 
-        ? `${prompt}\n\nMy data: ${healthContext.join(', ')}`
-        : prompt
-    
+    // For stress prompts, send only the suggested prompt (no appended data)
+    const messageWithData = isStressPrompt
+        ? prompt
+        : (healthContext.length > 0
+            ? `${prompt}\n\nMy data: ${healthContext.join(', ')}`
+            : prompt)
+
     newMessage.value = messageWithData
     // Send the message immediately
     await sendMessage()
@@ -1695,17 +1697,44 @@ const loadHealthData = async () => {
     }
 }
 
+// Force reload stress dates (used when data updates elsewhere)
+const forceReloadStressDates = async () => {
+    try {
+        const sResp = await getStressDates()
+        if (sResp && sResp.success && Array.isArray(sResp.data.dates) && sResp.data.dates.length > 0) {
+            setCachedStressDates(sResp.data.dates)
+        } else {
+            // If no dates returned, clear cached value to avoid stale prompts
+            setCachedStressDates([])
+        }
+    } catch (error) {
+        console.error('Failed to reload stress dates:', error)
+    }
+}
+
 onMounted(() => {
     // Scroll to top when entering the page
     window.scrollTo({ top: 0, behavior: 'smooth' })
     
     // Load health data for suggested prompts
     loadHealthData()
+
+    // Listen for updates from Data Setting or other views so prompts refresh automatically
+    window.addEventListener('stressDataUpdated', forceReloadStressDates)
+    // Also refresh cached health data when heart rate or BMI data changes
+    window.addEventListener('heartRateDataUpdated', loadHealthData)
+    window.addEventListener('bmiDataUpdated', loadHealthData)
     
     // Auto-load history when the panel is shown by default
     if (showHistoryPanel.value) {
         loadChatList(1).catch(e => console.warn('Failed to load chat history on mount:', e))
     }
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('stressDataUpdated', forceReloadStressDates)
+    window.removeEventListener('heartRateDataUpdated', loadHealthData)
+    window.removeEventListener('bmiDataUpdated', loadHealthData)
 })
 </script>
 

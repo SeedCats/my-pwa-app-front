@@ -177,6 +177,7 @@
     "uploading": "上傳中...",
 
     "uploadStressOnly": "僅上傳壓力資料（使用 /stress/upload）",
+    "uploadHeartOnly": "僅上傳心率資料（使用 /heartrate/upload）",
     "uploadedSuccessfullySummary": "上傳並處理完成",
     "recordsParsed": "筆資料被解析",
     "heartRateDays": "心率",
@@ -318,10 +319,11 @@
         "1": "對我而言，什麼是健康的靜止心率？"
       },
       "stress": {
-        "0": "我的壓力指數趨勢如何？",
+        "0": "一個健康的壓力水平應該是多少？",
         "1": "我可以做些什麼來更好地管理壓力？"
       }
-    },
+    },   
+    "hourlyStress": "每小時壓力分數：",   
     "rename": "重新命名",
     "load": "載入",
     "delete": "刪除",
