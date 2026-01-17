@@ -151,6 +151,12 @@
     "deleteAllRecords": "Delete All Records",
     "processing": "Processing...",
     "calculating": "Calculating...",
+    "processingCSV": "Processing CSV to the required format...",
+    "processingSuccess": "CSV processed successfully!",
+    "processingFailed": "CSV processing failed",
+    "emptyCsv": "CSV file is empty",
+    "missingColumns": "Missing Key/Value/UpdateTime columns",
+    "noMatchingKey": "No heart_rate or stress rows found",
 
     "fillHeightWeight": "Please fill in height and weight",
     "savedSuccessfully": "BMI data saved successfully!",

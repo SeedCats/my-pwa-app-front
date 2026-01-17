@@ -183,6 +183,17 @@
                                         </div>
                                     </div>
 
+                                    <!-- Processing Status -->
+                                    <div v-if="fileProcessStatus" class="p-3 rounded-lg text-sm" :class="[
+                                        fileProcessStatus.type === 'success' 
+                                            ? isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-800'
+                                            : fileProcessStatus.type === 'info' 
+                                                ? isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-800'
+                                                : isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-800'
+                                    ]">
+                                        {{ fileProcessStatus.message }}
+                                    </div>
+
                                     <!-- Upload Status -->
                                     <div v-if="uploadStatus" class="p-3 rounded-lg text-sm" :class="[
                                         uploadStatus.type === 'success' 
@@ -310,6 +321,9 @@ const deleteBMIStatus = ref(null)
 // New states
 const isStressOnlyUpload = ref(false)
 const isHeartOnlyUpload = ref(false)
+// Processing state for client-side CSV formatting
+const isProcessing = ref(false)
+const fileProcessStatus = ref(null)
 
 // Keep upload type checkboxes mutually exclusive
 watch(isHeartOnlyUpload, (val) => { if (val) isStressOnlyUpload.value = false })
@@ -609,7 +623,50 @@ const handleFileDrop = (e) => {
 const clearFile = () => {
     selectedFile.value = null
     uploadStatus.value = null
+    fileProcessStatus.value = null
     if (fileInput.value) fileInput.value.value = ''
+}
+
+// Helper to split CSV line while respecting quoted commas
+const splitCsvLine = (line) => {
+    const regex = /,(?=(?:(?:[^"]*"){2})*[^\"]*$)/
+    return line.split(regex)
+}
+
+// Process CSV text into required "Value,Date" format
+function processCsvText(text) {
+    const lines = text.split(/\r?\n/).filter(l => l.trim() !== '')
+    if (!lines.length) throw new Error(t('dataSettings.emptyCsv') || 'Empty CSV')
+
+    const headers = splitCsvLine(lines[0]).map(h => h.replace(/^"|"$/g, '').trim())
+    const keyIdx = headers.findIndex(h => /key/i.test(h))
+    const valueIdx = headers.findIndex(h => /value/i.test(h))
+    const updateIdx = headers.findIndex(h => /updatetime|time/i.test(h))
+
+    if (keyIdx === -1 || valueIdx === -1 || updateIdx === -1) {
+        throw new Error(t('dataSettings.missingColumns') || 'Missing Key/Value/UpdateTime columns')
+    }
+
+    const targetKeys = new Set(['heart_rate', 'stress'])
+    const out = ['Value,Date']
+    for (let i = 1; i < lines.length; i++) {
+        const cols = splitCsvLine(lines[i])
+        if (cols.length !== headers.length) continue
+        const key = cols[keyIdx].replace(/^"|"$/g, '').trim()
+        if (!targetKeys.has(key)) continue
+        const value = cols[valueIdx].replace(/^"|"$/g, '').trim()
+        const updateTime = cols[updateIdx].replace(/^"|"$/g, '').trim()
+        out.push(`${value},${updateTime}`)
+    }
+    if (out.length === 1) throw new Error(t('dataSettings.noMatchingKey') || 'No heart_rate or stress rows found')
+    return out.join('\n')
+}
+
+const uploadProcessedCsv = async (csvText, filename = 'heart_rate_stress_combined.csv') => {
+    const processedFile = new File([csvText], filename, { type: 'text/csv' })
+    if (isHeartOnlyUpload.value) return await uploadHeartRateCSV(processedFile)
+    if (isStressOnlyUpload.value) return await uploadStressCSV(processedFile)
+    return await uploadAllCSV(processedFile)
 }
 
 const submitFileUpload = async () => {
@@ -619,19 +676,29 @@ const submitFileUpload = async () => {
     }
 
     isUploading.value = true
+    isProcessing.value = true
     uploadStatus.value = null
+    fileProcessStatus.value = { type: 'info', message: t('dataSettings.processingCSV')}
 
     try {
-        let response
-        if (isHeartOnlyUpload.value) {
-            response = await uploadHeartRateCSV(selectedFile.value)
-        } else if (isStressOnlyUpload.value) {
-            response = await uploadStressCSV(selectedFile.value)
-        } else {
-            response = await uploadAllCSV(selectedFile.value)
+        // Read file text and process
+        const text = await selectedFile.value.text()
+        let processedCsv
+        try {
+            processedCsv = processCsvText(text)
+            fileProcessStatus.value = { type: 'success', message: t('dataSettings.processingSuccess') || 'CSV processed' }
+            // Show uploading message after processing
+            fileProcessStatus.value = { type: 'info', message: t('dataSettings.uploading') || 'Uploading...' }
+        } catch (error) {
+            console.error('CSV processing error:', error)
+            fileProcessStatus.value = { type: 'error', message: error.message || t('dataSettings.processingFailed') }
+            throw error
         }
 
-        if (response.success) {
+        // Upload processed file
+        const response = await uploadProcessedCsv(processedCsv)
+
+        if (response && response.success) {
             // Handle new backend response shape
             const d = response.data || {}
             const totalParsed = d.totalRecordsParsed ?? 0
@@ -658,13 +725,15 @@ const submitFileUpload = async () => {
             await checkHeartRateData()
             await checkStressData()
         } else {
-            uploadStatus.value = { type: 'error', message: response.message || t('dataSettings.uploadFailed') }
+            uploadStatus.value = { type: 'error', message: (response && response.message) || t('dataSettings.uploadFailed') }
         }
     } catch (error) {
         console.error('File upload error:', error)
         uploadStatus.value = { type: 'error', message: error.message || t('dataSettings.uploadFailedTry') }
     } finally {
         isUploading.value = false
+        isProcessing.value = false
+        setTimeout(() => { fileProcessStatus.value = null }, 3000)
     }
 } 
 </script>

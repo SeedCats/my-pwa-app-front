@@ -157,6 +157,12 @@
     "csvFilesOnly": "僅支援 CSV 檔案 (.csv)",
     "processing": "處理中...",
     "calculating": "計算中...",
+    "processingCSV": "正在將 CSV 處理為所需格式...",
+    "processingSuccess": "CSV 處理成功！",
+    "processingFailed": "CSV 處理失敗",
+    "emptyCsv": "CSV 檔案為空",
+    "missingColumns": "缺少 Key/Value/UpdateTime 欄位",
+    "noMatchingKey": "未找到 heart_rate 或 stress 的資料列",
 
     "fillHeightWeight": "請填寫身高與體重",
     "savedSuccessfully": "BMI 資料儲存成功！",
