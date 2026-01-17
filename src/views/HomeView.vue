@@ -440,7 +440,10 @@
 
           <div class="text-center mb-6">
             <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stressScore }}</div>
-            <div class="text-lg mb-4" :class="themeClasses.textSecondary">{{ $t('home.stress.name') }}</div>
+            <div class="text-lg mb-2" :class="themeClasses.textSecondary">{{ $t('home.stress.name') }}</div>
+            <div class="mb-4">
+              <div class="inline-block text-white px-3 py-1 rounded-full text-sm font-semibold" :class="stressCategoryBadgeClass">{{ stressCategoryLabel || '--' }}</div>
+            </div>
           </div>
         </template>
 
@@ -504,6 +507,17 @@
                 <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stressMeanRounded !== null ?
                   stressMeanRounded : '--' }}</div>
                 <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.stress.average') }}</div>
+              </div>
+            </div>
+
+            <!-- Stress Ranges -->
+            <div class="mt-4 pt-4 border-t" :class="themeClasses.border">
+              <h4 class="text-sm font-semibold mb-2" :class="themeClasses.textPrimary">{{ $t('home.stress.rangeTitle') }}</h4>
+              <div class="text-xs grid grid-cols-1 sm:grid-cols-2 gap-2" :class="themeClasses.textSecondary">
+                <div>{{ $t('home.stress.range.relaxed') }}</div>
+                <div>{{ $t('home.stress.range.light') }}</div>
+                <div>{{ $t('home.stress.range.mid') }}</div>
+                <div>{{ $t('home.stress.range.heavy') }}</div>
               </div>
             </div> 
           </div>
@@ -660,11 +674,6 @@ const pressureData = ref([])
 const pressureChartData = ref(null)
 const pressureSummaryData = ref(null)
 
-const pressureMean = computed(() => {
-  if (!pressureData.value || pressureData.value.length === 0) return null
-  return pressureData.value.reduce((s, v) => s + v, 0) / pressureData.value.length
-})
-
 // Real stress averages derived from the day's stress visualization
 const stressMean = computed(() => {
   if (!stressData.value || stressData.value.length === 0) return null
@@ -682,6 +691,23 @@ const stressScore = computed(() => {
   const s = stressStats.value?.avg
   if (typeof s === 'number' && !isNaN(s)) return Math.round(s)
   return stressMeanRounded.value !== null ? stressMeanRounded.value : '--'
+})
+
+// Category mapping derived from current score (uses ranges you specified)
+const stressCategoryKey = computed(() => {
+  const s = stressScore.value
+  if (s === '--' || s === null || s === undefined) return ''
+  if (s <= 25) return 'relaxed'
+  if (s <= 50) return 'light'
+  if (s <= 80) return 'moderate'
+  return 'severe'
+})
+
+const stressCategoryLabel = computed(() => stressCategoryKey.value ? t(`home.stress.${stressCategoryKey.value}`) : '')
+
+const stressCategoryBadgeClass = computed(() => {
+  const map = { relaxed: 'bg-teal-400', light: 'bg-green-400', moderate: 'bg-yellow-500', severe: 'bg-orange-500' }
+  return map[stressCategoryKey.value] || 'bg-gray-400'
 })
 
 // Calendar state
@@ -766,16 +792,21 @@ const bmiRangeDisplay = computed(() => {
   return ranges[key] || '18.5 - 24.9'
 })
 
-// Show Overall Analysis only when both BMI and heart rate data are available
+// Show Overall Analysis only when BMI, heart rate and stress data are available
 const showOverallAnalysis = computed(() => {
-  return !isBMILoading.value && !isHeartRateLoading.value && bmiData.value && bmiData.value.bmi && hasHeartRateData.value && stats.value && stats.value.avg
+  return !isBMILoading.value && !isHeartRateLoading.value && !isStressLoading.value &&
+         bmiData.value && bmiData.value.bmi &&
+         hasHeartRateData.value && stats.value && typeof stats.value.avg === 'number' &&
+         hasStressData.value && (typeof stressStats.value?.avg === 'number' || stressMean.value !== null)
 })
 
-// Simple heuristic to compute an overall health score (0-100) using BMI and heart rate
+// Simple heuristic to compute an overall health score (0-100) using BMI, heart rate and stress
 const overallAnalysis = computed(() => {
   const bmi = parseFloat(bmiData.value?.bmi)
   const hr = parseFloat(stats.value?.avg)
-  if (!bmi || !hr) {
+  const stressVal = (typeof stressStats.value?.avg === 'number' ? parseFloat(stressStats.value.avg) : (stressMean.value !== null ? parseFloat(stressMean.value) : null))
+
+  if (!bmi || !hr || stressVal === null || typeof stressVal === 'undefined' || isNaN(stressVal)) {
     return { score: '--', statusKey: 'noData', summary: t('home.overallAnalysis.noData'), advice: [], badgeClass: 'bg-gray-400', progressClass: 'bg-gray-400' }
   }
 
@@ -791,7 +822,12 @@ const overallAnalysis = computed(() => {
   else if (hr > 90) hrDeviation = hr - 90
   const hrPenalty = Math.min(40, Math.round((hrDeviation / 30) * 40))
 
-  let score = Math.max(0, Math.min(100, 100 - bmiPenalty - hrPenalty))
+  // Stress penalty: target <= 25 (relaxed); deviation penalized up to 20 points
+  let stressDeviation = 0
+  if (stressVal > 25) stressDeviation = stressVal - 25
+  const stressPenalty = Math.min(20, Math.round((stressDeviation / 75) * 20))
+
+  let score = Math.max(0, Math.min(100, 100 - bmiPenalty - hrPenalty - stressPenalty))
 
   // Status mapping
   let statusKey = 'excellent'
@@ -813,6 +849,10 @@ const overallAnalysis = computed(() => {
 
   if (hr > 90) advice.push(t('home.overallAnalysis.advice.highHr'))
   else if (hr < 50) advice.push(t('home.overallAnalysis.advice.lowHr'))
+
+  // Stress advice
+  if (stressVal >= 80) advice.push(t('home.overallAnalysis.advice.highStress'))
+  else if (stressVal >= 50) advice.push(t('home.overallAnalysis.advice.moderateStress'))
 
   return { score, statusKey, summary: t(`home.overallAnalysis.summary.${statusKey}`), advice, badgeClass: badgeMap[statusKey], progressClass: progressMap[statusKey] }
 })

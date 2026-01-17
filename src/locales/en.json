@@ -84,12 +84,19 @@
       "categoryLabel": "Category",
       "max": "Max Stress",
       "min": "Min Stress",
-      "dataPoints": "Data Points"
+      "dataPoints": "Data Points",
+      "rangeTitle": "Stress Ranges",
+      "range": {
+        "relaxed": "Relaxed: 1 ~ 25",
+        "light": "Light-Stress: 26 ~ 50",
+        "moderate": "Moderate-Stress: 51 ~ 80",
+        "severe": "Severe-Stress: 81 ~ 100"
+      }
     },
     "selectDate": "Select Date",
     "overallAnalysis": {
       "title": "Overall Analysis",
-      "noData": "Not enough data to analyze. Add BMI and heart rate records.",
+      "noData": "Not enough data to analyze. Add BMI, heart rate and stress records.",
       "adviceTitle": "Suggested Actions",
       "statuses": {
         "excellent": "Excellent",
@@ -98,7 +105,7 @@
         "poor": "Poor"
       },
       "summary": {
-        "excellent": "Excellent overall health based on current BMI and heart rate.",
+        "excellent": "Excellent overall health based on current BMI, heart rate and stress.",
         "good": "Good overall health. Keep maintaining healthy habits.",
         "fair": "Fair health. Consider small improvements to lifestyle.",
         "poor": "Indicators suggest potential concerns. Consider consulting a healthcare professional."
@@ -109,7 +116,9 @@
         "overweight": "Consider weight management strategies: diet, regular exercise, and professional guidance.",
         "obese": "Seek a healthcare provider for a structured weight loss plan and monitoring.",
         "highHr": "Reduce stress and stimulants; consult a doctor if high heart rate persists.",
-        "lowHr": "If you experience symptoms with low heart rate, seek medical advice."
+        "lowHr": "If you experience symptoms with low heart rate, seek medical advice.",
+        "moderateStress": "Manage stress with relaxation techniques, regular sleep, and consider counseling if persistent.",
+        "highStress": "High stress detected — prioritize stress reduction strategies and consult a professional if necessary."
       }
     } 
   },
@@ -284,6 +293,10 @@
       "heartRate": {
         "0": "What do my heart rate trends indicate?",
         "1": "What's a healthy resting heart rate for me?"
+      },
+      "stress": {
+        "0": "How are my stress index trends?",
+        "1": "What can I do to better manage stress?"
       }
     },
     "rename": "Rename",

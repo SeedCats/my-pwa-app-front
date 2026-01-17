@@ -486,8 +486,9 @@ import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { sendMessageToGrok, sendMessageToGrokWithFile, fetchAichatList, fetchAichatById, createAichat, appendMessagesToAichat, deleteAichat, updateAichatTitle, updateAichatLastMessage } from '../services/grokService'
 import { useI18n } from 'vue-i18n'
-import { useUserStore, getCachedBmiData, getCachedHeartRateDates, setCachedBmiData, setCachedHeartRateDates } from '../stores/userStore'
+import { useUserStore, getCachedBmiData, getCachedHeartRateDates, getCachedStressDates, setCachedBmiData, setCachedHeartRateDates, setCachedStressDates } from '../stores/userStore'
 import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
+import { getStressStats } from '../services/stressService' 
 import { getLatestBMIRecord } from '../services/bmiService' 
 
 const { isDarkMode, themeClasses } = useTheme()
@@ -582,17 +583,20 @@ watch(() => ({ ...aiSettings }), (nv) => {
 const suggestedPrompts = computed(() => {
     const bmiData = getCachedBmiData()
     const heartRateDates = getCachedHeartRateDates()
+    const stressDates = getCachedStressDates()
     
     // Only show prompts if there's actual health data available
     const hasBmiData = bmiData && bmiData.bmi
     const hasHeartRateData = heartRateDates && heartRateDates.length > 0
+    const hasStressData = stressDates && stressDates.length > 0
     
-    if (!hasBmiData && !hasHeartRateData) {
+    if (!hasBmiData && !hasHeartRateData && !hasStressData) {
         return [] // No prompts if no health data
     }
     
     const bmiPrompts = []
     const heartRatePrompts = []
+    const stressPrompts = []
     
     // Generate 2 BMI-related prompts if BMI data exists
     if (hasBmiData) {
@@ -618,20 +622,30 @@ const suggestedPrompts = computed(() => {
         heartRatePrompts.push(t('aiSupport.prompts.heartRate.0'))
         heartRatePrompts.push(t('aiSupport.prompts.heartRate.1'))
     }
+
+    // Generate 2 stress-related prompts if stress data exists
+    if (hasStressData) {
+        stressPrompts.push(t('aiSupport.prompts.stress.0'))
+        stressPrompts.push(t('aiSupport.prompts.stress.1'))
+    }
     
-    // Combine prompts: 2 BMI + 2 Heart Rate
-    const allPrompts = [...bmiPrompts, ...heartRatePrompts]
+    // Combine prompts: BMI + Heart Rate + Stress (max 4 shown)
+    const allPrompts = [...bmiPrompts, ...heartRatePrompts, ...stressPrompts]
     
-    return allPrompts.slice(0, 4) // Show max 4 prompts
+    return allPrompts.slice(0, 6) // Show max 6 prompts
 })
 
 // Use a suggested prompt
 const usePrompt = async (prompt) => {
     if (isChatBusy.value) return
     
-    // Determine if this is a heart rate prompt or BMI prompt
+    // Determine if this is a heart rate prompt, stress prompt, or BMI prompt
     const heartRateKeywords = ['heart rate', 'cardiovascular', 'resting heart', '心率', '靜止心率', '心跳']
+    const stressKeywords = ['stress', 'stress score', 'pressure', 'tension', '壓力', '壓力指數']
     const isHeartRatePrompt = heartRateKeywords.some(keyword => 
+        prompt.toLowerCase().includes(keyword) || prompt.includes(keyword)
+    )
+    const isStressPrompt = stressKeywords.some(keyword => 
         prompt.toLowerCase().includes(keyword) || prompt.includes(keyword)
     )
     
@@ -639,6 +653,7 @@ const usePrompt = async (prompt) => {
     const healthContext = []
     const bmiData = getCachedBmiData()
     const heartRateDates = getCachedHeartRateDates()
+    const stressDates = getCachedStressDates()
     
     if (isHeartRatePrompt) {
         // For heart rate prompts, fetch and include all heart rate statistics
@@ -674,6 +689,26 @@ const usePrompt = async (prompt) => {
                 }
             } catch (error) {
                 console.error('Failed to fetch heart rate stats:', error)
+            }
+        }
+    } else if (isStressPrompt) {
+        // For stress prompts, fetch and include basic stress statistics
+        if (stressDates && stressDates.length > 0) {
+            try {
+                const response = await getStressStats({ date: stressDates[0] })
+                if (response && response.success && response.data) {
+                    // Support different API shapes (stats inside data.stats or directly under data)
+                    const s = response.data.stats || response.data || {}
+                    const sMin = s.min ?? s.minValue ?? s.minStress ?? null
+                    const sMax = s.max ?? s.maxValue ?? s.maxStress ?? null
+                    const sAvg = s.avg ?? s.average ?? s.mean ?? null
+
+                    if (sAvg !== null && typeof sAvg !== 'undefined') healthContext.push(`Average Stress: ${sAvg} ${t('home.stress.unit')}`)
+                    if (sMax !== null && typeof sMax !== 'undefined') healthContext.push(`Max Stress: ${sMax} ${t('home.stress.unit')}`)
+                    if (sMin !== null && typeof sMin !== 'undefined') healthContext.push(`Min Stress: ${sMin} ${t('home.stress.unit')}`)
+                }
+            } catch (error) {
+                console.error('Failed to fetch stress stats:', error)
             }
         }
     } else {
@@ -1641,6 +1676,18 @@ const loadHealthData = async () => {
                 }
             } catch (error) {
                 // No heart rate data available
+            }
+        }
+
+        // Load stress dates if not cached (so suggested stress prompts appear without a full page refresh)
+        if (!getCachedStressDates()) {
+            try {
+                const sResp = await getStressDates()
+                if (sResp && sResp.success && Array.isArray(sResp.data.dates) && sResp.data.dates.length > 0) {
+                    setCachedStressDates(sResp.data.dates)
+                }
+            } catch (error) {
+                // No stress data available
             }
         }
     } catch (error) {
