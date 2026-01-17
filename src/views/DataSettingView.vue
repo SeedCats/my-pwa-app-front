@@ -115,7 +115,7 @@
                                         <svg v-else class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                                         </svg>
-                                        {{ isDeletingBMI ? t('dataSettings.deleting') : t('dataSettings.deleteAllRecords') }} 
+                                        {{ isDeletingBMI ? t('dataSettings.deleting') : t('dataSettings.deleteBMI') }} 
                                     </button>
 
                                     <!-- BMI Delete Status Message -->
@@ -191,6 +191,12 @@
                                         {{ uploadStatus.message }}
                                     </div>
 
+                                    <!-- Optional: Upload as stress-only -->
+                                    <div class="flex items-center gap-3">
+                                        <input id="stressOnly" type="checkbox" v-model="isStressOnlyUpload" class="w-4 h-4" />
+                                        <label for="stressOnly" :class="themeClasses.textSecondary" class="text-sm">{{ $t('dataSettings.uploadStressOnly') }}</label>
+                                    </div> 
+
                                     <!-- Upload Button -->
                                     <button 
                                         @click="submitFileUpload"
@@ -207,7 +213,7 @@
                                         {{ isUploading ? t('dataSettings.uploading') : t('dataSettings.uploadFile') }} 
                                     </button>
 
-                                    <!-- Delete All Records Button -->
+                                    <!-- Delete All Heart Rate Records Button -->
                                     <button 
                                         @click="deleteAllHeartRateData"
                                         :disabled="isDeleting || !hasHeartRateData"
@@ -223,7 +229,26 @@
                                         <svg v-else class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                                         </svg>
-                                        {{ isDeleting ? t('dataSettings.deleting') : t('dataSettings.deleteAllRecords') }} 
+                                        {{ isDeleting ? t('dataSettings.deleting') : t('dataSettings.deleteAllHeartRateRecords') }} 
+                                    </button>
+
+                                    <!-- Delete All Stress Records Button -->
+                                    <button 
+                                        @click="deleteAllStressData"
+                                        :disabled="isDeleting || !hasStressData"
+                                        class="w-full mt-2 px-4 py-2 rounded-lg font-medium text-white transition-colors flex items-center justify-center"
+                                        :class="!isDeleting && hasStressData
+                                            ? 'bg-amber-600 hover:bg-amber-700' 
+                                            : 'bg-gray-400 cursor-not-allowed'"
+                                    >
+                                        <svg v-if="isDeleting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <svg v-else class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        {{ isDeleting ? t('dataSettings.deleting') : t('dataSettings.deleteAllStressRecords') }} 
                                     </button>
 
                                     <!-- Delete Status -->
@@ -234,6 +259,8 @@
                                     ]">
                                         {{ deleteStatus.message }}
                                     </div>
+
+
                                 </div>
                             </div>
                         </div>
@@ -249,7 +276,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { saveBMIData, getLatestBMIRecord, updateBMIRecord, deleteAllBMIRecords } from '../services/bmiService' 
 import { uploadHeartRateCSV, deleteAllHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
-import { invalidateBmiCache, invalidateHeartRateCache } from '../stores/userStore'
+import { uploadStressCSV, deleteAllStressRecords, getStressDates } from '../services/stressService' 
+import { invalidateBmiCache, invalidateHeartRateCache, invalidateStressCache } from '../stores/userStore' 
 
 const { isDarkMode, themeClasses } = useTheme()
 const { t } = useI18n()
@@ -269,8 +297,12 @@ const isUploading = ref(false)
 const isDeleting = ref(false)
 const deleteStatus = ref(null)
 const hasHeartRateData = ref(false)
+const hasStressData = ref(false)
 const isDeletingBMI = ref(false)
 const deleteBMIStatus = ref(null)
+// New states
+const isStressOnlyUpload = ref(false)
+
 
 // Computed
 const isUpdateMode = computed(() => !!(existingBMIRecord.value?._id || existingBMIRecord.value?.id))
@@ -439,7 +471,27 @@ const checkHeartRateData = async () => {
     } catch (error) {
         hasHeartRateData.value = false
     }
-}
+} 
+
+// Check if stress data exists
+const checkStressData = async () => {
+    try {
+        const response = await getStressDates()
+        if (
+            response &&
+            response.success &&
+            response.data &&
+            Array.isArray(response.data.dates) &&
+            response.data.dates.length > 0
+        ) {
+            hasStressData.value = true
+        } else {
+            hasStressData.value = false
+        }
+    } catch (error) {
+        hasStressData.value = false
+    }
+} 
 
 // Delete all heart rate data
 const deleteAllHeartRateData = async () => {
@@ -475,9 +527,46 @@ const deleteAllHeartRateData = async () => {
     }
 }
 
+
+
+// Delete all stress data
+const deleteAllStressData = async () => {
+    if (!confirm(t('dataSettings.deleteAllStressConfirm'))) {
+        return
+    }
+    
+    isDeleting.value = true
+    deleteStatus.value = null
+    
+    try {
+        const response = await deleteAllStressRecords()
+        
+        if (response.success) {
+            deleteStatus.value = { 
+                type: 'success', 
+                message: response.message || t('dataSettings.allStressDeleted')
+            }
+            hasStressData.value = false
+            invalidateStressCache()
+            window.dispatchEvent(new CustomEvent('stressDataUpdated'))
+        } else {
+            deleteStatus.value = { type: 'error', message: t('dataSettings.deleteFailed') }
+        }
+    } catch (error) {
+        console.error('Stress delete error:', error)
+        deleteStatus.value = { type: 'error', message: t('dataSettings.deleteFailed') }
+    } finally {
+        isDeleting.value = false
+        if (deleteStatus.value?.type === 'success') {
+            setTimeout(() => deleteStatus.value = null, 3000)
+        }
+    }
+}
+
 onMounted(() => {
     loadExistingBMIData()
     checkHeartRateData()
+    checkStressData()
 })
 
 // File Upload Handlers
@@ -516,36 +605,50 @@ const submitFileUpload = async () => {
         uploadStatus.value = { type: 'error', message: t('dataSettings.noFileSelected') }
         return
     }
-    
+
     isUploading.value = true
     uploadStatus.value = null
-    
+
     try {
-        const response = await uploadHeartRateCSV(selectedFile.value)
-        
+        const uploader = isStressOnlyUpload.value ? uploadStressCSV : uploadHeartRateCSV
+        const response = await uploader(selectedFile.value)
+
         if (response.success) {
-            const { inserted = 0, duplicatesSkipped = 0, totalRecords = 0 } = response.data || {}
-            const msg = `${t('dataSettings.uploadedSuccessfully')} ${inserted} ${t('dataSettings.recordsAdded')}${duplicatesSkipped > 0 ? `, ${duplicatesSkipped} ${t('dataSettings.duplicatesSkipped')}` : ''} (${totalRecords} ${t('dataSettings.totalInFile')})`
-            uploadStatus.value = { 
-                type: 'success', 
-                message: msg
+            // Handle new backend response shape
+            const d = response.data || {}
+            const totalParsed = d.totalRecordsParsed ?? 0
+            const daysProcessed = d.totalDaysProcessed ?? 0
+            const hrSummary = d.heartRate ?? {}
+            const stressSummary = d.stress ?? {}
+
+            let msgParts = []
+            if (typeof hrSummary.daysInserted === 'number' || typeof hrSummary.daysUpdated === 'number') {
+                msgParts.push(`${t('dataSettings.heartRateDays')}: ${hrSummary.daysInserted ?? 0} ${t('dataSettings.daysInserted')}, ${hrSummary.daysUpdated ?? 0} ${t('dataSettings.daysUpdated')}`)
             }
+            if (typeof stressSummary.daysInserted === 'number' || typeof stressSummary.daysUpdated === 'number') {
+                msgParts.push(`${t('dataSettings.stressDays')}: ${stressSummary.daysInserted ?? 0} ${t('dataSettings.daysInserted')}, ${stressSummary.daysUpdated ?? 0} ${t('dataSettings.daysUpdated')}`)
+            }
+
+            const msg = `${t('dataSettings.uploadedSuccessfullySummary')} ${totalParsed} ${t('dataSettings.recordsParsed')}. ${msgParts.join('; ')} (${daysProcessed} ${t('dataSettings.daysProcessed')})`
+
+            uploadStatus.value = { type: 'success', message: msg }
             clearFile()
-            invalidateHeartRateCache()  // Invalidate cache so HomeView fetches fresh data
-            // Dispatch event so HomeView can refresh heart rate data
+            invalidateHeartRateCache()
+            invalidateStressCache()
             window.dispatchEvent(new CustomEvent('heartRateDataUpdated'))
-            // Re-check heart rate data to enable delete button
+            window.dispatchEvent(new CustomEvent('stressDataUpdated'))
             await checkHeartRateData()
+            await checkStressData()
         } else {
             uploadStatus.value = { type: 'error', message: response.message || t('dataSettings.uploadFailed') }
         }
     } catch (error) {
-        console.error('Heart rate upload error:', error)
+        console.error('File upload error:', error)
         uploadStatus.value = { type: 'error', message: error.message || t('dataSettings.uploadFailedTry') }
     } finally {
         isUploading.value = false
     }
-}
+} 
 </script>
 
 <style scoped>

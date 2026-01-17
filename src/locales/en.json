@@ -31,6 +31,7 @@
     "loginNow": "Sign in"
   },
   "nav": {
+    "title": "Health Monitoring System",
     "home": "Home",
     "dataSettings": "Data Settings",
     "formatSettings": "Format Settings",
@@ -42,7 +43,8 @@
   "home": {
     "title": "Home",
     "dataAnalysis": "Data Analysis",
-    "todayOverview": "Today Overview",
+    "todayOverview": "Today Heart Rate Overview",
+    "todayPressureOverview": "Today Pressure Overview",
     "restingHeartRate": "Resting Heart Rate",
     "maxHeartRate": "Max Heart Rate",
     "minHeartRate": "Min Heart Rate",
@@ -82,6 +84,29 @@
       "average": "Average",
       "averageBpm": "Average bpm",
       "heartRateBpm": "Heart Rate (bpm)"
+    },
+    "stress": {
+      "title": "Stress",
+      "loading": "Loading stress data...",
+      "noData": "No stress data available",
+      "average": "Average",
+      "stressScore": "Stress Score",
+      "unit": "score"
+    },
+    "pressure": {
+      "title": "Pressure",
+      "name": "Average Pressure",
+      "emotionTitle": "Pressure Emotions",
+      "relaxed": "Relaxed",
+      "light": "Light",
+      "moderate": "Moderate",
+      "severe": "Severe",
+      "noData": "No pressure data available",
+      "loading": "Loading pressure data...",
+      "scoreLabel": "Score",
+      "categoryLabel": "Category",
+      "average": "Average",
+      "dataPoints": "Data Points"
     },
     "selectDate": "Select Date",
     "overallAnalysis": {
@@ -132,7 +157,7 @@
     "recordDate": "Record Date",
     "addHeartRate": "Add Heart Rate",
     "updateHeartRate": "Update Heart Rate",
-    "uploadCSV": "Upload CSV File for Heart Rate Data",
+    "uploadCSV": "Upload CSV File for Health Data (Heart Rate & Stress)",
     "uploadCSVShort": "Upload CSV File",
     "chooseFile": "Choose CSV file",
     "clickToUpload": "Click to upload or drag and drop",
@@ -146,9 +171,11 @@
     "savedSuccessfully": "BMI data saved successfully!",
     "updatedSuccessfully": "BMI data updated successfully!",
     "saveFailed": "Failed to save BMI data. Please try again.",
+    "deleteBMI": "Delete All BMI Records",
     "deleteBMIConfirm": "Are you sure you want to delete your BMI data? This action cannot be undone.",
     "bmiDeleted": "BMI data deleted",
     "deleteFailed": "Failed to delete data. Please try again.",
+    "yourBMI": "Your BMI",
 
     "invalidCsvSelect": "Please select a valid CSV file",
     "invalidCsvDrop": "Please drop a valid CSV file",
@@ -161,9 +188,26 @@
     "uploadFailedTry": "Upload failed. Please try again.",
     "uploading": "Uploading...",
 
+    "uploadStressOnly": "Upload as stress-only (use /stress/upload)",
+    "uploadedSuccessfullySummary": "Uploaded and processed",
+    "recordsParsed": "records parsed",
+    "heartRateDays": "Heart rate",
+    "stressDays": "Stress",
+    "daysInserted": "days inserted",
+    "daysUpdated": "days updated",
+    "daysProcessed": "days processed",
+    "deleteDateConfirm": "Delete data for {date}? This action cannot be undone.",
+    "dateDeleted": "Date data deleted",
+    "noDates": "No available dates",
+    "delete": "Delete",
+
     "deleting": "Deleting...",
     "deleteAllConfirm": "Are you sure you want to delete all heart rate records? This action cannot be undone?",
     "allHeartRateDeleted": "All heart rate data deleted successfully!",
+    "deleteAllHeartRateRecords": "Delete All Heart Rate Records",
+    "deleteAllStressConfirm": "Are you sure you want to delete all stress records? This action cannot be undone?",
+    "allStressDeleted": "All stress data deleted successfully!",
+    "deleteAllStressRecords": "Delete All Stress Records",
 
     "saving": "Saving...",
     "updating": "Updating...",

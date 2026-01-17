@@ -8,9 +8,11 @@ const state = reactive({
   user: null,
   bmiData: null,
   heartRateDates: null,
+  stressDates: null,
   lastAuthCheck: 0,
   lastBmiLoad: 0,
-  lastHeartRateDatesLoad: 0
+  lastHeartRateDatesLoad: 0,
+  lastStressDatesLoad: 0
 })
 
 // Cache duration in milliseconds (5 minutes for auth, 2 minutes for data)
@@ -83,6 +85,20 @@ export const setCachedHeartRateDates = (dates) => {
   state.lastHeartRateDatesLoad = Date.now()
 }
 
+// Get cached stress dates
+export const getCachedStressDates = () => {
+  if (state.stressDates && isCacheValid(state.lastStressDatesLoad, DATA_CACHE_DURATION)) {
+    return state.stressDates
+  }
+  return null
+}
+
+// Set stress dates in cache
+export const setCachedStressDates = (dates) => {
+  state.stressDates = dates
+  state.lastStressDatesLoad = Date.now()
+}
+
 // Invalidate caches (call when data is updated)
 export const invalidateBmiCache = () => {
   state.bmiData = null
@@ -92,6 +108,11 @@ export const invalidateBmiCache = () => {
 export const invalidateHeartRateCache = () => {
   state.heartRateDates = null
   state.lastHeartRateDatesLoad = 0
+}
+
+export const invalidateStressCache = () => {
+  state.stressDates = null
+  state.lastStressDatesLoad = 0
 }
 
 // Clear all caches (call on logout)

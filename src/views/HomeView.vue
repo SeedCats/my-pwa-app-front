@@ -7,390 +7,601 @@
     ]">
       <main class="px-3 sm:px-4 md:px-6 lg:px-6 pb-4">
 
-            <!-- Overall Analysis Section -->
-            <div v-if="showOverallAnalysis" class="mb-6 pt-4">
-              <div class="rounded-lg shadow-sm p-4 border flex items-center justify-between" :class="[themeClasses.cardBackground, themeClasses.border]">
-                <div>
-                  <h2 class="text-2xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.overallAnalysis.title') }}</h2>
-                  <p class="text-sm mt-1" :class="themeClasses.textSecondary">{{ overallAnalysis.summary }}</p>
-                  <div class="mt-2 flex items-center gap-3">
-                    <div class="text-4xl font-bold" :class="themeClasses.textPrimary">{{ overallAnalysis.score }}</div>
-                    <div class="inline-block text-white px-3 py-1 rounded-full text-sm font-semibold" :class="overallAnalysis.badgeClass">{{ $t(`home.overallAnalysis.statuses.${overallAnalysis.statusKey}`) }}</div>
-                  </div>
-                  <div class="mt-3 text-sm" :class="themeClasses.textSecondary">
-                    <h4 class="font-semibold">{{ $t('home.overallAnalysis.adviceTitle') }}</h4>
-                    <ul class="list-disc list-inside mt-1">
-                      <li v-for="(a, i) in overallAnalysis.advice" :key="i">{{ a }}</li>
-                    </ul>
-                  </div>
+        <!-- Overall Analysis Section -->
+        <div v-if="showOverallAnalysis" class="mb-6 pt-4">
+          <div class="rounded-lg shadow-sm p-4 border flex items-center justify-between"
+            :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div>
+              <h2 class="text-2xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.overallAnalysis.title') }}
+              </h2>
+              <p class="text-sm mt-1" :class="themeClasses.textSecondary">{{ overallAnalysis.summary }}</p>
+              <div class="mt-2 flex items-center gap-3">
+                <div class="text-4xl font-bold" :class="themeClasses.textPrimary">{{ overallAnalysis.score }}</div>
+                <div class="inline-block text-white px-3 py-1 rounded-full text-sm font-semibold"
+                  :class="overallAnalysis.badgeClass">{{
+                    $t(`home.overallAnalysis.statuses.${overallAnalysis.statusKey}`) }}</div>
+              </div>
+              <div class="mt-3 text-sm" :class="themeClasses.textSecondary">
+                <h4 class="font-semibold">{{ $t('home.overallAnalysis.adviceTitle') }}</h4>
+                <ul class="list-disc list-inside mt-1">
+                  <li v-for="(a, i) in overallAnalysis.advice" :key="i">{{ a }}</li>
+                </ul>
+              </div>
+            </div>
+            <div class="w-48">
+              <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <div :style="{ width: overallAnalysis.score + '%' }" class="h-full rounded-full"
+                  :class="overallAnalysis.progressClass"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BMI Information Section -->
+        <div class="mb-8 pt-4">
+          <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <!-- BMI Title -->
+            <div class="flex items-center justify-center mb-6">
+              <div class="text-center">
+                <h2 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.bmi.title') }}</h2>
+              </div>
+            </div>
+
+            <!-- Loading State -->
+            <div v-if="isBMILoading" class="text-center py-8">
+              <svg class="animate-spin h-8 w-8 mx-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+              </svg>
+              <p :class="themeClasses.textSecondary" class="mt-2">{{ $t('home.bmi.loading') }}</p>
+            </div>
+
+            <!-- No Data Message -->
+            <div v-else-if="!bmiData.bmi" class="text-center py-8">
+              <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.bmi.noData') }}</p>
+              <router-link to="/data-setting"
+                class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                {{ $t('home.bmi.addData') }}
+              </router-link>
+            </div>
+
+            <!-- BMI Value and Status -->
+            <div v-else>
+              <div class="text-center mb-8">
+                <div class="text-6xl font-bold mb-2" :class="themeClasses.textPrimary">{{ bmiData.bmi }}</div>
+                <div class="inline-block text-white px-4 py-1 rounded-full text-sm font-semibold mb-4"
+                  :class="bmiCategoryStyle">{{ bmiCategoryKey ? $t(`home.bmi.categories.${bmiCategoryKey}`) :
+                  bmiData.category }}</div>
+              </div>
+
+              <!-- BMI Slider -->
+              <div class="mb-8">
+                <div class="relative h-2 bg-gradient-to-r from-blue-400 via-green-400 to-orange-500 rounded-full mb-2">
+                  <!-- BMI Indicator -->
+                  <div
+                    class="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-gray-800 rounded-full shadow-lg"
+                    :style="{ left: bmiSliderPosition + '%' }"></div>
                 </div>
-                <div class="w-48">
-                  <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                    <div :style="{ width: overallAnalysis.score + '%' }" class="h-full rounded-full" :class="overallAnalysis.progressClass"></div>
+                <div class="flex justify-between text-xs" :class="themeClasses.textSecondary">
+                  <span>18.5</span>
+                  <span>24.0</span>
+                  <span>29.0</span>
+                </div>
+              </div>
+
+              <!-- BMI Categories -->
+              <div class="grid grid-cols-4 gap-2 mb-8 text-center text-xs">
+                <div class="flex flex-col items-center">
+                  <div class="w-4 h-4 rounded-full bg-blue-400 mb-2"
+                    :class="{ 'ring-2 ring-offset-2 ring-blue-400': bmiCategoryKey === 'underweight' }"></div>
+                  <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'underweight' }]">{{
+                    $t('home.bmi.categories.underweight') }}</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="w-4 h-4 rounded-full bg-green-400 mb-2"
+                    :class="{ 'ring-2 ring-offset-2 ring-green-400': bmiCategoryKey === 'normal' }"></div>
+                  <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'normal' }]">{{
+                    $t('home.bmi.categories.normal') }}</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="w-4 h-4 rounded-full bg-yellow-400 mb-2"
+                    :class="{ 'ring-2 ring-offset-2 ring-yellow-400': bmiCategoryKey === 'overweight' }"></div>
+                  <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'overweight' }]">{{
+                    $t('home.bmi.categories.overweight') }}</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="w-4 h-4 rounded-full bg-orange-500 mb-2"
+                    :class="{ 'ring-2 ring-offset-2 ring-orange-500': bmiCategoryKey === 'obese' }"></div>
+                  <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'obese' }]">{{
+                    $t('home.bmi.categories.obese') }}</span>
+                </div>
+              </div>
+
+              <!-- Data Analysis Section -->
+              <div class="border-t pt-6" :class="themeClasses.border">
+                <h4 class="text-lg font-semibold mb-6" :class="themeClasses.textPrimary">{{ $t('home.dataAnalysis') }}
+                </h4>
+                <div class="space-y-4">
+                  <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
+                    <span :class="themeClasses.textSecondary">{{ $t('dataSettings.age') }}</span>
+                    <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.age || '--'
+                      }}</span>
+                  </div>
+                  <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
+                    <span :class="themeClasses.textSecondary">{{ $t('dataSettings.height') }}</span>
+                    <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.height || '--'
+                      }}</span>
+                  </div>
+                  <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
+                    <span :class="themeClasses.textSecondary">{{ $t('dataSettings.weight') }}</span>
+                    <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.weight || '--'
+                      }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span :class="themeClasses.textSecondary">{{ $t('home.bmi.bmiRange') }}</span>
+                    <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiRangeDisplay }}</span>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <!-- BMI Information Section -->
-            <div class="mb-8 pt-4">
-              <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-                <!-- BMI Title -->
-                <div class="flex items-center justify-center mb-6">
-                  <div class="text-center">
-                    <h2 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.bmi.title') }}</h2>
-                  </div>
-                </div>
+        <!-- Header Section -->
+        <div class="mb-6 sm:mt-4 md:mt-4">
 
-                <!-- Loading State -->
-                <div v-if="isBMILoading" class="text-center py-8">
-                  <svg class="animate-spin h-8 w-8 mx-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          <div class="flex items-center justify-center mb-4">
+            <div class="text-center">
+              <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.heartRate.title') }}</h1>
+            </div>
+          </div>
+
+          <!-- Date Picker with Available Dates Indicator -->
+          <template v-if="hasHeartRateData">
+            <div class="flex justify-center gap-4 mb-4 items-center">
+              <button @click="previousDate"
+                class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+                :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
+                <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
+                  stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+
+              <!-- Custom Date Selector -->
+              <div class="relative">
+                <button @click="showDatePicker = !showDatePicker"
+                  class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
+                  :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']">
+                  <span>{{ currentDate || $t('home.selectDate') }}</span>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                   </svg>
-                  <p :class="themeClasses.textSecondary" class="mt-2">{{ $t('home.bmi.loading') }}</p>
-                </div>
+                </button>
 
-                <!-- No Data Message -->
-                <div v-else-if="!bmiData.bmi" class="text-center py-8">
-                  <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.bmi.noData') }}</p>
-                  <router-link to="/data-setting" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    {{ $t('home.bmi.addData') }}
-                  </router-link>
-                </div>
-
-                <!-- BMI Value and Status -->
-                <div v-else>
-                  <div class="text-center mb-8">
-                    <div class="text-6xl font-bold mb-2" :class="themeClasses.textPrimary">{{ bmiData.bmi }}</div>
-                    <div class="inline-block text-white px-4 py-1 rounded-full text-sm font-semibold mb-4" :class="bmiCategoryStyle">{{ bmiCategoryKey ? $t(`home.bmi.categories.${bmiCategoryKey}`) : bmiData.category }}</div>
-                  </div>
-
-                  <!-- BMI Slider -->
-                  <div class="mb-8">
-                    <div class="relative h-2 bg-gradient-to-r from-blue-400 via-green-400 to-orange-500 rounded-full mb-2">
-                      <!-- BMI Indicator -->
-                      <div 
-                        class="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-gray-800 rounded-full shadow-lg"
-                        :style="{ left: bmiSliderPosition + '%' }"
-                      ></div>
-                    </div>
-                    <div class="flex justify-between text-xs" :class="themeClasses.textSecondary">
-                      <span>18.5</span>
-                      <span>24.0</span>
-                      <span>29.0</span>
-                    </div>
-                  </div>
-
-                  <!-- BMI Categories -->
-                  <div class="grid grid-cols-4 gap-2 mb-8 text-center text-xs">
-                    <div class="flex flex-col items-center">
-                      <div class="w-4 h-4 rounded-full bg-blue-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-blue-400': bmiCategoryKey === 'underweight' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'underweight' }]">{{ $t('home.bmi.categories.underweight') }}</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                      <div class="w-4 h-4 rounded-full bg-green-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-green-400': bmiCategoryKey === 'normal' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'normal' }]">{{ $t('home.bmi.categories.normal') }}</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                      <div class="w-4 h-4 rounded-full bg-yellow-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-yellow-400': bmiCategoryKey === 'overweight' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'overweight' }]">{{ $t('home.bmi.categories.overweight') }}</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                      <div class="w-4 h-4 rounded-full bg-orange-500 mb-2" :class="{ 'ring-2 ring-offset-2 ring-orange-500': bmiCategoryKey === 'obese' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'obese' }]">{{ $t('home.bmi.categories.obese') }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Data Analysis Section -->
-                  <div class="border-t pt-6" :class="themeClasses.border">
-                    <h4 class="text-lg font-semibold mb-6" :class="themeClasses.textPrimary">{{ $t('home.dataAnalysis') }}</h4>
-                    <div class="space-y-4">
-                      <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                        <span :class="themeClasses.textSecondary">{{ $t('dataSettings.age') }}</span>
-                        <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.age || '--' }}</span>
-                      </div>
-                      <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                        <span :class="themeClasses.textSecondary">{{ $t('dataSettings.height') }}</span>
-                        <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.height || '--' }}</span>
-                      </div>
-                      <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                        <span :class="themeClasses.textSecondary">{{ $t('dataSettings.weight') }}</span>
-                        <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.weight || '--' }}</span>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span :class="themeClasses.textSecondary">{{ $t('home.bmi.bmiRange') }}</span>
-                        <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiRangeDisplay }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Header Section -->
-            <div class="mb-6 sm:mt-4 md:mt-4">
-
-              <div class="flex items-center justify-center mb-4">
-                <div class="text-center">
-                  <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.heartRate.title') }}</h1>
-                </div>
-              </div>
-
-              <!-- Date Picker with Available Dates Indicator -->
-              <template v-if="hasHeartRateData">
-                <div class="flex justify-center gap-4 mb-4 items-center">
-                  <button @click="previousDate" class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
-                    :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-                    <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                  </button>
-                  
-                  <!-- Custom Date Selector -->
-                  <div class="relative">
-                    <button 
-                      @click="showDatePicker = !showDatePicker"
-                      class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
-                      :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']"
-                    >
-                      <span>{{ currentDate || $t('home.selectDate') }}</span> 
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                <!-- Date Picker Dropdown -->
+                <div v-if="showDatePicker"
+                  class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-lg shadow-xl border p-4 min-w-[320px]"
+                  :class="[themeClasses.cardBackground, themeClasses.border]">
+                  <!-- Month Navigation -->
+                  <div class="flex items-center justify-between mb-4">
+                    <button @click="previousMonth"
+                      class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
+                      <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
                       </svg>
                     </button>
-                    
-                    <!-- Date Picker Dropdown -->
-                    <div 
-                      v-if="showDatePicker" 
-                      class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-lg shadow-xl border p-4 min-w-[320px]"
-                      :class="[themeClasses.cardBackground, themeClasses.border]"
-                    >
-                      <!-- Month Navigation -->
-                      <div class="flex items-center justify-between mb-4">
-                        <button @click="previousMonth" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
-                          <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                          </svg>
-                        </button>
-                        <span class="font-semibold" :class="themeClasses.textPrimary">
-                          {{ calendarMonthYear }}
-                        </span>
-                        <button @click="nextMonth" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
-                          <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                          </svg>
-                        </button>
-                      </div>
-                      
-                      <!-- Day Headers -->
-                      <div class="grid grid-cols-7 gap-1 mb-2">
-                        <div v-for="day in weekDayNames" :key="day" 
-                             class="text-center text-xs font-medium py-1" :class="themeClasses.textSecondary">
-                          {{ day }}
-                        </div>
-                      </div> 
-                      
-                      <!-- Calendar Days -->
-                      <div class="grid grid-cols-7 gap-1">
-                        <button
-                          v-for="day in calendarDays"
-                          :key="day.date"
-                          @click="selectDate(day)"
-                          :disabled="!day.currentMonth"
-                          class="relative p-2 text-sm rounded-lg transition-all duration-150 transform active:scale-90"
-                          :class="[
-                            day.currentMonth ? 'hover:scale-105' : 'opacity-30 cursor-not-allowed',
-                            day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
-                            day.isToday && !day.isSelected ? 'ring-2 ring-blue-400' : '',
-                            !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700 hover:shadow-md' : 'hover:bg-gray-100 hover:shadow-md') : '',
-                            day.isSelected ? '' : themeClasses.textPrimary
-                          ]"
-                        >
-                          {{ day.dayNumber }}
-                          <!-- Data Available Indicator -->
-                          <span 
-                            v-if="day.hasData && day.currentMonth" 
-                            class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-transform duration-150"
-                            :class="day.isSelected ? 'bg-white scale-125' : 'bg-green-500'"
-                          ></span>
-                        </button>
-                      </div>
-                      
-                      <!-- Legend -->
-                      <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs" :class="themeClasses.border">
-                        <div class="flex items-center gap-1">
-                          <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                          <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.hasData') }}</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                          <span class="w-4 h-4 rounded ring-2 ring-blue-400"></span>
-                          <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.today') }}</span>
-                        </div> 
-                      </div>
+                    <span class="font-semibold" :class="themeClasses.textPrimary">
+                      {{ calendarMonthYear }}
+                    </span>
+                    <button @click="nextMonth"
+                      class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
+                      <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Day Headers -->
+                  <div class="grid grid-cols-7 gap-1 mb-2">
+                    <div v-for="day in weekDayNames" :key="day" class="text-center text-xs font-medium py-1"
+                      :class="themeClasses.textSecondary">
+                      {{ day }}
                     </div>
                   </div>
-                  
-                  <button @click="nextDate" class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
-                    :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-                    <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </button>
-                </div>
 
-                <!-- Main Heart Rate Stats -->
-                <div class="text-center mb-6">
-                  <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
-                  <div class="text-lg mb-4" :class="themeClasses.textSecondary">{{ $t('home.heartRate.averageBpm') }}</div> 
-                </div>
-              </template>
+                  <!-- Calendar Days -->
+                  <div class="grid grid-cols-7 gap-1">
+                    <button v-for="day in calendarDays" :key="day.date" @click="selectDate(day)"
+                      :disabled="!day.currentMonth"
+                      class="relative p-2 text-sm rounded-lg transition-all duration-150 transform active:scale-90"
+                      :class="[
+                        day.currentMonth ? 'hover:scale-105' : 'opacity-30 cursor-not-allowed',
+                        day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
+                        day.isToday && !day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
+                        !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700 hover:shadow-md' : 'hover:bg-gray-100 hover:shadow-md') : '',
+                        day.isSelected ? '' : themeClasses.textPrimary
+                      ]">
+                      {{ day.dayNumber }}
+                      <!-- Data Available Indicator -->
+                      <span v-if="day.hasData && day.currentMonth"
+                        class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-transform duration-150"
+                        :class="(day.isSelected || day.isToday) ? 'bg-white scale-125' : 'bg-green-500'"></span>
+                    </button>
+                  </div>
 
-              <div v-else class="text-center py-8">
-                <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.heartRate.noData') }}</p>
-                <router-link to="/data-setting" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  {{ $t('home.heartRate.addData') }}
-                </router-link>
-              </div> 
+                  <!-- Legend -->
+                  <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs"
+                    :class="themeClasses.border">
+                    <div class="flex items-center gap-1">
+                      <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                      <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.hasData') }}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <span class="w-4 h-4 rounded ring-2 ring-blue-400"></span>
+                      <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.today') }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button @click="nextDate"
+                class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+                :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
+                <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
+                  stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
             </div>
 
-            <!-- Heart Rate Chart -->
-            <div class="mb-8">
-              <div class="rounded-lg shadow-sm pb-4 pl-4 pr-4 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-                <div class="relative" style="height: 500px;">
-                  <Line v-if="chartData" :data="chartData" :options="chartOptions" />
-                  <div v-else class="h-full flex items-center justify-center"
-                    :class="isDarkMode ? 'bg-gray-800' : 'bg-gray-50'">
-                    <span :class="themeClasses.textSecondary">{{ isHeartRateLoading ? $t('home.heartRate.loading') : $t('home.heartRate.noData') }}</span>
-                  </div> 
+            <!-- Main Heart Rate Stats -->
+            <div class="text-center mb-6">
+              <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
+              <div class="text-lg mb-4" :class="themeClasses.textSecondary">{{ $t('home.heartRate.averageBpm') }}</div>
+            </div>
+          </template>
+
+          <div v-else class="text-center py-8">
+            <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.heartRate.noData') }}</p>
+            <router-link to="/data-setting"
+              class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              {{ $t('home.heartRate.addData') }}
+            </router-link>
+          </div>
+        </div>
+
+        <!-- Heart Rate Chart -->
+        <div class="mb-8">
+          <div class="rounded-lg shadow-sm pb-4 pl-4 pr-4 border"
+            :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="relative" style="height: 500px;">
+              <Line v-if="chartData" :data="chartData" :options="chartOptions" />
+              <div v-else class="h-full flex items-center justify-center"
+                :class="isDarkMode ? 'bg-gray-800' : 'bg-gray-50'">
+                <span :class="themeClasses.textSecondary">{{ isHeartRateLoading ? $t('home.heartRate.loading') :
+                  $t('home.heartRate.noData') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today Heart Rate Overview Section -->
+        <div class="mb-8">
+          <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="flex items-center mb-6">
+              <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center mr-4">
+                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z">
+                  </path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('home.todayOverview') }}</h3>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="text-center p-3">
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.resting }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.restingHeartRate') }}</div>
+              </div>
+              <div class="text-center p-3">
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.max }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.maxHeartRate') }}</div>
+              </div>
+              <div class="text-center p-3">
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.min }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.minHeartRate') }}</div>
+              </div>
+              <div class="text-center p-3">
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.averageHeartRate') }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pressure Header / Date Picker -->
+        <div class="mb-6 sm:mt-4 md:mt-4">
+          <div class="flex items-center justify-center mb-4">
+            <div class="text-center">
+              <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.pressure.title') }}</h1>
+            </div>
+          </div>
+
+          <template v-if="hasPressureData">
+            <div class="flex justify-center gap-4 mb-4 items-center">
+              <button @click="previousPressureDate"
+                class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+                :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
+                <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
+                  stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+
+              <div class="relative">
+                <button @click="showPressureDatePicker = !showPressureDatePicker"
+                  class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
+                  :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']">
+                  <span>{{ currentPressureDate || $t('home.selectDate') }}</span>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </button>
+
+                <div v-if="showPressureDatePicker"
+                  class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-lg shadow-xl border p-4 min-w-[320px]"
+                  :class="[themeClasses.cardBackground, themeClasses.border]">
+                  <div class="flex items-center justify-between mb-4">
+                    <button @click="previousPressureMonth"
+                      class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
+                      <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                      </svg>
+                    </button>
+                    <span class="font-semibold" :class="themeClasses.textPrimary">{{ pressureCalendarMonthYear ||
+                      $t('home.selectDate') }}</span>
+                    <button @click="nextPressureMonth"
+                      class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
+                      <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="grid grid-cols-7 gap-1 mb-2">
+                    <div v-for="day in weekDayNames" :key="day" class="text-center text-xs font-medium py-1"
+                      :class="themeClasses.textSecondary">
+                      {{ day }}
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-7 gap-1">
+                    <button v-for="day in pressureCalendarDays" :key="day.date" @click="selectPressureDate(day)"
+                      :disabled="!day.currentMonth"
+                      class="relative p-2 text-sm rounded-lg transition-all duration-150 transform active:scale-90"
+                      :class="[
+                        day.currentMonth ? 'hover:scale-105' : 'opacity-30 cursor-not-allowed',
+                        day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
+                        day.isToday && !day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
+                        !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700 hover:shadow-md' : 'hover:bg-gray-100 hover:shadow-md') : '',
+                        day.isSelected ? '' : themeClasses.textPrimary
+                      ]">
+                      {{ day.dayNumber }}
+
+                      <!-- Data Available Indicator -->
+                      <span v-if="day.hasData && day.currentMonth"
+                        class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-transform duration-150"
+                        :class="(day.isSelected || day.isToday) ? 'bg-white scale-125' : 'bg-green-500'"></span>
+                    </button>
+                  </div>
+
+                  <!-- Legend -->
+                  <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs"
+                    :class="themeClasses.border">
+                    <div class="flex items-center gap-1">
+                      <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                      <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.hasData') }}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <input type="checkbox" disabled class="h-4 w-4 rounded border-gray-300" />
+                      <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.today') }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button @click="nextPressureDate"
+                class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+                :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
+                <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
+                  stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="text-center mb-6">
+              <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ pressureScore }}</div>
+              <div class="text-lg mb-4" :class="themeClasses.textSecondary">{{ $t('home.pressure.name') }}</div>
+            </div>
+          </template>
+
+          <div v-else class="text-center py-8">
+            <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.pressure.noData') }}</p>
+            <router-link to="/data-setting"
+              class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              {{ $t('home.pressure.loading') }}
+            </router-link>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <div class="rounded-lg shadow-sm pb-4 pl-4 pr-4 border"
+            :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="px-4 py-2">
+              <div class="flex items-center justify-center">
+                <div class="flex items-center gap-3">
+                  <!-- Centered, slightly larger colored dot -->
+                  <span class="w-4 h-4 rounded-full shadow-sm" style="background-color:#2563eb;"></span>
+                  <span class="text-sm font-semibold" :class="themeClasses.textPrimary">{{ $t('home.stress.stressScore') }}</span>
                 </div>
               </div>
             </div>
 
-            <!-- Today Overview Section -->
-            <div class="mb-8">
-              <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-                <div class="flex items-center mb-6">
-                  <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z">
-                      </path>
-                    </svg>
-                  </div>
-                  <h3 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('home.todayOverview') }}</h3>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="text-center p-3">
-                    <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.resting }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.restingHeartRate') }}</div>
-                  </div>
-                  <div class="text-center p-3">
-                    <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.max }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.maxHeartRate') }}</div>
-                  </div>
-                  <div class="text-center p-3">
-                    <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.min }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.minHeartRate') }}</div>
-                  </div>
-                  <div class="text-center p-3">
-                    <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.averageHeartRate') }}</div>
-                  </div>
-                </div>
+            <div class="relative" style="height: 400px;">
+              <Line v-if="stressChartData" :data="stressChartData" :options="stressChartOptions" />
+              <div v-else class="h-full flex items-center justify-center"
+                :class="isDarkMode ? 'bg-gray-800' : 'bg-gray-50'">
+                <span :class="themeClasses.textSecondary">{{ isStressLoading ? $t('home.stress.loading') :
+                  $t('home.stress.noData') }}</span>
               </div>
             </div>
+          </div>
+        </div>
 
-            <!-- Quick Actions Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <!-- Data Setting Card -->
-              <router-link to="/data-setting" class="block transform transition-transform duration-200 hover:scale-105">
-                <div class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
-                  :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-blue-300']">
-                  <div class="flex items-center mb-4">
-                    <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'">
-                      <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.dataSettings') }}</h3>
-                      <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.quickAdd') }}</p>
-                    </div>
-                  </div>
-                  <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
-                    {{ $t('home.recordData') }}
-                  </p>
-                  <div class="flex items-center text-blue-600 text-xs font-medium mt-auto">
-                    <span>{{ $t('home.addRecord') }}</span>
-                    <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </div>
-                </div>
-              </router-link>
-
-              <!-- AI Advice Card -->
-              <router-link to="/ai-support" class="block transform transition-transform duration-200 hover:scale-105">
-                <div class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
-                  :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-purple-300']">
-                  <div class="flex items-center mb-4">
-                    <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'">
-                      <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
-                        </path>
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.aiSupport') }}</h3>
-                      <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.availableAlways') }}</p>
-                    </div>
-                  </div>
-                  <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
-                    {{ $t('home.getAdvice') }}
-                  </p>
-                  <div class="flex items-center text-purple-600 text-xs font-medium mt-auto">
-                    <span>{{ $t('home.getAdviceButton') }}</span>
-                    <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </div>
-                </div>
-              </router-link>
-
-              <!-- Manual Support Card -->
-              <router-link to="/manual-support" class="block transform transition-transform duration-200 hover:scale-105">
-                <div class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
-                  :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-green-300']">
-                  <div class="flex items-center mb-4">
-                    <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-green-900/30' : 'bg-green-100'">
-                      <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-                        </path>
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.manualSupport') }}</h3>
-                      <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.learnMore') }}</p>
-                    </div>
-                  </div>
-                  <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
-                    {{ $t('home.accessGuides') }}
-                  </p>
-                  <div class="flex items-center text-green-600 text-xs font-medium mt-auto">
-                    <span>{{ $t('home.viewManual') }}</span>
-                    <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </div>
-                </div>
-              </router-link>
+        <!-- Today Pressure Overview Section -->
+        <div class="mb-8">
+          <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="flex items-center mb-6">
+              <div class="w-12 h-12 rounded-full bg-teal-500 flex items-center justify-center mr-4">
+                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 2a6 6 0 100 12 6 6 0 000-12z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('home.todayPressureOverview') }}
+              </h3>
             </div>
-        </main>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="text-center p-3">
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ pressureScore }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.pressure.scoreLabel') }}</div>
+              </div>
+              <div class="text-center p-3">
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ pressureCategoryLabel }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.pressure.categoryLabel') }}</div>
+              </div>
+              <div class="text-center p-3">
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ pressureMean !== null ?
+                  pressureMean.toFixed(2) : '--' }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.pressure.average') }}</div>
+              </div>
+              <div class="text-center p-3">
+                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ pressureData.length }}</div>
+                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.pressure.dataPoints') }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Data Setting Card -->
+          <router-link to="/data-setting" class="block transform transition-transform duration-200 hover:scale-105">
+            <div
+              class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
+              :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-blue-300']">
+              <div class="flex items-center mb-4">
+                <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'">
+                  <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.dataSettings') }}
+                  </h3>
+                  <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.quickAdd') }}</p>
+                </div>
+              </div>
+              <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
+                {{ $t('home.recordData') }}
+              </p>
+              <div class="flex items-center text-blue-600 text-xs font-medium mt-auto">
+                <span>{{ $t('home.addRecord') }}</span>
+                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </div>
+            </div>
+          </router-link>
+
+          <!-- AI Advice Card -->
+          <router-link to="/ai-support" class="block transform transition-transform duration-200 hover:scale-105">
+            <div
+              class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
+              :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-purple-300']">
+              <div class="flex items-center mb-4">
+                <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'">
+                  <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                    </path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.aiSupport') }}</h3>
+                  <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.availableAlways') }}</p>
+                </div>
+              </div>
+              <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
+                {{ $t('home.getAdvice') }}
+              </p>
+              <div class="flex items-center text-purple-600 text-xs font-medium mt-auto">
+                <span>{{ $t('home.getAdviceButton') }}</span>
+                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </div>
+            </div>
+          </router-link>
+
+          <!-- Manual Support Card -->
+          <router-link to="/manual-support" class="block transform transition-transform duration-200 hover:scale-105">
+            <div
+              class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
+              :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-green-300']">
+              <div class="flex items-center mb-4">
+                <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-green-900/30' : 'bg-green-100'">
+                  <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                    </path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.manualSupport') }}
+                  </h3>
+                  <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.learnMore') }}</p>
+                </div>
+              </div>
+              <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
+                {{ $t('home.accessGuides') }}
+              </p>
+              <div class="flex items-center text-green-600 text-xs font-medium mt-auto">
+                <span>{{ $t('home.viewManual') }}</span>
+                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </div>
+            </div>
+          </router-link>
+        </div>
+      </main>
     </div>
   </div>
 </template>
@@ -401,10 +612,11 @@ import { useTheme } from '../composables/useTheme'
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'vue-chartjs'
-import { useI18n } from 'vue-i18n' 
+import { useI18n } from 'vue-i18n'
 import { getLatestBMIRecord } from '../services/bmiService'
-import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
-import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedHeartRateDates } from '../stores/userStore'
+import { getHeartRateRecords, getHeartRateDates, getHeartRateStats } from '../services/heartRateService'
+import { getStressRecords, getStressDates, getStressStats } from '../services/stressService'
+import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedHeartRateDates, getCachedStressDates, setCachedStressDates } from '../stores/userStore'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler)
 
@@ -418,11 +630,130 @@ const chartData = ref(null)
 const selectedDate = ref('')
 const currentDate = ref('')
 const availableDates = ref([])
+
+// Pressure-specific date selection
+const selectedPressureDate = ref('')
+const currentPressureDate = ref('')
+const showPressureDatePicker = ref(false)
+const pressureCalendarMonth = ref(new Date().getMonth())
+const pressureCalendarYear = ref(new Date().getFullYear())
+
+// Stress-specific date selection (new)
+const availableStressDates = ref([])
+const selectedStressDate = ref('')
+const currentStressDate = ref('')
+const showStressDatePicker = ref(false)
+const stressCalendarMonth = ref(new Date().getMonth())
+const stressCalendarYear = ref(new Date().getFullYear())
+
 const stats = ref({ min: 0, max: 0, avg: 0, resting: 0 })
+const overallHrStats = ref(null)
+const overallStressStats = ref(null)
+
+// Stress state (previously missing; avoids reading .avg of undefined in template)
+const stressData = ref([])
+const stressStats = ref({ min: 0, max: 0, avg: 0 })
+const stressChartData = ref(null)
+const isStressLoading = ref(false)
+const hasStressData = ref(false)
+
 const bmiData = ref({ bmi: null, category: '', height: null, weight: null, age: null })
 const isBMILoading = ref(false)
 const isHeartRateLoading = ref(false)
 const hasHeartRateData = ref(false)
+
+// Pressure visualization state
+const isPressureLoading = ref(false)
+const hasPressureData = ref(false)
+const pressureData = ref([])
+const pressureChartData = ref(null)
+const pressureSummaryData = ref(null)
+
+const updatePressureSummaryChart = (values) => {
+  if (!values || values.length === 0) {
+    pressureSummaryData.value = null
+    return
+  }
+  const mapped = values.map(v => Math.round(((3 - v) / 3) * 100))
+  pressureSummaryData.value = {
+    labels: Array.from({ length: 24 }, (_, h) => `${h.toString().padStart(2, '0')}:00`),
+    datasets: [{
+      label: t('home.pressure.title'),
+      data: mapped,
+      borderColor: '#06b6d4',
+      backgroundColor: 'rgba(6,182,212,0.06)',
+      fill: false,
+      tension: 0.18,
+      pointRadius: 4,
+      pointBackgroundColor: '#06b6d4',
+      borderWidth: 2
+    }]
+  }
+}
+
+const pressureSummaryOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: isDarkMode.value ? '#1f2937' : '#fff',
+      titleColor: isDarkMode.value ? '#f3f4f6' : '#111827',
+      bodyColor: isDarkMode.value ? '#d1d5db' : '#374151',
+      borderColor: isDarkMode.value ? '#374151' : '#e5e7eb',
+      borderWidth: 1,
+      padding: 8,
+      callbacks: {
+        label: (ctx) => ctx.parsed.y !== undefined ? `${ctx.parsed.y} %` : ''
+      }
+    }
+  },
+  scales: {
+    y: {
+      position: 'right',
+      beginAtZero: true,
+      min: 0,
+      max: 100,
+      ticks: { color: isDarkMode.value ? '#9ca3af' : '#6b7280', font: { size: 12 }, stepSize: 25 },
+      grid: { color: isDarkMode.value ? '#374151' : '#e5e7eb', drawBorder: false, borderDash: [6, 6] }
+    },
+    x: {
+      ticks: { color: isDarkMode.value ? '#9ca3af' : '#6b7280', font: { size: 11 } },
+      grid: { display: false, drawBorder: false }
+    }
+  }
+}))
+
+
+
+const pressureMean = computed(() => {
+  if (!pressureData.value || pressureData.value.length === 0) return null
+  return pressureData.value.reduce((s, v) => s + v, 0) / pressureData.value.length
+})
+
+const pressureScore = computed(() => {
+  if (pressureMean.value === null) return '--'
+  return Math.round(((3 - pressureMean.value) / 3) * 100)
+})
+
+const pressureCategoryKey = computed(() => {
+  if (pressureScore.value === '--') return ''
+  const s = pressureScore.value
+  if (s <= 33) return 'relaxed'
+  if (s <= 66) return 'light'
+  if (s <= 85) return 'moderate'
+  return 'severe'
+})
+
+const pressureCategoryLabel = computed(() => pressureCategoryKey.value ? t(`home.pressure.${pressureCategoryKey.value}`) : '')
+
+const pressureCategoryLabelFull = computed(() => {
+  if (!pressureCategoryKey.value) return ''
+  const label = t(`home.pressure.${pressureCategoryKey.value}`)
+  // In Chinese we prefer no space ("輕度壓力"), in other locales add a space
+  return locale.value === 'zh' ? `${label}${t('home.pressure.title')}` : `${label} ${t('home.pressure.title')}`
+})
 
 // Calendar state
 const showDatePicker = ref(false)
@@ -449,7 +780,7 @@ const loadBMIData = async () => {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt
     } : { bmi: null, category: '', height: null, weight: null, age: null }
-    
+
     bmiData.value = result
     setCachedBmiData(result)  // Cache the result
   } catch (error) {
@@ -457,6 +788,25 @@ const loadBMIData = async () => {
     bmiData.value = { bmi: null, category: '', height: null, weight: null, age: null }
   } finally {
     isBMILoading.value = false
+  }
+}
+
+// Load overall statistics (uses backend aggregated stats endpoints)
+const loadOverallStats = async () => {
+  try {
+    const hrResp = await getHeartRateStats()
+    if (hrResp && hrResp.success && hrResp.data) overallHrStats.value = hrResp.data
+    else overallHrStats.value = null
+  } catch (e) {
+    overallHrStats.value = null
+  }
+
+  try {
+    const sResp = await getStressStats()
+    if (sResp && sResp.success && sResp.data) overallStressStats.value = sResp.data
+    else overallStressStats.value = null
+  } catch (e) {
+    overallStressStats.value = null
   }
 }
 
@@ -476,8 +826,23 @@ const bmiCategoryStyle = computed(() => {
 
 const bmiSliderPosition = computed(() => {
   const bmi = parseFloat(bmiData.value.bmi)
-  if (!bmi) return 50
-  return Math.max(0, Math.min(100, ((bmi - 15) / 20) * 100))
+  if (!bmi || isNaN(bmi)) return 50
+
+  // Map the slider so the visible ticks align with positions:
+  // left tick (0%) = 18.5, center tick (50%) = 24.0, right tick (100%) = 29.0
+  const left = 18.5
+  const center = 24.0
+  const right = 29.0
+
+  if (bmi <= left) return 0
+  if (bmi >= right) return 100
+
+  // Piecewise linear mapping: left..center => 0..50, center..right => 50..100
+  if (bmi <= center) {
+    return Math.max(0, Math.min(50, ((bmi - left) / (center - left)) * 50))
+  }
+
+  return Math.max(50, Math.min(100, 50 + ((bmi - center) / (right - center)) * 50))
 })
 
 const bmiRangeDisplay = computed(() => {
@@ -550,13 +915,27 @@ const formatDateForDisplay = (dateString) => {
   const options = { year: 'numeric', month: 'long', day: 'numeric' }
   const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
   return date.toLocaleDateString(loc, options)
-} 
+}
 
 // Calendar computed properties
 const calendarMonthYear = computed(() => {
   const date = new Date(calendarYear.value, calendarMonth.value, 1)
   const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
   return date.toLocaleDateString(loc, { month: 'long', year: 'numeric' })
+})
+
+// Safe month/year label for pressure picker (avoid Invalid Date when values are unset)
+const pressureCalendarMonthYear = computed(() => {
+  const m = pressureCalendarMonth.value
+  const y = pressureCalendarYear.value
+  if (typeof m !== 'number' || typeof y !== 'number') return ''
+  const date = new Date(y, m, 1)
+  const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
+  try {
+    return date.toLocaleDateString(loc, { month: 'long', year: 'numeric' })
+  } catch (e) {
+    return ''
+  }
 })
 
 // Localized weekday short names for calendar header
@@ -569,7 +948,7 @@ const weekDayNames = computed(() => {
     base.push(dtf.format(new Date(Date.UTC(2021, 0, 3 + d))))
   }
   return base
-}) 
+})
 
 const calendarDays = computed(() => {
   const days = []
@@ -577,7 +956,7 @@ const calendarDays = computed(() => {
   const lastDay = new Date(calendarYear.value, calendarMonth.value + 1, 0)
   const startDay = firstDay.getDay()
   const today = new Date().toISOString().split('T')[0]
-  
+
   // Previous month days
   const prevMonthLastDay = new Date(calendarYear.value, calendarMonth.value, 0).getDate()
   for (let i = startDay - 1; i >= 0; i--) {
@@ -592,7 +971,7 @@ const calendarDays = computed(() => {
       hasData: availableDates.value.includes(date)
     })
   }
-  
+
   // Current month days
   for (let i = 1; i <= lastDay.getDate(); i++) {
     const date = new Date(calendarYear.value, calendarMonth.value, i).toISOString().split('T')[0]
@@ -605,7 +984,7 @@ const calendarDays = computed(() => {
       hasData: availableDates.value.includes(date)
     })
   }
-  
+
   // Next month days
   const remaining = 42 - days.length
   for (let i = 1; i <= remaining; i++) {
@@ -619,7 +998,57 @@ const calendarDays = computed(() => {
       hasData: availableDates.value.includes(date)
     })
   }
-  
+
+  return days
+})
+
+// Separate calendar days for pressure date picker (so the two pickers can be independent)
+const pressureCalendarDays = computed(() => {
+  const days = []
+  const firstDay = new Date(pressureCalendarYear.value, pressureCalendarMonth.value, 1)
+  const lastDay = new Date(pressureCalendarYear.value, pressureCalendarMonth.value + 1, 0)
+  const startDay = firstDay.getDay()
+  const today = new Date().toISOString().split('T')[0]
+
+  const prevMonthLastDay = new Date(pressureCalendarYear.value, pressureCalendarMonth.value, 0).getDate()
+  for (let i = startDay - 1; i >= 0; i--) {
+    const dayNum = prevMonthLastDay - i
+    const date = new Date(pressureCalendarYear.value, pressureCalendarMonth.value - 1, dayNum).toISOString().split('T')[0]
+    days.push({
+      dayNumber: dayNum,
+      date: date,
+      currentMonth: false,
+      isToday: date === today,
+      isSelected: date === selectedPressureDate.value,
+      hasData: availableDates.value.includes(date)
+    })
+  }
+
+  for (let i = 1; i <= lastDay.getDate(); i++) {
+    const date = new Date(pressureCalendarYear.value, pressureCalendarMonth.value, i).toISOString().split('T')[0]
+    days.push({
+      dayNumber: i,
+      date: date,
+      currentMonth: true,
+      isToday: date === today,
+      isSelected: date === selectedPressureDate.value,
+      hasData: availableDates.value.includes(date)
+    })
+  }
+
+  const remaining = 42 - days.length
+  for (let i = 1; i <= remaining; i++) {
+    const date = new Date(pressureCalendarYear.value, pressureCalendarMonth.value + 1, i).toISOString().split('T')[0]
+    days.push({
+      dayNumber: i,
+      date: date,
+      currentMonth: false,
+      isToday: date === today,
+      isSelected: date === selectedPressureDate.value,
+      hasData: availableDates.value.includes(date)
+    })
+  }
+
   return days
 })
 
@@ -648,6 +1077,7 @@ const selectDate = (day) => {
   currentDate.value = formatDateForDisplay(day.date)
   showDatePicker.value = false
   loadHeartRateData()
+  loadStressData()
 }
 
 // Load available dates from backend
@@ -660,9 +1090,14 @@ const loadAvailableDates = async () => {
     if (cached.length > 0) {
       selectedDate.value = cached[0]
       currentDate.value = formatDateForDisplay(cached[0])
+      // initialize pressure selected date to same default
+      selectedPressureDate.value = cached[0]
+      currentPressureDate.value = formatDateForDisplay(cached[0])
       const recentDate = new Date(cached[0])
       calendarMonth.value = recentDate.getMonth()
       calendarYear.value = recentDate.getFullYear()
+      pressureCalendarMonth.value = recentDate.getMonth()
+      pressureCalendarYear.value = recentDate.getFullYear()
       return true
     }
     selectedDate.value = new Date().toISOString().split('T')[0]
@@ -672,7 +1107,7 @@ const loadAvailableDates = async () => {
 
   try {
     const response = await getHeartRateDates()
-    
+
     if (response.success && response.data.dates && response.data.dates.length > 0) {
       availableDates.value = response.data.dates
       setCachedHeartRateDates(response.data.dates)  // Cache the result
@@ -680,10 +1115,15 @@ const loadAvailableDates = async () => {
       // Set the most recent date as default
       selectedDate.value = response.data.dates[0]
       currentDate.value = formatDateForDisplay(response.data.dates[0])
+      // set pressure selected date to same default
+      selectedPressureDate.value = response.data.dates[0]
+      currentPressureDate.value = formatDateForDisplay(response.data.dates[0])
       // Set calendar to the month of most recent data
       const recentDate = new Date(response.data.dates[0])
       calendarMonth.value = recentDate.getMonth()
       calendarYear.value = recentDate.getFullYear()
+      pressureCalendarMonth.value = recentDate.getMonth()
+      pressureCalendarYear.value = recentDate.getFullYear()
       return true
     }
     // No heart rate data - set today as default date for display
@@ -701,40 +1141,95 @@ const loadAvailableDates = async () => {
   }
 }
 
+// Load available stress dates (cache-aware)
+const loadAvailableStressDates = async () => {
+  // Check cache first
+  const cached = getCachedStressDates()
+  if (cached) {
+    availableStressDates.value = cached
+    hasStressData.value = cached.length > 0
+    if (cached.length > 0) {
+      selectedStressDate.value = cached[0]
+      currentStressDate.value = formatDateForDisplay(cached[0])
+      const recentDate = new Date(cached[0])
+      stressCalendarMonth.value = recentDate.getMonth()
+      stressCalendarYear.value = recentDate.getFullYear()
+      await loadStressData(cached[0])
+      return true
+    }
+    return false
+  }
+
+  try {
+    const response = await getStressDates()
+    if (response.success && response.data && Array.isArray(response.data.dates) && response.data.dates.length > 0) {
+      availableStressDates.value = response.data.dates
+      setCachedStressDates(response.data.dates)
+      hasStressData.value = true
+      selectedStressDate.value = response.data.dates[0]
+      currentStressDate.value = formatDateForDisplay(response.data.dates[0])
+      const recentDate = new Date(response.data.dates[0])
+      stressCalendarMonth.value = recentDate.getMonth()
+      stressCalendarYear.value = recentDate.getFullYear()
+      await loadStressData(response.data.dates[0])
+      return true
+    }
+    hasStressData.value = false
+    return false
+  } catch (error) {
+    console.error('Error loading available stress dates:', error)
+    hasStressData.value = false
+    return false
+  }
+}
+
 // Load heart rate data from backend for selected date (aggregated format)
 const loadHeartRateData = async () => {
   if (!selectedDate.value) return
-  
+
   isHeartRateLoading.value = true
   try {
     const response = await getHeartRateRecords({ date: selectedDate.value })
-    
+
     if (response.success && response.data.records.length > 0) {
       const record = response.data.records[0]  // One document per day
-      
+
       // Use aggregated hourly data directly
       heartRateData.value = record.hourlyData
-      
+
       // Calculate stats from hourly data
       const hourlyValues = record.hourlyData.filter(h => h.avg > 0)
-      
+
       // Use min/max of average values (matching what's shown in the chart)
       const avgValues = hourlyValues.map(h => h.avg)
-      const actualMin = avgValues.length > 0 
+      const actualMin = avgValues.length > 0
         ? Math.min(...avgValues)
         : 0
-      const actualMax = avgValues.length > 0 
+      const actualMax = avgValues.length > 0
         ? Math.max(...avgValues)
         : 0
       const actualAvg = avgValues.length > 0
         ? Math.round(avgValues.reduce((sum, v) => sum + v, 0) / avgValues.length)
         : 0
-      
+
+      // Fallback: if the record includes stress values in the same hourly data, derive stress from it
+      if (record.hourlyData && record.hourlyData.length > 0 && (record.hourlyData[0].hasOwnProperty('stress') || record.hourlyData[0].hasOwnProperty('stress_avg') || record.hourlyData[0].hasOwnProperty('stressAvg'))) {
+        const sArr = record.hourlyData.map(h => ({ avg: h.stress ?? h.stress_avg ?? h.stressAvg ?? null }))
+        const sVals = sArr.filter(h => h.avg !== null && !isNaN(h.avg)).map(h => Number(h.avg))
+        const sMin = sVals.length > 0 ? Math.min(...sVals) : 0
+        const sMax = sVals.length > 0 ? Math.max(...sVals) : 0
+        const sAvg = sVals.length > 0 ? Math.round(sVals.reduce((s, v) => s + v, 0) / sVals.length) : 0
+        stressData.value = sArr
+        stressStats.value = { min: sMin, max: sMax, avg: sAvg }
+        hasStressData.value = sVals.length > 0
+        updateStressChartFromAggregated(stressData.value)
+      }
+
       // Calculate resting heart rate from the actual minimum values in hourly data
       const actualRestingMin = hourlyValues.length > 0
         ? Math.min(...hourlyValues.map(h => h.min))
         : 0
-      
+
       stats.value = {
         min: actualMin,
         max: actualMax,
@@ -742,9 +1237,11 @@ const loadHeartRateData = async () => {
         resting: actualRestingMin,
         count: record.dailyStats?.count || 0
       }
-      
+
       hasHeartRateData.value = true
       updateChartFromAggregated(record.hourlyData)
+      // Create pressure visualization (mock) based on available heart rate data
+      generateMockPressure()
     } else {
       heartRateData.value = []
       stats.value = { min: 0, max: 0, avg: 0, resting: 0, count: 0 }
@@ -786,6 +1283,217 @@ const updateChartFromAggregated = (hourlyData) => {
   }
 }
 
+// Generate a simple mock pressure profile derived from heart rate presence (placeholder until backend exists)
+const generateMockPressure = (date) => {
+  if (!heartRateData.value || heartRateData.value.length === 0) {
+    pressureChartData.value = null
+    pressureSummaryData.value = null
+    hasPressureData.value = false
+    return
+  }
+
+  isPressureLoading.value = true
+
+  // Pattern matching the reference image: first hours relaxed (3), then a drop to lower level (1) and stays
+  // Optionally vary slightly by date to simulate changes
+  const base = date ? new Date(date).getDate() % 3 : 0
+  const values = Array.from({ length: 24 }, (_, i) => {
+    if (i < 4) return 3
+    // small variation using base
+    return 1 + (base === 1 ? 0 : 0)
+  })
+
+  // small delay for UX
+  setTimeout(() => {
+    pressureData.value = values
+    hasPressureData.value = true
+    updatePressureChartFromData(values)
+    updatePressureSummaryChart(values)
+    isPressureLoading.value = false
+  }, 60)
+}
+
+const loadPressureData = async (date) => {
+  if (!date) date = selectedPressureDate.value
+  isPressureLoading.value = true
+  try {
+    // Placeholder for real API call
+    // If you add a `pressureService`, call it here and use returned values
+    generateMockPressure(date)
+  } catch (err) {
+    console.error('Error loading pressure data:', err)
+    pressureData.value = []
+    pressureChartData.value = null
+    pressureSummaryData.value = null
+    hasPressureData.value = false
+    isPressureLoading.value = false
+  }
+}
+
+// Load stress data from backend for selected date (aggregated format)
+const loadStressData = async (date) => {
+  // Use passed date -> selectedStressDate -> fallback to selected heart-rate date
+  const useDate = date || selectedStressDate.value || selectedDate.value
+  if (!useDate) return
+  isStressLoading.value = true
+  try {
+    const response = await getStressRecords({ date: useDate })
+    if (response.success && response.data.records && response.data.records.length > 0) {
+      const record = response.data.records[0]
+      stressData.value = record.hourlyData || []
+      const hourlyValues = stressData.value.filter(h => h.avg !== undefined)
+      const avgValues = hourlyValues.map(h => h.avg)
+      const actualMin = avgValues.length > 0 ? Math.min(...avgValues) : 0
+      const actualMax = avgValues.length > 0 ? Math.max(...avgValues) : 0
+      const actualAvg = avgValues.length > 0 ? Math.round(avgValues.reduce((s, v) => s + v, 0) / avgValues.length) : 0
+      stressStats.value = { min: actualMin, max: actualMax, avg: actualAvg }
+      hasStressData.value = true
+      updateStressChartFromAggregated(stressData.value)
+    } else {
+      stressData.value = []
+      stressStats.value = { min: 0, max: 0, avg: 0 }
+      stressChartData.value = null
+      hasStressData.value = false
+    }
+  } catch (err) {
+    console.error('Error loading stress data:', err)
+    stressData.value = []
+    stressStats.value = { min: 0, max: 0, avg: 0 }
+    stressChartData.value = null
+    hasStressData.value = false
+  } finally {
+    isStressLoading.value = false
+  }
+}
+
+const updateStressChartFromAggregated = (hourlyData) => {
+  if (!hourlyData || hourlyData.length === 0) {
+    stressChartData.value = null
+    return
+  }
+  stressChartData.value = {
+    labels: Array.from({ length: 24 }, (_, h) => `${h.toString().padStart(2, '0')}:00`),
+    datasets: [{
+      label: t('home.stress.stressScore'),
+      data: hourlyData.map(h => h.avg !== undefined ? h.avg : null),
+      borderColor: '#2563eb',
+      backgroundColor: 'rgba(37,99,235,0.06)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 3,
+      pointBackgroundColor: '#2563eb',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointHoverRadius: 5
+    }]
+  }
+}
+
+const forceReloadStressData = async () => {
+  try {
+    const response = await getStressDates()
+    if (response.success && response.data.dates && response.data.dates.length > 0) {
+      setCachedStressDates(response.data.dates)
+      hasStressData.value = true
+      // If current selected date is not set or not in list, set the latest
+      if (!selectedStressDate.value || !response.data.dates.includes(selectedStressDate.value)) {
+        selectedStressDate.value = response.data.dates[0]
+        currentStressDate.value = formatDateForDisplay(response.data.dates[0])
+      }
+      await loadStressData()
+    }
+  } catch (error) {
+    console.error('Error loading stress dates:', error)
+  }
+}
+
+// Helper: draw emoji inside colored circle on canvas for pointStyle
+const createEmojiPoint = (emoji, bgColor, size = 40) => {
+  // safe-guard: only run in browser
+  if (typeof document === 'undefined') return null
+  const c = document.createElement('canvas')
+  c.width = size
+  c.height = size
+  const ctx = c.getContext('2d')
+  // Draw circle background
+  ctx.clearRect(0, 0, size, size)
+  ctx.fillStyle = bgColor
+  ctx.beginPath()
+  ctx.arc(size / 2, size / 2, size / 2 - 2, 0, Math.PI * 2)
+  ctx.fill()
+  // Draw emoji centered
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  // Choose font size relative to canvas
+  ctx.font = `${Math.floor(size * 0.5)}px sans-serif`
+  ctx.fillStyle = '#000'
+  ctx.fillText(emoji, size / 2, size / 2 + 1)
+  return c
+}
+
+const updatePressureChartFromData = (values) => {
+  const colorFor = (v) => v === 3 ? '#06b6d4' : v === 2 ? '#84cc16' : v === 1 ? '#f59e0b' : '#f97316'
+  const emojiFor = (v) => v === 3 ? '😄' : v === 2 ? '😐' : v === 1 ? '😕' : '😣'
+
+  const pointStyles = values.map(v => createEmojiPoint(emojiFor(v), colorFor(v), 44))
+
+  pressureChartData.value = {
+    labels: Array.from({ length: 24 }, (_, h) => `${h.toString().padStart(2, '0')}:00`),
+    datasets: [{
+      label: t('home.pressure.title'),
+      data: values,
+      borderColor: '#06b6d4',
+      borderWidth: 2.5,
+      backgroundColor: 'rgba(6,182,212,0.08)',
+      fill: false,
+      tension: 0.2,
+      // use custom point styles (canvas elements)
+      pointRadius: 0, // radius handled by pointStyle canvas size
+      pointStyle: pointStyles,
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointHoverRadius: 24
+    }]
+  }
+}
+
+const pressureChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  layout: { padding: { top: 12, bottom: 12 } },
+  interaction: { mode: 'nearest', intersect: true },
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: isDarkMode.value ? '#1f2937' : '#fff',
+      titleColor: isDarkMode.value ? '#f3f4f6' : '#111827',
+      bodyColor: isDarkMode.value ? '#d1d5db' : '#374151',
+      borderColor: isDarkMode.value ? '#374151' : '#e5e7eb',
+      borderWidth: 1,
+      padding: 10,
+      callbacks: {
+        label: (ctx) => {
+          const map = { 3: t('home.pressure.relaxed'), 2: t('home.pressure.light'), 1: t('home.pressure.moderate'), 0: t('home.pressure.severe') }
+          return ctx.parsed.y !== undefined ? map[Math.round(ctx.parsed.y)] || '' : ''
+        }
+      }
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      min: 0,
+      max: 3,
+      ticks: { display: false, stepSize: 1 },
+      grid: { color: isDarkMode.value ? '#374151' : '#e5e7eb', drawBorder: false, borderDash: [6, 6] }
+    },
+    x: {
+      ticks: { color: isDarkMode.value ? '#9ca3af' : '#6b7280' },
+      grid: { display: false, drawBorder: false }
+    }
+  }
+}))
+
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
@@ -812,7 +1520,7 @@ const chartOptions = computed(() => ({
       bodyFont: { size: 14 },
       callbacks: {
         label: (ctx) => ctx.parsed.y ? `${ctx.parsed.y} ${t('home.heartRate.bpm')}` : t('home.heartRate.noData')
-      } 
+      }
     }
   },
   scales: {
@@ -831,22 +1539,84 @@ const chartOptions = computed(() => ({
 }))
 
 watch(isDarkMode, () => {
-  // Re-render chart when theme changes
+  // Re-render charts when theme changes
   if (heartRateData.value && heartRateData.value.length > 0) {
     updateChartFromAggregated(heartRateData.value)
+  }
+  if (pressureData.value && pressureData.value.length > 0) {
+    updatePressureChartFromData(pressureData.value)
+  }
+  if (stressData.value && stressData.value.length > 0) {
+    updateStressChartFromAggregated(stressData.value)
   }
 })
 
 watch(locale, () => {
-  // Re-render chart when language changes so labels/units update
+  // Re-render charts when language changes so labels/units update
   if (heartRateData.value && heartRateData.value.length > 0) {
     updateChartFromAggregated(heartRateData.value)
   }
+  if (pressureData.value && pressureData.value.length > 0) {
+    updatePressureChartFromData(pressureData.value)
+  }
+  if (stressData.value && stressData.value.length > 0) {
+    updateStressChartFromAggregated(stressData.value)
+  }
 })
+
+const stressChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: isDarkMode.value ? '#1f2937' : '#fff',
+      titleColor: isDarkMode.value ? '#f3f4f6' : '#111827',
+      bodyColor: isDarkMode.value ? '#d1d5db' : '#374151',
+      borderColor: isDarkMode.value ? '#374151' : '#e5e7eb',
+      borderWidth: 1,
+      padding: 12,
+      displayColors: true,
+      titleFont: { size: 14 },
+      bodyFont: { size: 14 },
+      callbacks: {
+        label: (ctx) => ctx.parsed.y ? `${ctx.parsed.y} ${t('home.stress.unit')}` : t('home.stress.noData')
+      }
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      min: 0,
+      max: 100,
+      ticks: { color: isDarkMode.value ? '#9ca3af' : '#6b7280', font: { size: 14 } },
+      grid: { color: isDarkMode.value ? '#374151' : '#e5e7eb', drawBorder: false }
+    },
+    x: {
+      ticks: { color: isDarkMode.value ? '#9ca3af' : '#6b7280' },
+      grid: { display: false, drawBorder: false }
+    }
+  }
+}))
 
 watch(selectedDate, () => {
   if (selectedDate.value) {
     currentDate.value = formatDateForDisplay(selectedDate.value)
+  }
+})
+
+watch(selectedPressureDate, () => {
+  if (selectedPressureDate.value) {
+    currentPressureDate.value = formatDateForDisplay(selectedPressureDate.value)
+    loadPressureData(selectedPressureDate.value)
+  }
+})
+
+watch(selectedStressDate, () => {
+  if (selectedStressDate.value) {
+    currentStressDate.value = formatDateForDisplay(selectedStressDate.value)
+    loadStressData(selectedStressDate.value)
   }
 })
 
@@ -859,15 +1629,103 @@ const changeDate = (days) => {
   calendarMonth.value = date.getMonth()
   calendarYear.value = date.getFullYear()
   loadHeartRateData()
+  // Also load stress data for the selected date
+  loadStressData()
 }
 
 const previousDate = () => changeDate(-1)
 const nextDate = () => changeDate(1)
 
-// Close date picker when clicking outside
+// Pressure date helpers
+const changePressureDate = (days) => {
+  const date = new Date(selectedPressureDate.value)
+  date.setDate(date.getDate() + days)
+  selectedPressureDate.value = date.toISOString().split('T')[0]
+  currentPressureDate.value = formatDateForDisplay(selectedPressureDate.value)
+  pressureCalendarMonth.value = date.getMonth()
+  pressureCalendarYear.value = date.getFullYear()
+  loadPressureData()
+}
+const previousPressureDate = () => changePressureDate(-1)
+const nextPressureDate = () => changePressureDate(1)
+
+const previousPressureMonth = () => {
+  if (pressureCalendarMonth.value === 0) {
+    pressureCalendarMonth.value = 11
+    pressureCalendarYear.value--
+  } else {
+    pressureCalendarMonth.value--
+  }
+}
+
+const nextPressureMonth = () => {
+  if (pressureCalendarMonth.value === 11) {
+    pressureCalendarMonth.value = 0
+    pressureCalendarYear.value++
+  } else {
+    pressureCalendarMonth.value++
+  }
+}
+
+// Stress date helpers
+const changeStressDate = (days) => {
+  const date = new Date(selectedStressDate.value || new Date().toISOString().split('T')[0])
+  date.setDate(date.getDate() + days)
+  selectedStressDate.value = date.toISOString().split('T')[0]
+  currentStressDate.value = formatDateForDisplay(selectedStressDate.value)
+  stressCalendarMonth.value = date.getMonth()
+  stressCalendarYear.value = date.getFullYear()
+  loadStressData()
+}
+const previousStressDate = () => changeStressDate(-1)
+const nextStressDate = () => changeStressDate(1)
+
+const previousStressMonth = () => {
+  if (stressCalendarMonth.value === 0) {
+    stressCalendarMonth.value = 11
+    stressCalendarYear.value--
+  } else {
+    stressCalendarMonth.value--
+  }
+}
+
+const nextStressMonth = () => {
+  if (stressCalendarMonth.value === 11) {
+    stressCalendarMonth.value = 0
+    stressCalendarYear.value++
+  } else {
+    stressCalendarMonth.value++
+  }
+}
+
+const selectPressureDate = (day) => {
+  if (!day.currentMonth) return
+  selectedPressureDate.value = day.date
+  currentPressureDate.value = formatDateForDisplay(day.date)
+  pressureCalendarMonth.value = new Date(day.date).getMonth()
+  pressureCalendarYear.value = new Date(day.date).getFullYear()
+  showPressureDatePicker.value = false
+  loadPressureData(day.date)
+}
+
+// Select stress date handler
+const selectStressDate = (day) => {
+  if (!day.currentMonth) return
+  selectedStressDate.value = day.date
+  currentStressDate.value = formatDateForDisplay(day.date)
+  stressCalendarMonth.value = new Date(day.date).getMonth()
+  stressCalendarYear.value = new Date(day.date).getFullYear()
+  showStressDatePicker.value = false
+  loadStressData(day.date)
+}
+
+
+// Close date picker when clicking outside (handle both pickers)
 const closeDatePicker = (event) => {
-  if (showDatePicker.value && !event.target.closest('.relative')) {
+  if ((showDatePicker.value || showPressureDatePicker.value || showStressDatePicker.value) && !event.target.closest('.relative')) {
     showDatePicker.value = false
+    showPressureDatePicker.value = false
+    showStressDatePicker.value = false
   }
 }
 
@@ -885,7 +1743,7 @@ const forceReloadBMIData = async () => {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt
     } : { bmi: null, category: '', height: null, weight: null, age: null }
-    
+
     bmiData.value = result
     setCachedBmiData(result)
   } catch (error) {
@@ -926,14 +1784,27 @@ const initHeartRateData = async () => {
 onMounted(() => {
   initHeartRateData()
   loadBMIData()
+  // Also attempt to load stress dates (if stress-only CSV was uploaded)
+  forceReloadStressData()
+  // Also load cached/available stress dates and set default stress date
+  loadAvailableStressDates()
+  // Load overall stats
+  loadOverallStats()
   window.addEventListener('bmiDataUpdated', forceReloadBMIData)
   window.addEventListener('heartRateDataUpdated', forceReloadHeartRateData)
+  window.addEventListener('stressDataUpdated', forceReloadStressData)
+  // Refresh overall stats when data is updated
+  window.addEventListener('heartRateDataUpdated', loadOverallStats)
+  window.addEventListener('stressDataUpdated', loadOverallStats)
   document.addEventListener('click', closeDatePicker)
 })
 
 onUnmounted(() => {
   window.removeEventListener('bmiDataUpdated', forceReloadBMIData)
   window.removeEventListener('heartRateDataUpdated', forceReloadHeartRateData)
+  window.removeEventListener('stressDataUpdated', forceReloadStressData)
+  window.removeEventListener('heartRateDataUpdated', loadOverallStats)
+  window.removeEventListener('stressDataUpdated', loadOverallStats)
   document.removeEventListener('click', closeDatePicker)
 })
 </script>
