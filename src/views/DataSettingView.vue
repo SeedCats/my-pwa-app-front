@@ -131,8 +131,9 @@
 
                             <!-- File Upload Segment -->
                             <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-                                <h2 class="text-xl font-semibold mb-6" :class="themeClasses.textPrimary">{{ $t('dataSettings.uploadCSV') }}</h2>
-                                
+                                <h2 class="text-xl font-semibold mb-4" :class="themeClasses.textPrimary">{{ $t('dataSettings.uploadCSV') }}</h2>
+                                <p class="text-sm mb-4" :class="themeClasses.textSecondary">{{ $t('dataSettings.uploadCSVHelper') }}</p>
+
                                 <div class="space-y-4">
                                     <!-- File Upload Area -->
                                     <div 

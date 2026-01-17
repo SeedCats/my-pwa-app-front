@@ -458,17 +458,6 @@
         <div class="mb-8">
           <div class="rounded-lg shadow-sm pb-4 pl-4 pr-4 border"
             :class="[themeClasses.cardBackground, themeClasses.border]">
-            <div class="px-4 py-2">
-              <div class="flex items-center justify-center">
-                <div class="flex items-center gap-3">
-                  <!-- Centered, slightly larger colored dot -->
-                  <span class="w-4 h-4 rounded-full shadow-sm" style="background-color:#2563eb;"></span>
-                  <span class="text-sm font-semibold" :class="themeClasses.textPrimary">{{ $t('home.stress.stressScore')
-                  }}</span>
-                </div>
-              </div>
-            </div>
-
             <div class="relative" style="height: 400px;">
               <Line v-if="stressChartData" :data="stressChartData" :options="stressChartOptions" />
               <div v-else class="h-full flex items-center justify-center"
@@ -1329,7 +1318,7 @@ const updateStressChartFromAggregated = (hourlyData) => {
   stressChartData.value = {
     labels: Array.from({ length: 24 }, (_, h) => `${h.toString().padStart(2, '0')}:00`),
     datasets: [{
-      label: t('home.stress.stressScore'),
+      label: t('home.stress.stressScoreWithUnit'),
       data: hourlyData.map(h => h.avg !== undefined ? h.avg : null),
       borderColor: '#2563eb',
       backgroundColor: 'rgba(37,99,235,0.06)',
@@ -1437,7 +1426,15 @@ const stressChartOptions = computed(() => ({
   maintainAspectRatio: false,
   interaction: { mode: 'index', intersect: false },
   plugins: {
-    legend: { display: false },
+    legend: {
+      display: true,
+      labels: {
+        color: isDarkMode.value ? '#9ca3af' : '#6b7280',
+        usePointStyle: true,
+        padding: 20,
+        font: { size: 12, weight: 'bold' }
+      }
+    },
     tooltip: {
       backgroundColor: isDarkMode.value ? '#1f2937' : '#fff',
       titleColor: isDarkMode.value ? '#f3f4f6' : '#111827',
