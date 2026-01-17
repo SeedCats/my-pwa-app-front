@@ -57,11 +57,11 @@
 
                                     <!-- Weight Input -->
                                     <div>
-                                        <label class="block text-sm font-medium mb-2" :class="themeClasses.textSecondary">Weight (kg)</label>
+                                        <label class="block text-sm font-medium mb-2" :class="themeClasses.textSecondary">{{ $t('dataSettings.weight') }}</label>
                                         <input 
                                             v-model="bmiForm.weight" 
                                             type="number" 
-                                            placeholder="Enter your weight in kg"
+                                            :placeholder="$t('dataSettings.enterWeight')"
                                             class="w-full px-4 py-2 rounded-lg border transition-colors no-spinner"
                                             :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-800 placeholder-gray-400']"
                                         />
@@ -70,9 +70,9 @@
                                     <!-- BMI Result Display -->
                                     <div v-if="calculatedBMI" class="mt-6 p-4 rounded-lg" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-100'">
                                         <div class="text-center">
-                                            <p class="text-sm" :class="themeClasses.textSecondary">Your BMI</p>
+                                            <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('dataSettings.yourBMI') }}</p>
                                             <p class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ calculatedBMI }}</p>
-                                            <p class="text-sm mt-2" :class="[bmiCategoryColor]">{{ bmiCategory }}</p>
+                                            <p class="text-sm mt-2" :class="[bmiCategoryColor]">{{ bmiCategoryKey ? $t(`home.bmi.categories.${bmiCategoryKey}`) : bmiCategory }}</p>
                                         </div>
                                     </div>
 
@@ -98,7 +98,7 @@
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        {{ isLoading ? (isUpdateMode ? 'Updating...' : 'Saving...') : (isUpdateMode ? 'Update' : 'Save') }}
+                                        {{ isLoading ? (isUpdateMode ? t('dataSettings.updating') : t('dataSettings.saving')) : (isUpdateMode ? t('dataSettings.update') : t('dataSettings.save')) }} 
                                     </button>
 
                                     <!-- Delete BMI Button -->
@@ -115,7 +115,7 @@
                                         <svg v-else class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                                         </svg>
-                                        {{ isDeletingBMI ? 'Deleting...' : 'Delete BMI Data' }}
+                                        {{ isDeletingBMI ? t('dataSettings.deleting') : t('dataSettings.deleteAllRecords') }} 
                                     </button>
 
                                     <!-- BMI Delete Status Message -->
@@ -204,7 +204,7 @@
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        {{ isUploading ? 'Uploading...' : 'Upload File' }}
+                                        {{ isUploading ? t('dataSettings.uploading') : t('dataSettings.uploadFile') }} 
                                     </button>
 
                                     <!-- Delete All Records Button -->
@@ -223,7 +223,7 @@
                                         <svg v-else class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                                         </svg>
-                                        {{ isDeleting ? 'Deleting...' : 'Delete All Records' }}
+                                        {{ isDeleting ? t('dataSettings.deleting') : t('dataSettings.deleteAllRecords') }} 
                                     </button>
 
                                     <!-- Delete Status -->
@@ -246,11 +246,13 @@
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { ref, computed, onMounted } from 'vue'
-import { saveBMIData, getLatestBMIRecord, updateBMIRecord, deleteAllBMIRecords } from '../services/bmiService'
+import { useI18n } from 'vue-i18n'
+import { saveBMIData, getLatestBMIRecord, updateBMIRecord, deleteAllBMIRecords } from '../services/bmiService' 
 import { uploadHeartRateCSV, deleteAllHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
 import { invalidateBmiCache, invalidateHeartRateCache } from '../stores/userStore'
 
 const { isDarkMode, themeClasses } = useTheme()
+const { t } = useI18n()
 
 // State
 const sidebarHidden = ref(false)
@@ -289,6 +291,15 @@ const bmiCategory = computed(() => {
     return 'Obese'
 })
 
+const bmiCategoryKey = computed(() => {
+    const raw = (bmiCategory.value || '').toString().toLowerCase()
+    if (raw.includes('under') || raw.includes('過輕')) return 'underweight'
+    if (raw.includes('normal') || raw.includes('正常')) return 'normal'
+    if (raw.includes('over') || raw.includes('過重')) return 'overweight'
+    if (raw.includes('obese') || raw.includes('肥胖')) return 'obese'
+    return ''
+})
+
 const bmiCategoryColor = computed(() => {
     const bmi = parseFloat(calculatedBMI.value)
     if (!bmi) return ''
@@ -325,7 +336,7 @@ const loadExistingBMIData = async () => {
 
 const submitBMIData = async () => {
     if (!bmiForm.value.height || !bmiForm.value.weight) {
-        submitStatus.value = { type: 'error', message: 'Please fill in height and weight' }
+        submitStatus.value = { type: 'error', message: t('dataSettings.fillHeightWeight') }
         return
     }
     
@@ -354,16 +365,16 @@ const submitBMIData = async () => {
             }
             submitStatus.value = {
                 type: 'success',
-                message: `BMI data ${isUpdateMode.value ? 'updated' : 'saved'} successfully!`
+                message: isUpdateMode.value ? t('dataSettings.updatedSuccessfully') : t('dataSettings.savedSuccessfully')
             }
             invalidateBmiCache()  // Invalidate cache so HomeView fetches fresh data
             window.dispatchEvent(new CustomEvent('bmiDataUpdated'))
         } else {
-            submitStatus.value = { type: 'error', message: response.message || 'Failed to save BMI data' }
+            submitStatus.value = { type: 'error', message: response.message || t('dataSettings.saveFailed') }
         }
     } catch (error) {
         console.error('BMI submission error:', error)
-        submitStatus.value = { type: 'error', message: error.message || 'Failed to save BMI data. Please try again.' }
+        submitStatus.value = { type: 'error', message: error.message || t('dataSettings.saveFailed') }
     } finally {
         isLoading.value = false
         if (submitStatus.value?.type === 'success') {
@@ -374,7 +385,7 @@ const submitBMIData = async () => {
 
 // Delete BMI data
 const deleteBMIData = async () => {
-    if (!confirm('Are you sure you want to delete your BMI data? This action cannot be undone.')) {
+    if (!confirm(t('dataSettings.deleteBMIConfirm'))) {
         return
     }
     
@@ -387,7 +398,7 @@ const deleteBMIData = async () => {
         if (response.success) {
             deleteBMIStatus.value = { 
                 type: 'success', 
-                message: 'BMI Data is deleted'
+                message: t('dataSettings.bmiDeleted')
             }
             // Clear the form and reset state
             bmiForm.value = { age: '', height: '', weight: '' }
@@ -395,11 +406,11 @@ const deleteBMIData = async () => {
             invalidateBmiCache()
             window.dispatchEvent(new CustomEvent('bmiDataUpdated'))
         } else {
-            deleteBMIStatus.value = { type: 'error', message: response.message || 'Failed to delete data' }
+            deleteBMIStatus.value = { type: 'error', message: response.message || t('dataSettings.deleteFailed') }
         }
     } catch (error) {
         console.error('BMI delete error:', error)
-        deleteBMIStatus.value = { type: 'error', message: error.message || 'Failed to delete data. Please try again.' }
+        deleteBMIStatus.value = { type: 'error', message: error.message || t('dataSettings.deleteFailed') }
     } finally {
         isDeletingBMI.value = false
         if (deleteBMIStatus.value?.type === 'success') {
@@ -432,7 +443,7 @@ const checkHeartRateData = async () => {
 
 // Delete all heart rate data
 const deleteAllHeartRateData = async () => {
-    if (!confirm('Are you sure you want to delete all heart rate records? This action cannot be undone.')) {
+    if (!confirm(t('dataSettings.deleteAllConfirm'))) {
         return
     }
     
@@ -445,17 +456,17 @@ const deleteAllHeartRateData = async () => {
         if (response.success) {
             deleteStatus.value = { 
                 type: 'success', 
-                message: response.message || 'All heart rate data deleted successfully!'
+                message: response.message || t('dataSettings.allHeartRateDeleted')
             }
             hasHeartRateData.value = false
             invalidateHeartRateCache()
             window.dispatchEvent(new CustomEvent('heartRateDataUpdated'))
         } else {
-            deleteStatus.value = { type: 'error', message: response.message || 'Failed to delete data' }
+            deleteStatus.value = { type: 'error', message: response.message || t('dataSettings.deleteFailed') }
         }
     } catch (error) {
         console.error('Heart rate delete error:', error)
-        deleteStatus.value = { type: 'error', message: error.message || 'Failed to delete data. Please try again.' }
+        deleteStatus.value = { type: 'error', message: error.message || t('dataSettings.deleteFailed') }
     } finally {
         isDeleting.value = false
         if (deleteStatus.value?.type === 'success') {
@@ -487,12 +498,12 @@ const validateAndSetFile = (file, errorMsg) => {
     }
 }
 
-const handleFileSelect = (e) => validateAndSetFile(e.target.files[0], 'Please select a valid CSV file')
+const handleFileSelect = (e) => validateAndSetFile(e.target.files[0], t('dataSettings.invalidCsvSelect'))
 
 const handleFileDrop = (e) => {
     isDragging.value = false
-    validateAndSetFile(e.dataTransfer.files[0], 'Please drop a valid CSV file')
-}
+    validateAndSetFile(e.dataTransfer.files[0], t('dataSettings.invalidCsvDrop'))
+} 
 
 const clearFile = () => {
     selectedFile.value = null
@@ -502,7 +513,7 @@ const clearFile = () => {
 
 const submitFileUpload = async () => {
     if (!selectedFile.value) {
-        uploadStatus.value = { type: 'error', message: 'No file selected' }
+        uploadStatus.value = { type: 'error', message: t('dataSettings.noFileSelected') }
         return
     }
     
@@ -514,9 +525,10 @@ const submitFileUpload = async () => {
         
         if (response.success) {
             const { inserted = 0, duplicatesSkipped = 0, totalRecords = 0 } = response.data || {}
+            const msg = `${t('dataSettings.uploadedSuccessfully')} ${inserted} ${t('dataSettings.recordsAdded')}${duplicatesSkipped > 0 ? `, ${duplicatesSkipped} ${t('dataSettings.duplicatesSkipped')}` : ''} (${totalRecords} ${t('dataSettings.totalInFile')})`
             uploadStatus.value = { 
                 type: 'success', 
-                message: `Successfully uploaded! ${inserted} records added${duplicatesSkipped > 0 ? `, ${duplicatesSkipped} duplicates skipped` : ''} (${totalRecords} total in file)` 
+                message: msg
             }
             clearFile()
             invalidateHeartRateCache()  // Invalidate cache so HomeView fetches fresh data
@@ -525,11 +537,11 @@ const submitFileUpload = async () => {
             // Re-check heart rate data to enable delete button
             await checkHeartRateData()
         } else {
-            uploadStatus.value = { type: 'error', message: response.message || 'Upload failed' }
+            uploadStatus.value = { type: 'error', message: response.message || t('dataSettings.uploadFailed') }
         }
     } catch (error) {
         console.error('Heart rate upload error:', error)
-        uploadStatus.value = { type: 'error', message: error.message || 'Upload failed. Please try again.' }
+        uploadStatus.value = { type: 'error', message: error.message || t('dataSettings.uploadFailedTry') }
     } finally {
         isUploading.value = false
     }

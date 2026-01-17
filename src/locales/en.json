@@ -75,11 +75,14 @@
       "loading": "Loading heart rate data...",
       "noData": "No heart rate data available",
       "addData": "Add Heart Rate Data",
+      "hasData": "Has data",
+      "today": "Today",
       "bpm": "bpm",
       "average": "Average",
       "averageBpm": "Average bpm",
       "heartRateBpm": "Heart Rate (bpm)"
-    }
+    },
+    "selectDate": "Select Date" 
   },
   "dataSettings": {
     "title": "Data Setting",
@@ -111,7 +114,35 @@
     "uploadFile": "Upload File",
     "deleteAllRecords": "Delete All Records",
     "processing": "Processing...",
-    "calculating": "Calculating..."
+    "calculating": "Calculating...",
+
+    "fillHeightWeight": "Please fill in height and weight",
+    "savedSuccessfully": "BMI data saved successfully!",
+    "updatedSuccessfully": "BMI data updated successfully!",
+    "saveFailed": "Failed to save BMI data. Please try again.",
+    "deleteBMIConfirm": "Are you sure you want to delete your BMI data? This action cannot be undone.",
+    "bmiDeleted": "BMI data deleted",
+    "deleteFailed": "Failed to delete data. Please try again.",
+
+    "invalidCsvSelect": "Please select a valid CSV file",
+    "invalidCsvDrop": "Please drop a valid CSV file",
+    "noFileSelected": "No file selected",
+    "uploadedSuccessfully": "Successfully uploaded!",
+    "recordsAdded": "records added",
+    "duplicatesSkipped": "duplicates skipped",
+    "totalInFile": "total in file",
+    "uploadFailed": "Upload failed",
+    "uploadFailedTry": "Upload failed. Please try again.",
+    "uploading": "Uploading...",
+
+    "deleting": "Deleting...",
+    "deleteAllConfirm": "Are you sure you want to delete all heart rate records? This action cannot be undone?",
+    "allHeartRateDeleted": "All heart rate data deleted successfully!",
+
+    "saving": "Saving...",
+    "updating": "Updating...",
+    "save": "Save",
+    "update": "Update"
   },
   "formatSettings": {
     "title": "Settings",
@@ -179,7 +210,56 @@
     "hide": "Hide",
     "show": "Show",
     "noPastConversations": "No past conversations.",
-    "newConversation": "New Conversation"
+    "sending": "Sending...",
+    "reset": "Reset",
+    "done": "Done",
+    "yesDelete": "Yes, delete",
+    "attachFile": "Attach file",
+    "sources": "Sources:",
+    "temperature": "Temperature",
+    "temperatureDesc": "Controls randomness. Lower = deterministic, higher = more creative.",
+    "maxSources": "Max sources",
+    "maxSourcesDesc": "Limits number of external sources used by AI (0 = none).",
+    "maxTokens": "Max tokens",
+    "maxTokensDesc": "Limit tokens used by model for each request (advisory).",
+    "topP": "Top-p",
+    "topPDesc": "Alternative sampling parameter (complements temperature).",
+    "deleteConversationConfirm": "Delete this conversation? This cannot be undone.",
+    "sendFailed": "Failed to send message. Please try again.",
+    "prompts": {
+      "bmi": {
+        "underweight": {
+          "0": "What are healthy ways to gain weight?",
+          "1": "What diet should I follow to increase my weight safely?"
+        },
+        "normal": {
+          "0": "How can I maintain my healthy weight?",
+          "1": "What exercises are best for my current BMI?"
+        },
+        "overweight": {
+          "0": "What are effective strategies for healthy weight loss?",
+          "1": "How can I create a sustainable weight loss plan?"
+        },
+        "obese": {
+          "0": "What exercises are safe for obese individuals?",
+          "1": "How can I start a weight loss journey safely?"
+        }
+      },
+      "heartRate": {
+        "0": "What do my heart rate trends indicate?",
+        "1": "What's a healthy resting heart rate for me?"
+      }
+    },
+    "rename": "Rename",
+    "load": "Load",
+    "delete": "Delete",
+    "prev": "Prev",
+    "next": "Next",
+    "pageLabel": "Page {p}",
+    "showingPage": "Showing page {page} of {total}",
+    "newConversation": "New Conversation",
+    "renameFailed": "Failed to rename conversation"
+
   },
   "manualSupport": {
     "title": "Manual Support",

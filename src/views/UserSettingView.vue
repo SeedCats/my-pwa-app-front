@@ -75,7 +75,7 @@
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    {{ profileLoading ? 'Updating...' : 'Update Profile' }}
+                    {{ profileLoading ? $t('userSettings.updating') : $t('userSettings.updateProfile') }}
                   </button>
                 </div>
               </form>
@@ -149,7 +149,7 @@
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    {{ passwordLoading ? 'Updating...' : 'Update Password' }}
+                    {{ passwordLoading ? $t('userSettings.updating') : $t('userSettings.updatePassword') }}
                   </button>
                 </div>
               </form>
@@ -158,19 +158,19 @@
             <!-- Delete Account -->
             <div class="shadow-sm rounded-lg border" :class="isDarkMode ? 'bg-gray-800 border-red-600' : 'bg-white border-red-200'">
               <div class="px-6 py-4 border-b" :class="isDarkMode ? 'border-red-600' : 'border-red-200'">
-                <h2 class="text-xl font-semibold text-red-600">Delete Account</h2>
-                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">Once your account is deleted, all of its resources and data will be permanently deleted.</p>
+                <h2 class="text-xl font-semibold text-red-600">{{ $t('userSettings.deleteAccount') }}</h2>
+                <p class="mt-1 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.deleteAccountWarning') }}</p>
               </div>
               
               <div class="p-6">
                 <div class="max-w-full text-sm mb-4" :class="themeClasses.textSecondary">
-                  <p>Before deleting your account, please download any data or information that you wish to retain.</p>
+                  <p>{{ $t('userSettings.deleteAccountDownloadData') }}</p>
                 </div>
                 
                 <!-- Password confirmation input (appears when delete is clicked) -->
                 <div v-if="showDeletePassword" class="mb-4">
                   <label for="delete-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">
-                    Enter your password to confirm deletion
+                    {{ $t('userSettings.enterPasswordToConfirmDeletion') }}
                   </label>
                   <input 
                     type="password" 
@@ -180,7 +180,7 @@
                       'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200',
                       isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
                     ]"
-                    placeholder="Enter your password"
+                    :placeholder="$t('userSettings.enterPasswordToConfirmDeletion')"
                     @keyup.enter="deleteAccount"
                   />
                 </div>
@@ -191,7 +191,7 @@
                     @click="showDeletePassword = true"
                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
-                    Delete Account
+                    {{ $t('userSettings.deleteAccount') }}
                   </button>
                   
                   <template v-if="showDeletePassword">
@@ -204,14 +204,14 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      {{ deleteLoading ? 'Deleting...' : 'Confirm Delete' }}
+                      {{ deleteLoading ? $t('userSettings.deleting') : $t('userSettings.confirmDelete') }}
                     </button>
                     
                     <button 
                       @click="showDeletePassword = false; deletePassword = ''"
                       class="inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" :class="isDarkMode ? 'border-gray-600 text-gray-300 bg-gray-700 hover:bg-gray-600' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'"
                     >
-                      Cancel
+                      {{ $t('common.close') }}
                     </button>
                   </template>
                 </div>

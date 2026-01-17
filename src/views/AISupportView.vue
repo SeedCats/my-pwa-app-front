@@ -19,7 +19,7 @@
                         <div class="flex items-center justify-between mb-2 gap-2">
                             <div v-if="showTitle" class="text-base sm:text-lg font-semibold truncate" :class="[themeClasses.textPrimary, isDarkMode ? 'text-white' : 'text-gray-900']">{{ currentTitle }}</div>
                             <div class="flex items-center space-x-1 sm:space-x-2 flex-shrink-0" :class="showTitle ? '' : 'ml-auto'">
-                                <button @click.prevent="showSettings = !showSettings" :disabled="isChatBusy" :aria-disabled="isChatBusy" :title="isChatBusy ? 'Settings disabled while AI is responding' : 'AI Settings'" :class="['inline-flex items-center justify-center p-2 rounded-full text-sm transition-shadow duration-200 transform focus:outline-none focus:ring-2', isChatBusy ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : (isDarkMode ? 'bg-white text-gray-900 hover:shadow-md focus:ring-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-300')]" aria-label="AI Settings" role="button">
+                                <button @click.prevent="showSettings = !showSettings" :disabled="isChatBusy" :aria-disabled="isChatBusy" :title="isChatBusy ? $t('aiSupport.settingsDisabled') : $t('aiSupport.settings')" :class="['inline-flex items-center justify-center p-2 rounded-full text-sm transition-shadow duration-200 transform focus:outline-none focus:ring-2', isChatBusy ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : (isDarkMode ? 'bg-white text-gray-900 hover:shadow-md focus:ring-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-300')]" :aria-label="$t('aiSupport.settings')" role="button">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-current transform transition-transform duration-200 hover:scale-105" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                         <rect x="3" y="5" width="12" height="2" rx="1"></rect>
                                         <circle cx="18.5" cy="6" r="1.5"></circle>
@@ -111,7 +111,7 @@
                                                 <svg class="w-4 h-4 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                                 </svg>
-                                                Sources:
+                                                {{ $t('aiSupport.sources') }}
                                             </div>
                                             <ul class="space-y-1.5">
                                                 <li v-for="(source, si) in message.sources" :key="si" class="flex items-start break-words">
@@ -157,7 +157,7 @@
                                                 <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
                                                     style="animation-delay: 0.2s"></div>
                                             </div>
-                                            <span class="text-xs text-gray-500">AI is thinking...</span>
+                                            <span class="text-xs text-gray-500">{{ $t('aiSupport.thinking') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -190,14 +190,14 @@
                                         </div>
                                     </div>
 
-                                    <input v-model="newMessage" type="text" placeholder="Type your message here..."
+                                    <input v-model="newMessage" type="text" :placeholder="$t('aiSupport.typingPlaceholder')"
                                         class="flex-1 min-w-0 px-3 py-2 rounded-lg border transition-colors text-sm" :class="[
                                             themeClasses.cardBackground,
                                             themeClasses.border,
                                             isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-800 placeholder-gray-400'
                                         ]" :disabled="isTyping" @keydown.enter.prevent="sendMessage" />
 
-                                    <button type="button" @click.prevent="openFilePicker" aria-label="Attach file"
+                                    <button type="button" @click.prevent="openFilePicker" :aria-label="$t('aiSupport.attachFile')"
                                         :class="[
                                             'flex-shrink-0 inline-flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-lg transition-colors border focus:outline-none focus:ring-2 focus:ring-blue-500/30',
                                             isDarkMode
@@ -227,7 +227,7 @@
                                         <svg v-else class="w-5 h-5 sm:w-4 sm:h-4 sm:mr-2" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                                         </svg>
-                                        <span class="hidden sm:inline">{{ isTyping ? 'Sending...' : 'Send' }}</span>
+                                        <span class="hidden sm:inline">{{ isTyping ? $t('aiSupport.sending') : $t('aiSupport.send') }}</span>
                                     </button>
                                 </form>
                             </div>
@@ -254,8 +254,8 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg font-semibold">AI Settings</h3>
-                                    <p class="text-sm mt-0.5" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">Adjust model behavior and response style</p>
+                                    <h3 class="text-lg font-semibold">{{ $t('aiSupport.settings') }}</h3>
+                                    <p class="text-sm mt-0.5" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{ $t('aiSupport.settingsDescription') }}</p>
                                 </div>
                             </div>
 
@@ -268,48 +268,48 @@
 
                         <div v-if="isChatBusy" class="mb-3 p-3 rounded text-sm bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 flex items-center space-x-3">
                             <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div>Settings are locked while AI is processing — changes will apply after the response completes.</div>
+                            <div>{{ $t('aiSupport.settingsDisabled') }}</div>
                         </div>
 
                         <div class="space-y-3">
                             <div :class="['p-3 rounded-lg border', isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200']">
                                 <label class="flex items-center justify-between text-sm font-medium mb-2">
-                                    <span>Temperature</span>
+                                    <span>{{ $t('aiSupport.temperature') }}</span>
                                     <span class="text-sm font-semibold">{{ stagedSettings.temperature.toFixed(2) }}</span>
                                 </label>
                                 <input type="range" min="0" max="2" step="0.01" v-model.number="stagedSettings.temperature" :disabled="isChatBusy" :class="['w-full h-2 rounded-lg bg-gray-200 accent-blue-500', isChatBusy ? 'opacity-60 cursor-not-allowed' : '']" />
-                                <p class="text-xs mt-2" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">Controls randomness. Lower = deterministic, higher = more creative.</p>
+                                <p class="text-xs mt-2" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{ $t('aiSupport.temperatureDesc') }}</p>
                             </div>
 
                             <div :class="['p-3 rounded-lg border', isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200']">
                                 <label class="flex items-center justify-between text-sm font-medium mb-2">
-                                    <span>Max sources</span>
+                                    <span>{{ $t('aiSupport.maxSources') }}</span>
                                     <span class="text-sm font-semibold">{{ stagedSettings.maxSources }}</span>
                                 </label>
                                 <input type="range" min="0" max="10" step="1" v-model.number="stagedSettings.maxSources" :disabled="isChatBusy" :class="['w-full h-2 rounded-lg bg-gray-200', isChatBusy ? 'opacity-60 cursor-not-allowed' : '']" />
-                                <p class="text-xs mt-2" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">Limits number of external sources used by AI (0 = none).</p>
+                                <p class="text-xs mt-2" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{ $t('aiSupport.maxSourcesDesc') }}</p>
                             </div>
 
                             <div :class="['p-3 rounded-lg border', isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200']">
-                                <label class="block text-sm font-medium mb-2">Max tokens</label>
+                                <label class="block text-sm font-medium mb-2">{{ $t('aiSupport.maxTokens') }}</label>
                                 <input type="number" min="64" step="1" v-model.number="stagedSettings.maxTokens" :disabled="isChatBusy" :class="['w-full px-3 py-2 rounded-md border', isChatBusy ? 'opacity-60 cursor-not-allowed' : '']" />
-                                <p class="text-xs mt-2" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">Limit tokens used by model for each request (advisory).</p>
+                                <p class="text-xs mt-2" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{ $t('aiSupport.maxTokensDesc') }}</p>
                             </div>
 
                             <div :class="['p-3 rounded-lg border', isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200']">
                                 <label class="flex items-center justify-between text-sm font-medium mb-2">
-                                    <span>Top-p</span>
+                                    <span>{{ $t('aiSupport.topP') }}</span>
                                     <span class="text-sm font-semibold">{{ stagedSettings.topP.toFixed(2) }}</span>
                                 </label>
                                 <input type="range" min="0" max="1" step="0.01" v-model.number="stagedSettings.topP" :disabled="isChatBusy" :class="['w-full h-2 rounded-lg bg-gray-200', isChatBusy ? 'opacity-60 cursor-not-allowed' : '']" />
-                                <p class="text-xs mt-2" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">Alternative sampling parameter (complements temperature).</p>
+                                <p class="text-xs mt-2" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{ $t('aiSupport.topPDesc') }}</p>
                             </div>
 
                         </div>
 
                         <div class="mt-4 flex items-center justify-end space-x-2">
-                            <button @click.prevent="resetAiSettings" :disabled="isChatBusy" :aria-disabled="isChatBusy" :title="isChatBusy ? 'Locked while AI is processing' : 'Reset'" class="px-4 py-2 rounded-md border text-sm inline-flex items-center justify-center" :class="[ isDarkMode ? 'border-gray-600 text-gray-100 hover:bg-gray-700' : 'border-gray-200 text-gray-800 hover:bg-gray-100', isChatBusy ? 'opacity-60 cursor-not-allowed' : '' ]">Reset</button>
-                            <button @click.prevent="applyAiSettings" :disabled="isChatBusy" :aria-disabled="isChatBusy" :title="isChatBusy ? 'Locked while AI is processing' : 'Done'" class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 shadow-sm inline-flex items-center justify-center text-sm" :class="isChatBusy ? 'opacity-60 cursor-not-allowed' : ''">Done</button>
+                            <button @click.prevent="resetAiSettings" :disabled="isChatBusy" :aria-disabled="isChatBusy" :title="isChatBusy ? $t('aiSupport.settingsDisabled') : $t('aiSupport.reset')" class="px-4 py-2 rounded-md border text-sm inline-flex items-center justify-center" :class="[ isDarkMode ? 'border-gray-600 text-gray-100 hover:bg-gray-700' : 'border-gray-200 text-gray-800 hover:bg-gray-100', isChatBusy ? 'opacity-60 cursor-not-allowed' : '' ]">{{ $t('aiSupport.reset') }}</button>
+                            <button @click.prevent="applyAiSettings" :disabled="isChatBusy" :aria-disabled="isChatBusy" :title="isChatBusy ? $t('aiSupport.settingsDisabled') : $t('aiSupport.done')" class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 shadow-sm inline-flex items-center justify-center text-sm" :class="isChatBusy ? 'opacity-60 cursor-not-allowed' : ''">{{ $t('aiSupport.done') }}</button>
                         </div>
                     </div>
                 </div>
@@ -328,7 +328,7 @@
                                         @click.prevent="confirmDeleteAll = !confirmDeleteAll"
                                         :disabled="historyLoading || chatList.length === 0 || isChatBusy"
                                         :aria-disabled="historyLoading || chatList.length === 0 || isChatBusy"
-                                        :title="isChatBusy ? 'Please wait until the current response is finished' : 'Delete all conversations'"
+                                        :title="isChatBusy ? $t('aiSupport.waitForResponse') : $t('aiSupport.deleteAll')"
                                         class="inline-flex items-center px-3 py-1 text-sm rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:from-red-600 hover:to-red-700 transition-transform transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
@@ -348,11 +348,11 @@
                                          class="absolute right-0 mt-2 w-64 p-3 rounded-lg shadow-lg z-50" 
                                          :class="[themeClasses.cardBackground, themeClasses.border]">
                                         <div class="text-sm mb-2" :class="isDarkMode ? 'text-gray-200' : 'text-gray-800'">
-                                            <strong>Are you sure?</strong> This will permanently delete <span class="font-semibold">all</span> conversations.
+                                            {{ $t('aiSupport.deleteAllConfirm') }}
                                         </div>
                                         <div class="flex justify-end space-x-2">
-                                            <button @click.prevent="confirmDeleteAll = false" class="px-3 py-1 text-sm rounded bg-gray-100 hover:bg-gray-200">Cancel</button>
-                                            <button @click.prevent="deleteAllChats(true)" class="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700">Yes, delete</button>
+                                            <button @click.prevent="confirmDeleteAll = false" class="px-3 py-1 text-sm rounded bg-gray-100 hover:bg-gray-200">{{ $t('common.cancel') }}</button>
+                                            <button @click.prevent="deleteAllChats(true)" class="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700">{{ $t('aiSupport.yesDelete') }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -380,7 +380,7 @@
                         </div>
 
                         <div v-if="showHistoryPanel">
-                            <div v-if="historyLoading" class="text-sm text-gray-500">Loading…</div>
+                            <div v-if="historyLoading" class="text-sm text-gray-500">{{ $t('common.loading') }}</div>
                             <div v-if="historyError" class="text-sm text-red-500">{{ historyError }}</div>
                             <div v-if="!historyLoading && chatList.length === 0" class="text-sm text-gray-500">{{ $t('aiSupport.noPastConversations') }}</div>
                             <ul class="space-y-2">
@@ -409,8 +409,8 @@
                                         <div class="text-xs truncate" :class="isDarkMode ? 'text-white' : 'text-gray-600'">{{ chatPreviews[index] || '' }}</div>
                                     </div>
                                     <div class="ml-3 flex-shrink-0 flex items-center space-x-2">
-                                        <button @click.prevent="startEditing(chat)" title="Rename"
-                                            class="px-2 py-1 text-sm rounded bg-gray-100 text-gray-800 hover:bg-gray-200 border">Rename</button>
+                                        <button @click.prevent="startEditing(chat)" :title="$t('aiSupport.rename')"
+                                            class="px-2 py-1 text-sm rounded bg-gray-100 text-gray-800 hover:bg-gray-200 border">{{$t('aiSupport.rename')}}</button>
                                         <button @click.prevent="loadChatIntoConversation(chat._id)"
                                             :disabled="isChatBusy" :aria-disabled="isChatBusy"
                                             :title="isChatBusy ? 'Finish current response before loading another chat' : 'Load'"
@@ -419,7 +419,7 @@
                                             <button @click.prevent="confirmDeleteId = parseId(chat._id || chat.id)" 
                                                 :disabled="isChatBusy" 
                                                 :aria-disabled="isChatBusy"
-                                                :title="isChatBusy ? 'Please wait until the current response is finished' : 'Delete'"
+                                                :title="isChatBusy ? $t('aiSupport.waitForResponse') : $t('common.delete')"
                                                 :class="isChatBusy ? 'px-2 py-1 text-sm rounded bg-red-100 text-red-400 cursor-not-allowed border opacity-50' : 'px-2 py-1 text-sm rounded bg-red-100 text-red-700 hover:bg-red-200 border'">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                                     viewBox="0 0 24 24" stroke="currentColor">
@@ -440,15 +440,14 @@
                                                  class="absolute right-0 top-full mt-2 w-64 p-3 rounded-lg shadow-lg z-50" 
                                                  :class="[themeClasses.cardBackground, themeClasses.border]">
                                                 <div class="text-sm mb-2" :class="isDarkMode ? 'text-gray-200' : 'text-gray-800'">
-                                                    <strong>Delete conversation?</strong><br>
-                                                    This cannot be undone.
+                                                    {{ $t('aiSupport.deleteConversationConfirm') }}
                                                 </div>
                                                 <div class="flex justify-end space-x-2">
                                                     <button @click.prevent="confirmDeleteId = null" 
                                                             class="px-3 py-1 text-sm rounded" 
-                                                            :class="isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'">Cancel</button>
+                                                            :class="isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'">{{ $t('common.cancel') }}</button>
                                                     <button @click.prevent="deleteChat(chat._id, true)" 
-                                                            class="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700">Delete</button>
+                                                            class="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700">{{ $t('aiSupport.delete') }}</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -457,17 +456,17 @@
                             </ul>
 
                             <div v-if="showPagination" class="mt-3 flex items-center justify-between text-sm">
-                                <div class="text-gray-500">Showing page {{ historyPage }} of {{ totalPages }}</div>
+                                <div class="text-gray-500">{{ $t('aiSupport.showingPage', { page: historyPage, total: totalPages }) }}</div>
                                 <div class="flex items-center space-x-2">
-                                    <button :disabled="historyPage <= 1" @click.prevent="loadChatList(historyPage - 1)" class="inline-flex items-center px-3 py-1 rounded border transition-transform duration-200 transform hover:-translate-x-1 hover:scale-105 active:scale-95 focus:outline-none" :class="[ isDarkMode ? 'bg-gray-700 text-white border-gray-600 focus:ring-gray-400' : 'bg-white text-gray-900 border-gray-200 focus:ring-blue-200', historyPage <= 1 ? 'opacity-50 cursor-not-allowed' : '' ]" aria-label="Previous page">
+                                    <button :disabled="historyPage <= 1" @click.prevent="loadChatList(historyPage - 1)" class="inline-flex items-center px-3 py-1 rounded border transition-transform duration-200 transform hover:-translate-x-1 hover:scale-105 active:scale-95 focus:outline-none" :class="[ isDarkMode ? 'bg-gray-700 text-white border-gray-600 focus:ring-gray-400' : 'bg-white text-gray-900 border-gray-200 focus:ring-blue-200', historyPage <= 1 ? 'opacity-50 cursor-not-allowed' : '' ]" :aria-label="$t('aiSupport.prev')">
                                         <svg class="h-4 w-4 mr-2 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.707 14.707a1 1 0 01-1.414 0L7.586 11l3.707-3.707a1 1 0 011.414 1.414L10.414 11l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
-                                        Prev
+                                        {{ $t('aiSupport.prev') }}
                                     </button>
                                     <select v-model.number="historyPage" @change.prevent="loadChatList(historyPage)" :class="isDarkMode ? 'px-2 py-1 border rounded bg-gray-700 text-white border-gray-600' : 'px-2 py-1 border rounded bg-white text-gray-800 border-gray-200'">
-                                        <option v-for="p in historyPageOptions" :key="p" :value="p">Page {{ p }}</option>
+                                        <option v-for="p in historyPageOptions" :key="p" :value="p">{{ $t('aiSupport.pageLabel', { p }) }}</option>
                                     </select>
-                                    <button :disabled="historyPage >= totalPages" @click.prevent="loadChatList(historyPage + 1)" class="inline-flex items-center px-3 py-1 rounded border transition-transform duration-200 transform hover:translate-x-1 hover:scale-105 active:scale-95 focus:outline-none" :class="[ isDarkMode ? 'bg-gray-700 text-white border-gray-600 focus:ring-gray-400' : 'bg-white text-gray-900 border-gray-200 focus:ring-blue-200', historyPage >= totalPages ? 'opacity-50 cursor-not-allowed' : '' ]" aria-label="Next page">
-                                        Next
+                                    <button :disabled="historyPage >= totalPages" @click.prevent="loadChatList(historyPage + 1)" class="inline-flex items-center px-3 py-1 rounded border transition-transform duration-200 transform hover:translate-x-1 hover:scale-105 active:scale-95 focus:outline-none" :class="[ isDarkMode ? 'bg-gray-700 text-white border-gray-600 focus:ring-gray-400' : 'bg-white text-gray-900 border-gray-200 focus:ring-blue-200', historyPage >= totalPages ? 'opacity-50 cursor-not-allowed' : '' ]" :aria-label="$t('aiSupport.next')">
+                                        {{ $t('aiSupport.next') }}
                                         <svg class="h-4 w-4 ml-2 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.293 5.293a1 1 0 011.414 0L12.414 9l-3.707 3.707a1 1 0 01-1.414-1.414L9.586 9 7.293 6.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                                     </button>
                                 </div>
@@ -486,11 +485,13 @@ import { ref, nextTick, computed, onMounted, onBeforeUnmount } from 'vue'
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { sendMessageToGrok, sendMessageToGrokWithFile, fetchAichatList, fetchAichatById, createAichat, appendMessagesToAichat, deleteAichat, updateAichatTitle, updateAichatLastMessage } from '../services/grokService'
+import { useI18n } from 'vue-i18n'
 import { useUserStore, getCachedBmiData, getCachedHeartRateDates, setCachedBmiData, setCachedHeartRateDates } from '../stores/userStore'
 import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
 import { getLatestBMIRecord } from '../services/bmiService' 
 
 const { isDarkMode, themeClasses } = useTheme()
+const { t } = useI18n()
 
 // State
 const sidebarHidden = ref(false)
@@ -512,7 +513,7 @@ const historyPage = ref(1)
 const historyPerPage = ref(3)
 const historyTotal = ref(0)
 const chatId = ref(null)
-const currentTitle = ref('New Conversation')
+const currentTitle = ref(t('aiSupport.newConversation'))
 const showTitle = ref(false)
 
 const parseId = (idCandidate) => {
@@ -598,24 +599,24 @@ const suggestedPrompts = computed(() => {
         const bmi = parseFloat(bmiData.bmi)
         
         if (bmi < 18.5) {
-            bmiPrompts.push("What are healthy ways to gain weight?")
-            bmiPrompts.push("What diet should I follow to increase my weight safely?")
+            bmiPrompts.push(t('aiSupport.prompts.bmi.underweight.0'))
+            bmiPrompts.push(t('aiSupport.prompts.bmi.underweight.1'))
         } else if (bmi >= 18.5 && bmi < 25) {
-            bmiPrompts.push("How can I maintain my healthy weight?")
-            bmiPrompts.push("What exercises are best for my current BMI?")
+            bmiPrompts.push(t('aiSupport.prompts.bmi.normal.0'))
+            bmiPrompts.push(t('aiSupport.prompts.bmi.normal.1'))
         } else if (bmi >= 25 && bmi < 30) {
-            bmiPrompts.push("What are effective strategies for healthy weight loss?")
-            bmiPrompts.push("How can I create a sustainable weight loss plan?")
+            bmiPrompts.push(t('aiSupport.prompts.bmi.overweight.0'))
+            bmiPrompts.push(t('aiSupport.prompts.bmi.overweight.1'))
         } else if (bmi >= 30) {
-            bmiPrompts.push("What exercises are safe for obese individuals?")
-            bmiPrompts.push("How can I start a weight loss journey safely?")
+            bmiPrompts.push(t('aiSupport.prompts.bmi.obese.0'))
+            bmiPrompts.push(t('aiSupport.prompts.bmi.obese.1'))
         }
     }
     
     // Generate 2 heart rate-related prompts if heart rate data exists
     if (hasHeartRateData) {
-        heartRatePrompts.push("What do my heart rate trends indicate?")
-        heartRatePrompts.push("What's a healthy resting heart rate for me?")
+        heartRatePrompts.push(t('aiSupport.prompts.heartRate.0'))
+        heartRatePrompts.push(t('aiSupport.prompts.heartRate.1'))
     }
     
     // Combine prompts: 2 BMI + 2 Heart Rate
@@ -629,9 +630,9 @@ const usePrompt = async (prompt) => {
     if (isChatBusy.value) return
     
     // Determine if this is a heart rate prompt or BMI prompt
-    const heartRateKeywords = ['heart rate', 'cardiovascular', 'resting heart']
+    const heartRateKeywords = ['heart rate', 'cardiovascular', 'resting heart', '心率', '靜止心率', '心跳']
     const isHeartRatePrompt = heartRateKeywords.some(keyword => 
-        prompt.toLowerCase().includes(keyword)
+        prompt.toLowerCase().includes(keyword) || prompt.includes(keyword)
     )
     
     // Build health data context to append to the prompt
@@ -834,7 +835,7 @@ const upsertChatList = (id, { title, lastMessage, updatedAt } = {}, options = { 
 // Delete all conversations (with confirmation). This fetches all pages and deletes every chat found.
 const deleteAllChats = async (skipConfirm = false) => {
     if (!skipConfirm) {
-        if (!confirm($t('aiSupport.deleteAllConfirm'))) return
+        if (!confirm(t('aiSupport.deleteAllConfirm'))) return
     }
     confirmDeleteAll.value = false
     historyLoading.value = true
@@ -897,7 +898,7 @@ const loadChatIntoConversation = async (id) => {
     if (!id) return
     // Prevent loading another conversation while a response is in progress
     if (isChatBusy.value) {
-        try { alert('Please wait until the current response is finished before loading another conversation.') } catch(e) {}
+        try { alert(t('aiSupport.waitForResponse')) } catch(e) {}
         return
     }
     historyLoading.value = true
@@ -965,7 +966,7 @@ const deleteChat = async (id, skipConfirm = false) => {
     if (!id) return
     if (!skipConfirm) {
         // Should not reach here anymore since we use custom popup
-        const ok = confirm('Delete this conversation? This cannot be undone.')
+        const ok = confirm(t('aiSupport.deleteConversationConfirm'))
         if (!ok) return
     }
     confirmDeleteId.value = null // Close the confirmation popup
@@ -1109,10 +1110,12 @@ const cleanContent = (content) => {
     t = t.replace(/<\s*\/\s*x\s*>/gi, '')
     t = t.replace(/<\s*\/\s*x\s*ai\s*_?\s*call\s*>/gi, '')
     t = t.replace(/<\s*\/\s*xai\s*:\s*function\s*_?\s*call\s*>/gi, '')
-    // Remove ai:function call patterns
-    t = t.replace(/ai:\s*function\s*_?\s*call\s+[^>]*>/gi, '')
-    t = t.replace(/<\s*ai:\s*function\s*_?\s*call[^>]*>/gi, '')
-    t = t.replace(/<\s*xai:\s*function\s*_?\s*call[^>]*>/gi, '')
+    // Remove ai:function call patterns (handle spaces within the pattern)
+    t = t.replace(/ai\s*:\s*function\s*_?\s*call\s+[^>]*>/gi, '')
+    t = t.replace(/<\s*ai\s*:\s*function\s*_?\s*call[^>]*>/gi, '')
+    t = t.replace(/<\s*xai\s*:\s*function\s*_?\s*call[^>]*>/gi, '')
+    // Remove incomplete or malformed function call tags
+    t = t.replace(/ai\s*:\s*function\s+_?\s*call\s+name\s*=\s*[^>]*/gi, '')
     
     // Normalize non-breaking spaces to normal spaces
     t = t.replace(/\u00A0/g, ' ')
@@ -1560,7 +1563,7 @@ const sendMessage = async () => {
 
     } catch (error) {
         console.error('API error:', error)
-        errorMessage.value = error.message || 'Failed to send message. Please try again.'
+        errorMessage.value = error.message || t('aiSupport.sendFailed')
         // Do not insert a generic assistant error message into the chat; rely on `errorMessage` shown above the input.
     } finally {
         isTyping.value = false
@@ -1585,7 +1588,7 @@ const removeSelectedFile = () => {
 const startNewChat = async () => {
     // Prevent starting a new chat if a message/response is in progress
     if (isChatBusy.value) {
-        try { alert('Please wait until the current response is finished before starting a new chat.') } catch (e) {}
+        try { alert(t('aiSupport.waitForResponse')) } catch (e) {}
         return
     }
     // Start a fresh conversation immediately (no pop-up confirmation)

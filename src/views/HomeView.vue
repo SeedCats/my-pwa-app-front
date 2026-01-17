@@ -38,7 +38,7 @@
                 <div v-else>
                   <div class="text-center mb-8">
                     <div class="text-6xl font-bold mb-2" :class="themeClasses.textPrimary">{{ bmiData.bmi }}</div>
-                    <div class="inline-block text-white px-4 py-1 rounded-full text-sm font-semibold mb-4" :class="bmiCategoryStyle">{{ bmiData.category }}</div>
+                    <div class="inline-block text-white px-4 py-1 rounded-full text-sm font-semibold mb-4" :class="bmiCategoryStyle">{{ bmiCategoryKey ? $t(`home.bmi.categories.${bmiCategoryKey}`) : bmiData.category }}</div>
                   </div>
 
                   <!-- BMI Slider -->
@@ -60,20 +60,20 @@
                   <!-- BMI Categories -->
                   <div class="grid grid-cols-4 gap-2 mb-8 text-center text-xs">
                     <div class="flex flex-col items-center">
-                      <div class="w-4 h-4 rounded-full bg-blue-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-blue-400': bmiData.category === 'Underweight' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Underweight' }]">{{ $t('home.bmi.categories.underweight') }}</span>
+                      <div class="w-4 h-4 rounded-full bg-blue-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-blue-400': bmiCategoryKey === 'underweight' }"></div>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'underweight' }]">{{ $t('home.bmi.categories.underweight') }}</span>
                     </div>
                     <div class="flex flex-col items-center">
-                      <div class="w-4 h-4 rounded-full bg-green-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-green-400': bmiData.category === 'Normal' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Normal' }]">{{ $t('home.bmi.categories.normal') }}</span>
+                      <div class="w-4 h-4 rounded-full bg-green-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-green-400': bmiCategoryKey === 'normal' }"></div>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'normal' }]">{{ $t('home.bmi.categories.normal') }}</span>
                     </div>
                     <div class="flex flex-col items-center">
-                      <div class="w-4 h-4 rounded-full bg-yellow-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-yellow-400': bmiData.category === 'Overweight' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Overweight' }]">{{ $t('home.bmi.categories.overweight') }}</span>
+                      <div class="w-4 h-4 rounded-full bg-yellow-400 mb-2" :class="{ 'ring-2 ring-offset-2 ring-yellow-400': bmiCategoryKey === 'overweight' }"></div>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'overweight' }]">{{ $t('home.bmi.categories.overweight') }}</span>
                     </div>
                     <div class="flex flex-col items-center">
-                      <div class="w-4 h-4 rounded-full bg-orange-500 mb-2" :class="{ 'ring-2 ring-offset-2 ring-orange-500': bmiData.category === 'Obese' }"></div>
-                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiData.category === 'Obese' }]">{{ $t('home.bmi.categories.obese') }}</span>
+                      <div class="w-4 h-4 rounded-full bg-orange-500 mb-2" :class="{ 'ring-2 ring-offset-2 ring-orange-500': bmiCategoryKey === 'obese' }"></div>
+                      <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'obese' }]">{{ $t('home.bmi.categories.obese') }}</span>
                     </div>
                   </div>
 
@@ -108,7 +108,7 @@
 
               <div class="flex items-center justify-center mb-4">
                 <div class="text-center">
-                  <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">Heart Rate</h1>
+                  <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.heartRate.title') }}</h1>
                 </div>
               </div>
 
@@ -129,7 +129,7 @@
                       class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
                       :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']"
                     >
-                      <span>{{ currentDate || 'Select Date' }}</span>
+                      <span>{{ currentDate || $t('home.selectDate') }}</span> 
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                       </svg>
@@ -160,11 +160,11 @@
                       
                       <!-- Day Headers -->
                       <div class="grid grid-cols-7 gap-1 mb-2">
-                        <div v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day" 
+                        <div v-for="day in weekDayNames" :key="day" 
                              class="text-center text-xs font-medium py-1" :class="themeClasses.textSecondary">
                           {{ day }}
                         </div>
-                      </div>
+                      </div> 
                       
                       <!-- Calendar Days -->
                       <div class="grid grid-cols-7 gap-1">
@@ -196,12 +196,12 @@
                       <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs" :class="themeClasses.border">
                         <div class="flex items-center gap-1">
                           <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                          <span :class="themeClasses.textSecondary">Has data</span>
+                          <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.hasData') }}</span>
                         </div>
                         <div class="flex items-center gap-1">
                           <span class="w-4 h-4 rounded ring-2 ring-blue-400"></span>
-                          <span :class="themeClasses.textSecondary">Today</span>
-                        </div>
+                          <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.today') }}</span>
+                        </div> 
                       </div>
                     </div>
                   </div>
@@ -217,16 +217,16 @@
                 <!-- Main Heart Rate Stats -->
                 <div class="text-center mb-6">
                   <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
-                  <div class="text-lg mb-4" :class="themeClasses.textSecondary">Average bpm</div>
+                  <div class="text-lg mb-4" :class="themeClasses.textSecondary">{{ $t('home.heartRate.averageBpm') }}</div> 
                 </div>
               </template>
 
               <div v-else class="text-center py-8">
-                <p :class="themeClasses.textSecondary" class="mb-4">No heart rate data available</p>
+                <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.heartRate.noData') }}</p>
                 <router-link to="/data-setting" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  Add Heart Rate Data
+                  {{ $t('home.heartRate.addData') }}
                 </router-link>
-              </div>
+              </div> 
             </div>
 
             <!-- Heart Rate Chart -->
@@ -236,8 +236,8 @@
                   <Line v-if="chartData" :data="chartData" :options="chartOptions" />
                   <div v-else class="h-full flex items-center justify-center"
                     :class="isDarkMode ? 'bg-gray-800' : 'bg-gray-50'">
-                    <span :class="themeClasses.textSecondary">Loading data or no data...</span>
-                  </div>
+                    <span :class="themeClasses.textSecondary">{{ isHeartRateLoading ? $t('home.heartRate.loading') : $t('home.heartRate.noData') }}</span>
+                  </div> 
                 </div>
               </div>
             </div>
@@ -376,6 +376,7 @@ import { useTheme } from '../composables/useTheme'
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'vue-chartjs'
+import { useI18n } from 'vue-i18n' 
 import { getLatestBMIRecord } from '../services/bmiService'
 import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
 import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedHeartRateDates } from '../stores/userStore'
@@ -383,6 +384,7 @@ import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedH
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler)
 
 const { isDarkMode, themeClasses } = useTheme()
+const { t, locale } = useI18n()
 
 // State
 const sidebarHidden = ref(false)
@@ -433,9 +435,18 @@ const loadBMIData = async () => {
   }
 }
 
+const bmiCategoryKey = computed(() => {
+  const raw = (bmiData.value.category || '').toString().toLowerCase()
+  if (raw.includes('under') || raw.includes('過輕')) return 'underweight'
+  if (raw.includes('normal') || raw.includes('正常')) return 'normal'
+  if (raw.includes('over') || raw.includes('過重')) return 'overweight'
+  if (raw.includes('obese') || raw.includes('肥胖')) return 'obese'
+  return ''
+})
+
 const bmiCategoryStyle = computed(() => {
-  const styles = { Underweight: 'bg-blue-500', Normal: 'bg-green-500', Overweight: 'bg-yellow-500', Obese: 'bg-orange-500' }
-  return styles[bmiData.value.category] || 'bg-gray-500'
+  const styles = { underweight: 'bg-blue-500', normal: 'bg-green-500', overweight: 'bg-yellow-500', obese: 'bg-orange-500' }
+  return styles[bmiCategoryKey.value] || 'bg-gray-500'
 })
 
 const bmiSliderPosition = computed(() => {
@@ -445,14 +456,14 @@ const bmiSliderPosition = computed(() => {
 })
 
 const bmiRangeDisplay = computed(() => {
-  const category = bmiData.value.category
+  const key = bmiCategoryKey.value
   const ranges = {
-    'Underweight': '< 18.5',
-    'Normal': '18.5 - 24.9',
-    'Overweight': '25.0 - 29.9',
-    'Obese': '≥ 30.0'
+    'underweight': '< 18.5',
+    'normal': '18.5 - 24.9',
+    'overweight': '25.0 - 29.9',
+    'obese': '≥ 30.0'
   }
-  return ranges[category] || '18.5 - 24.9'
+  return ranges[key] || '18.5 - 24.9'
 })
 
 const updateSidebarState = (state) => sidebarHidden.value = state
@@ -461,14 +472,28 @@ const updateSidebarState = (state) => sidebarHidden.value = state
 const formatDateForDisplay = (dateString) => {
   const date = new Date(dateString)
   const options = { year: 'numeric', month: 'long', day: 'numeric' }
-  return date.toLocaleDateString('en-US', options)
-}
+  const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
+  return date.toLocaleDateString(loc, options)
+} 
 
 // Calendar computed properties
 const calendarMonthYear = computed(() => {
   const date = new Date(calendarYear.value, calendarMonth.value, 1)
-  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
+  return date.toLocaleDateString(loc, { month: 'long', year: 'numeric' })
 })
+
+// Localized weekday short names for calendar header
+const weekDayNames = computed(() => {
+  const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
+  const dtf = new Intl.DateTimeFormat(loc, { weekday: 'short' })
+  const base = []
+  // Jan 3 2021 is a Sunday - iterate Sun..Sat
+  for (let d = 0; d < 7; d++) {
+    base.push(dtf.format(new Date(Date.UTC(2021, 0, 3 + d))))
+  }
+  return base
+}) 
 
 const calendarDays = computed(() => {
   const days = []
@@ -670,7 +695,7 @@ const updateChartFromAggregated = (hourlyData) => {
   chartData.value = {
     labels: Array.from({ length: 24 }, (_, h) => `${h.toString().padStart(2, '0')}:00`),
     datasets: [{
-      label: 'Heart Rate (bpm)',
+      label: t('home.heartRate.heartRateBpm'),
       data: hourlyData.map(h => h.avg),  // Use pre-calculated averages
       borderColor: '#ef4444',
       backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -710,8 +735,8 @@ const chartOptions = computed(() => ({
       titleFont: { size: 14 },
       bodyFont: { size: 14 },
       callbacks: {
-        label: (ctx) => ctx.parsed.y ? `${ctx.parsed.y} bpm` : 'No data'
-      }
+        label: (ctx) => ctx.parsed.y ? `${ctx.parsed.y} ${t('home.heartRate.bpm')}` : t('home.heartRate.noData')
+      } 
     }
   },
   scales: {
@@ -731,6 +756,13 @@ const chartOptions = computed(() => ({
 
 watch(isDarkMode, () => {
   // Re-render chart when theme changes
+  if (heartRateData.value && heartRateData.value.length > 0) {
+    updateChartFromAggregated(heartRateData.value)
+  }
+})
+
+watch(locale, () => {
+  // Re-render chart when language changes so labels/units update
   if (heartRateData.value && heartRateData.value.length > 0) {
     updateChartFromAggregated(heartRateData.value)
   }

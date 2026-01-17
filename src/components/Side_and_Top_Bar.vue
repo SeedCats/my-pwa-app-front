@@ -31,8 +31,7 @@
                             <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4"
                                 :class="themeClasses.cardBackground">
                                 <div class="flex h-16 shrink-0 items-center">
-                                    <h1 class="text-xl font-bold" :class="themeClasses.textPrimary">Health Monitoring
-                                        System</h1>
+                                    <h1 class="text-xl font-bold" :class="themeClasses.textPrimary">{{ $t('nav.title') }}</h1>
                                 </div>
                                 <nav class="flex flex-1 flex-col">
                                     <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -87,7 +86,7 @@
             <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r px-6 pb-4"
                 :class="[themeClasses.cardBackground, themeClasses.border]">
                 <div class="flex h-16 shrink-0 items-center">
-                    <h1 class="text-xl font-bold mt-8 mb-2" :class="themeClasses.textPrimary">Health Monitoring System
+                    <h1 class="text-xl font-bold mt-8 mb-2" :class="themeClasses.textPrimary">{{ $t('nav.title') }}
                     </h1>
                 </div>
                 <nav class="flex flex-1 flex-col">
