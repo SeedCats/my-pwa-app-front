@@ -39,7 +39,8 @@
     "formatSettings": "系統設定",
     "userSettings": "使用者設定",
     "aiSupport": "AI 支援",
-    "manualSupport": "人工支援"
+    "manualSupport": "人工支援",
+    "bookingSystem": "預約系統"
   },
   "home": {
     "title": "首頁",
@@ -85,7 +86,32 @@
       "averageBpm": "平均 次/分",
       "heartRateBpm": "心率 (次/分)"
     },
-    "selectDate": "選擇日期"
+    "selectDate": "選擇日期",
+    "overallAnalysis": {
+      "title": "整體健康分析",
+      "noData": "資料不足，請新增 BMI 與心率紀錄以進行分析。",
+      "adviceTitle": "建議事項",
+      "statuses": {
+        "excellent": "優良",
+        "good": "良好",
+        "fair": "一般",
+        "poor": "請注意"
+      },
+      "summary": {
+        "excellent": "依目前 BMI 與心率判斷，整體狀態良好。",
+        "good": "整體狀態不錯，請繼續維持健康習慣。",
+        "fair": "整體狀態普通，建議稍作生活習慣調整。",
+        "poor": "指標顯示需注意，建議諮詢醫療專業人員。"
+      },
+      "advice": {
+        "underweight": "增加營養密度高的熱量攝取並諮詢營養師。",
+        "maintain": "維持現有習慣：均衡飲食與規律運動。",
+        "overweight": "考慮體重管理策略：飲食、運動與專業指導。",
+        "obese": "請尋求醫療專業以擬定安全的減重計畫並進行監測。",
+        "highHr": "減少壓力與刺激性物質，若心率持續偏高請就醫。",
+        "lowHr": "若低心率伴隨症狀，請儘速就醫。"
+      }
+    }
   },
   "dataSettings": {
     "title": "資料設定",

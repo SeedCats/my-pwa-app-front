@@ -59,7 +59,13 @@ const router = createRouter({
       name: 'ManualSupport',
       component: ManualSupportView,
       meta: { requiresAuth: true }
-    }
+    },
+    {
+      path: '/booking-system',
+      name: 'BookingSystem',
+      component: () => import('../views/BookingSystemView.vue'),
+      meta: { requiresAuth: true }
+    },
   ]
 })
 

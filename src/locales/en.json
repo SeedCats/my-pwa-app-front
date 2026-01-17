@@ -36,7 +36,8 @@
     "formatSettings": "Format Settings",
     "userSettings": "User Settings",
     "aiSupport": "AI Support",
-    "manualSupport": "Manual Support"
+    "manualSupport": "Manual Support",
+    "bookingSystem": "Booking System"
   },
   "home": {
     "title": "Home",
@@ -82,7 +83,32 @@
       "averageBpm": "Average bpm",
       "heartRateBpm": "Heart Rate (bpm)"
     },
-    "selectDate": "Select Date" 
+    "selectDate": "Select Date",
+    "overallAnalysis": {
+      "title": "Overall Analysis",
+      "noData": "Not enough data to analyze. Add BMI and heart rate records.",
+      "adviceTitle": "Suggested Actions",
+      "statuses": {
+        "excellent": "Excellent",
+        "good": "Good",
+        "fair": "Fair",
+        "poor": "Poor"
+      },
+      "summary": {
+        "excellent": "Excellent overall health based on current BMI and heart rate.",
+        "good": "Good overall health. Keep maintaining healthy habits.",
+        "fair": "Fair health. Consider small improvements to lifestyle.",
+        "poor": "Indicators suggest potential concerns. Consider consulting a healthcare professional."
+      },
+      "advice": {
+        "underweight": "Increase caloric intake with nutrient-dense foods and consult a nutritionist.",
+        "maintain": "Maintain current habits: balanced diet and regular exercise.",
+        "overweight": "Consider weight management strategies: diet, regular exercise, and professional guidance.",
+        "obese": "Seek a healthcare provider for a structured weight loss plan and monitoring.",
+        "highHr": "Reduce stress and stimulants; consult a doctor if high heart rate persists.",
+        "lowHr": "If you experience symptoms with low heart rate, seek medical advice."
+      }
+    } 
   },
   "dataSettings": {
     "title": "Data Setting",

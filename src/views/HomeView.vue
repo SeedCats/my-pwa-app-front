@@ -7,6 +7,31 @@
     ]">
       <main class="px-3 sm:px-4 md:px-6 lg:px-6 pb-4">
 
+            <!-- Overall Analysis Section -->
+            <div v-if="showOverallAnalysis" class="mb-6 pt-4">
+              <div class="rounded-lg shadow-sm p-4 border flex items-center justify-between" :class="[themeClasses.cardBackground, themeClasses.border]">
+                <div>
+                  <h2 class="text-2xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.overallAnalysis.title') }}</h2>
+                  <p class="text-sm mt-1" :class="themeClasses.textSecondary">{{ overallAnalysis.summary }}</p>
+                  <div class="mt-2 flex items-center gap-3">
+                    <div class="text-4xl font-bold" :class="themeClasses.textPrimary">{{ overallAnalysis.score }}</div>
+                    <div class="inline-block text-white px-3 py-1 rounded-full text-sm font-semibold" :class="overallAnalysis.badgeClass">{{ $t(`home.overallAnalysis.statuses.${overallAnalysis.statusKey}`) }}</div>
+                  </div>
+                  <div class="mt-3 text-sm" :class="themeClasses.textSecondary">
+                    <h4 class="font-semibold">{{ $t('home.overallAnalysis.adviceTitle') }}</h4>
+                    <ul class="list-disc list-inside mt-1">
+                      <li v-for="(a, i) in overallAnalysis.advice" :key="i">{{ a }}</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="w-48">
+                  <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                    <div :style="{ width: overallAnalysis.score + '%' }" class="h-full rounded-full" :class="overallAnalysis.progressClass"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- BMI Information Section -->
             <div class="mb-8 pt-4">
               <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
@@ -464,6 +489,57 @@ const bmiRangeDisplay = computed(() => {
     'obese': '≥ 30.0'
   }
   return ranges[key] || '18.5 - 24.9'
+})
+
+// Show Overall Analysis only when both BMI and heart rate data are available
+const showOverallAnalysis = computed(() => {
+  return !isBMILoading.value && !isHeartRateLoading.value && bmiData.value && bmiData.value.bmi && hasHeartRateData.value && stats.value && stats.value.avg
+})
+
+// Simple heuristic to compute an overall health score (0-100) using BMI and heart rate
+const overallAnalysis = computed(() => {
+  const bmi = parseFloat(bmiData.value?.bmi)
+  const hr = parseFloat(stats.value?.avg)
+  if (!bmi || !hr) {
+    return { score: '--', statusKey: 'noData', summary: t('home.overallAnalysis.noData'), advice: [], badgeClass: 'bg-gray-400', progressClass: 'bg-gray-400' }
+  }
+
+  // BMI penalty: normal range 18.5 - 24, deviation penalized up to 40 points
+  let bmiDeviation = 0
+  if (bmi < 18.5) bmiDeviation = 18.5 - bmi
+  else if (bmi > 24) bmiDeviation = bmi - 24
+  const bmiPenalty = Math.min(40, Math.round((bmiDeviation / 10) * 40))
+
+  // Heart rate penalty: target 60 - 90 bpm, deviation penalized up to 40 points
+  let hrDeviation = 0
+  if (hr < 60) hrDeviation = 60 - hr
+  else if (hr > 90) hrDeviation = hr - 90
+  const hrPenalty = Math.min(40, Math.round((hrDeviation / 30) * 40))
+
+  let score = Math.max(0, Math.min(100, 100 - bmiPenalty - hrPenalty))
+
+  // Status mapping
+  let statusKey = 'excellent'
+  if (score >= 85) statusKey = 'excellent'
+  else if (score >= 70) statusKey = 'good'
+  else if (score >= 50) statusKey = 'fair'
+  else statusKey = 'poor'
+
+  const badgeMap = { excellent: 'bg-green-500', good: 'bg-teal-500', fair: 'bg-yellow-500', poor: 'bg-orange-500' }
+  const progressMap = { excellent: 'bg-green-500', good: 'bg-teal-500', fair: 'bg-yellow-500', poor: 'bg-orange-500' }
+
+  // Advice generation
+  const advice = []
+  if (bmi < 18.5) advice.push(t('home.overallAnalysis.advice.underweight'))
+  else if (bmi >= 25) {
+    if (bmi >= 30) advice.push(t('home.overallAnalysis.advice.obese'))
+    else advice.push(t('home.overallAnalysis.advice.overweight'))
+  } else advice.push(t('home.overallAnalysis.advice.maintain'))
+
+  if (hr > 90) advice.push(t('home.overallAnalysis.advice.highHr'))
+  else if (hr < 50) advice.push(t('home.overallAnalysis.advice.lowHr'))
+
+  return { score, statusKey, summary: t(`home.overallAnalysis.summary.${statusKey}`), advice, badgeClass: badgeMap[statusKey], progressClass: progressMap[statusKey] }
 })
 
 const updateSidebarState = (state) => sidebarHidden.value = state
