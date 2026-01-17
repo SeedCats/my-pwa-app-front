@@ -171,8 +171,8 @@
     "uploadFailedTry": "Upload failed. Please try again.",
     "uploading": "Uploading...",
 
-    "uploadStressOnly": "Upload as stress-only (use /stress/upload)",
-    "uploadHeartOnly": "Upload as heart-rate-only (use /heartrate/upload)",
+    "uploadStressOnly": "Upload stress only",
+    "uploadHeartOnly": "Upload heart rate only",
     "uploadedSuccessfullySummary": "Uploaded and processed",
     "recordsParsed": "records parsed",
     "heartRateDays": "Heart rate",

@@ -176,8 +176,8 @@
     "uploadFailedTry": "上傳失敗，請再試一次。",
     "uploading": "上傳中...",
 
-    "uploadStressOnly": "僅上傳壓力資料（使用 /stress/upload）",
-    "uploadHeartOnly": "僅上傳心率資料（使用 /heartrate/upload）",
+    "uploadStressOnly": "僅上傳壓力資料",
+    "uploadHeartOnly": "僅上傳心率資料",
     "uploadedSuccessfullySummary": "上傳並處理完成",
     "recordsParsed": "筆資料被解析",
     "heartRateDays": "心率",

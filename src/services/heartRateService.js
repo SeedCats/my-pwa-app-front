@@ -26,6 +26,19 @@ export const uploadHeartRateCSV = async (file) => {
     return handleResponse(response)
 }
 
+// Upload both heart rate and stress CSV file (server route: /uploadAll)
+export const uploadAllCSV = async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await fetchWithAuth(`${API_URL}/api/data/uploadAll`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+    })
+    return handleResponse(response)
+} 
+
 // Get heart rate records with optional filters
 export const getHeartRateRecords = async (params = {}) => {
     const queryParams = new URLSearchParams()

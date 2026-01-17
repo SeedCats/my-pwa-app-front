@@ -281,7 +281,7 @@ import { useTheme } from '../composables/useTheme'
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { saveBMIData, getLatestBMIRecord, updateBMIRecord, deleteAllBMIRecords } from '../services/bmiService' 
-import { uploadHeartRateCSV, deleteAllHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
+import { uploadHeartRateCSV, uploadAllCSV, deleteAllHeartRateRecords, getHeartRateDates } from '../services/heartRateService' 
 import { uploadStressCSV, deleteAllStressRecords, getStressDates } from '../services/stressService' 
 import { invalidateBmiCache, invalidateHeartRateCache, invalidateStressCache } from '../stores/userStore' 
 
@@ -621,8 +621,14 @@ const submitFileUpload = async () => {
     uploadStatus.value = null
 
     try {
-        const uploader = isStressOnlyUpload.value ? uploadStressCSV : uploadHeartRateCSV
-        const response = await uploader(selectedFile.value)
+        let response
+        if (isHeartOnlyUpload.value) {
+            response = await uploadHeartRateCSV(selectedFile.value)
+        } else if (isStressOnlyUpload.value) {
+            response = await uploadStressCSV(selectedFile.value)
+        } else {
+            response = await uploadAllCSV(selectedFile.value)
+        }
 
         if (response.success) {
             // Handle new backend response shape
