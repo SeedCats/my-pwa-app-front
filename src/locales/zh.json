@@ -1,36 +1,20 @@
 {
   "common": {
-    "welcome": "歡迎",
     "loading": "載入中...",
-    "error": "錯誤",
-    "success": "成功",
     "cancel": "取消",
-    "confirm": "確認",
-    "save": "儲存",
     "delete": "刪除",
-    "edit": "編輯",
-    "add": "新增",
-    "search": "搜尋",
-    "close": "關閉",
-    "update": "更新",
-    "submit": "提交"
+    "close": "關閉"
   },
   "auth": {
     "welcomeBack": "歡迎回來",
     "signIn": "登入賬戶",
-    "signUp": "注冊賬戶",
     "email": "電子郵件",
     "password": "密碼",
-    "confirmPassword": "密碼確認",
     "rememberMe": "記住我",
     "rememberMeInfo": "保持登入 7 天",
     "login": "登入",
     "register": "註冊",
-    "logout": "登出",
-    "alreadyHaveAccount": "已有帳戶？",
-    "dontHaveAccount": "還沒有帳戶？",
-    "registerNow": "立即註冊",
-    "loginNow": "立即登入"
+    "logout": "登出"
   },
   "nav": {
     "title": "健康監控系統",
@@ -69,7 +53,6 @@
       "value": "BMI 值",
       "category": "類別",
       "bmiRange": "BMI 範圍 (kg/m²)",
-      "deleteBMI": "刪除所有 BMI 紀錄",
       "categories": {
         "underweight": "過輕",
         "normal": "正常",
@@ -91,6 +74,7 @@
     },
     "stress": {
       "title": "壓力指數",
+      "name": "平均壓力指數",
       "loading": "載入壓力資料中...",
       "noData": "暫無壓力資料",
       "average": "平均",
@@ -100,7 +84,6 @@
     "pressure": {
       "title": "壓力",
       "name": "平均壓力",
-      "emotionTitle": "壓力表情",
       "relaxed": "放松",
       "light": "輕度",
       "moderate": "中度",
@@ -161,7 +144,7 @@
     "recordDate": "紀錄日期",
     "addHeartRate": "新增心率",
     "updateHeartRate": "更新心率",
-    "uploadCSV": "上傳健康資料的 CSV 檔案（心率與壓力）",
+    "uploadCSV": "上傳健康資料的 CSV 檔案",
     "uploadCSVShort": "上傳 CSV 檔案",
     "chooseFile": "選擇 CSV 檔案",
     "clickToUpload": "點擊上傳或拖放",

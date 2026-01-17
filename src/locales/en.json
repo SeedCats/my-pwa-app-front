@@ -1,34 +1,17 @@
 {
   "common": {
-    "welcome": "Welcome",
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "add": "Add",
-    "search": "Search",
-    "close": "Close"
+    "loading": "Loading..."
   },
   "auth": {
     "welcomeBack": "Welcome Back",
     "signIn": "Sign in to your account",
-    "signUp": "Create your account",
     "email": "Email address",
     "password": "Password",
-    "confirmPassword": "Confirm Password",
     "rememberMe": "Remember me",
     "rememberMeInfo": "Stay account for 7 days",
     "login": "Sign in",
     "register": "Sign up",
-    "logout": "Logout",
-    "alreadyHaveAccount": "Already have an account?",
-    "dontHaveAccount": "Don't have an account?",
-    "registerNow": "Register now",
-    "loginNow": "Sign in"
+    "logout": "Logout"
   },
   "nav": {
     "title": "Health Monitoring System",
@@ -87,6 +70,7 @@
     },
     "stress": {
       "title": "Stress",
+      "name": "Average Stress",
       "loading": "Loading stress data...",
       "noData": "No stress data available",
       "average": "Average",
@@ -96,7 +80,6 @@
     "pressure": {
       "title": "Pressure",
       "name": "Average Pressure",
-      "emotionTitle": "Pressure Emotions",
       "relaxed": "Relaxed",
       "light": "Light",
       "moderate": "Moderate",
@@ -146,10 +129,6 @@
     "enterHeight": "Enter your height in cm",
     "weight": "Weight (kg)",
     "enterWeight": "Enter your weight in kg",
-    "gender": "Gender",
-    "male": "Male",
-    "female": "Female",
-    "calculateBMI": "Calculate BMI",
     "updateBMI": "Update BMI",
     "heartRateInfo": "Heart Rate Information",
     "heartRate": "Heart Rate (BPM)",
@@ -157,7 +136,7 @@
     "recordDate": "Record Date",
     "addHeartRate": "Add Heart Rate",
     "updateHeartRate": "Update Heart Rate",
-    "uploadCSV": "Upload CSV File for Health Data (Heart Rate & Stress)",
+    "uploadCSV": "Upload CSV File for Health Data",
     "uploadCSVShort": "Upload CSV File",
     "chooseFile": "Choose CSV file",
     "clickToUpload": "Click to upload or drag and drop",
@@ -227,10 +206,6 @@
     "darkModeDesc": "Easy on the eyes in low-light conditions",
     "autoTheme": "Auto Theme",
     "autoThemeDesc": "Automatically switch theme based on system preference",
-    "language": "Language",
-    "units": "Units",
-    "dateFormat": "Date Format",
-    "timeFormat": "Time Format",
     "lightMode": "Light Mode",
     "darkMode": "Dark Mode"
   },
@@ -254,14 +229,11 @@
     "confirmNewPassword": "Confirm New Password",
     "confirmPasswordPlaceholder": "Confirm your new password",
     "updatePassword": "Update Password",
-    "deleteAccount": "Delete Account",
-    "deleteAccountDesc": "Once your account is deleted, all of its resources and data will be permanently deleted.",
-    "deleteAccountButton": "Delete Account"
+    "deleteAccount": "Delete Account"
   },
   "aiSupport": {
     "title": "AI Support Chat",
     "subtitle": "Chat with AI for assistance and support",
-    "askQuestion": "Ask a question",
     "send": "Send",
     "thinking": "AI is thinking...",
     "noMessages": "No messages yet. Start a conversation!",
@@ -294,7 +266,6 @@
     "maxTokensDesc": "Limit tokens used by model for each request (advisory).",
     "topP": "Top-p",
     "topPDesc": "Alternative sampling parameter (complements temperature).",
-    "deleteConversationConfirm": "Delete this conversation? This cannot be undone.",
     "sendFailed": "Failed to send message. Please try again.",
     "prompts": {
       "bmi": {

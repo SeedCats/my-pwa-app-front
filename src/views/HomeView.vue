@@ -74,7 +74,7 @@
                 <div class="text-6xl font-bold mb-2" :class="themeClasses.textPrimary">{{ bmiData.bmi }}</div>
                 <div class="inline-block text-white px-4 py-1 rounded-full text-sm font-semibold mb-4"
                   :class="bmiCategoryStyle">{{ bmiCategoryKey ? $t(`home.bmi.categories.${bmiCategoryKey}`) :
-                  bmiData.category }}</div>
+                    bmiData.category }}</div>
               </div>
 
               <!-- BMI Slider -->
@@ -128,17 +128,17 @@
                   <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
                     <span :class="themeClasses.textSecondary">{{ $t('dataSettings.age') }}</span>
                     <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.age || '--'
-                      }}</span>
+                    }}</span>
                   </div>
                   <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
                     <span :class="themeClasses.textSecondary">{{ $t('dataSettings.height') }}</span>
                     <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.height || '--'
-                      }}</span>
+                    }}</span>
                   </div>
                   <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
                     <span :class="themeClasses.textSecondary">{{ $t('dataSettings.weight') }}</span>
                     <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.weight || '--'
-                      }}</span>
+                    }}</span>
                   </div>
                   <div class="flex justify-between items-center">
                     <span :class="themeClasses.textSecondary">{{ $t('home.bmi.bmiRange') }}</span>
@@ -329,126 +329,129 @@
           </div>
         </div>
 
-        <!-- Pressure Header / Date Picker -->
-        <div class="mb-6 sm:mt-4 md:mt-4">
-          <div class="flex items-center justify-center mb-4">
-            <div class="text-center">
-              <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.pressure.title') }}</h1>
-            </div>
-          </div>
-
-          <template v-if="hasPressureData">
-            <div class="flex justify-center gap-4 mb-4 items-center">
-              <button @click="previousPressureDate"
-                class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
-                :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-                <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-              </button>
-
-              <div class="relative">
-                <button @click="showPressureDatePicker = !showPressureDatePicker"
-                  class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
-                  :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']">
-                  <span>{{ currentPressureDate || $t('home.selectDate') }}</span>
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                </button>
-
-                <div v-if="showPressureDatePicker"
-                  class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-lg shadow-xl border p-4 min-w-[320px]"
-                  :class="[themeClasses.cardBackground, themeClasses.border]">
-                  <div class="flex items-center justify-between mb-4">
-                    <button @click="previousPressureMonth"
-                      class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
-                      <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                        </path>
-                      </svg>
-                    </button>
-                    <span class="font-semibold" :class="themeClasses.textPrimary">{{ pressureCalendarMonthYear ||
-                      $t('home.selectDate') }}</span>
-                    <button @click="nextPressureMonth"
-                      class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
-                      <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div class="grid grid-cols-7 gap-1 mb-2">
-                    <div v-for="day in weekDayNames" :key="day" class="text-center text-xs font-medium py-1"
-                      :class="themeClasses.textSecondary">
-                      {{ day }}
-                    </div>
-                  </div>
-
-                  <div class="grid grid-cols-7 gap-1">
-                    <button v-for="day in pressureCalendarDays" :key="day.date" @click="selectPressureDate(day)"
-                      :disabled="!day.currentMonth"
-                      class="relative p-2 text-sm rounded-lg transition-all duration-150 transform active:scale-90"
-                      :class="[
-                        day.currentMonth ? 'hover:scale-105' : 'opacity-30 cursor-not-allowed',
-                        day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
-                        day.isToday && !day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
-                        !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700 hover:shadow-md' : 'hover:bg-gray-100 hover:shadow-md') : '',
-                        day.isSelected ? '' : themeClasses.textPrimary
-                      ]">
-                      {{ day.dayNumber }}
-
-                      <!-- Data Available Indicator -->
-                      <span v-if="day.hasData && day.currentMonth"
-                        class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-transform duration-150"
-                        :class="(day.isSelected || day.isToday) ? 'bg-white scale-125' : 'bg-green-500'"></span>
-                    </button>
-                  </div>
-
-                  <!-- Legend -->
-                  <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs"
-                    :class="themeClasses.border">
-                    <div class="flex items-center gap-1">
-                      <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                      <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.hasData') }}</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                      <input type="checkbox" disabled class="h-4 w-4 rounded border-gray-300" />
-                      <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.today') }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <button @click="nextPressureDate"
-                class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
-                :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-                <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
-
-            <div class="text-center mb-6">
-              <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ pressureScore }}</div>
-              <div class="text-lg mb-4" :class="themeClasses.textSecondary">{{ $t('home.pressure.name') }}</div>
-            </div>
-          </template>
-
-          <div v-else class="text-center py-8">
-            <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.pressure.noData') }}</p>
-            <router-link to="/data-setting"
-              class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              {{ $t('home.pressure.loading') }}
-            </router-link>
+        <div class="flex items-center justify-center mb-4">
+          <div class="text-center">
+            <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.stress.title') }}</h1>
           </div>
         </div>
 
+        <!-- Date Picker with Available Dates Indicator for Stress -->
+        <template v-if="hasStressData">
+          <div class="flex justify-center gap-4 mb-4 items-center mt-3">
+            <button @click="previousStressDate"
+              class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+              :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
+              <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+
+            <!-- Custom Date Selector -->
+            <div class="relative">
+              <button @click="showStressDatePicker = !showStressDatePicker"
+                class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
+                :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']">
+                <span>{{ currentStressDate || $t('home.selectDate') }}</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </button>
+
+              <!-- Date Picker Dropdown -->
+              <div v-if="showStressDatePicker"
+                class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-lg shadow-xl border p-4 min-w-[320px]"
+                :class="[themeClasses.cardBackground, themeClasses.border]">
+                <!-- Month Navigation -->
+                <div class="flex items-center justify-between mb-4">
+                  <button @click="previousStressMonth"
+                    class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
+                    <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                      </path>
+                    </svg>
+                  </button>
+                  <span class="font-semibold" :class="themeClasses.textPrimary">
+                    {{ stressCalendarMonthYear || $t('home.selectDate') }}
+                  </span>
+                  <button @click="nextStressMonth"
+                    class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
+                    <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Day Headers -->
+                <div class="grid grid-cols-7 gap-1 mb-2">
+                  <div v-for="day in weekDayNames" :key="day" class="text-center text-xs font-medium py-1"
+                    :class="themeClasses.textSecondary">
+                    {{ day }}
+                  </div>
+                </div>
+
+                <!-- Calendar Days -->
+                <div class="grid grid-cols-7 gap-1">
+                  <button v-for="day in stressCalendarDays" :key="day.date" @click="selectStressDate(day)"
+                    :disabled="!day.currentMonth"
+                    class="relative p-2 text-sm rounded-lg transition-all duration-150 transform active:scale-90"
+                    :class="[
+                      day.currentMonth ? 'hover:scale-105' : 'opacity-30 cursor-not-allowed',
+                      day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
+                      day.isToday && !day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
+                      !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700 hover:shadow-md' : 'hover:bg-gray-100 hover:shadow-md') : '',
+                      day.isSelected ? '' : themeClasses.textPrimary
+                    ]">
+                    {{ day.dayNumber }}
+                    <!-- Data Available Indicator -->
+                    <span v-if="day.hasData && day.currentMonth"
+                      class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-transform duration-150"
+                      :class="(day.isSelected || day.isToday) ? 'bg-white scale-125' : 'bg-green-500'"></span>
+                  </button>
+                </div>
+
+                <!-- Legend -->
+                <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs"
+                  :class="themeClasses.border">
+                  <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.hasData') }}</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="w-4 h-4 rounded ring-2 ring-blue-400"></span>
+                    <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.today') }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button @click="nextStressDate"
+              class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+              :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
+              <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="text-center mb-6">
+            <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stressStats.avg }}</div>
+            <div class="text-lg mb-4" :class="themeClasses.textSecondary">{{ $t('home.stress.name') }}</div>
+          </div>
+        </template>
+
+        <div v-else class="text-center py-6">
+          <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.stress.noData') }}</p>
+          <router-link to="/data-setting"
+            class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            {{ $t('home.heartRate.addData') }}</router-link>
+        </div>
+
+        <!-- Stress Chart -->
         <div class="mb-8">
           <div class="rounded-lg shadow-sm pb-4 pl-4 pr-4 border"
             :class="[themeClasses.cardBackground, themeClasses.border]">
@@ -457,7 +460,8 @@
                 <div class="flex items-center gap-3">
                   <!-- Centered, slightly larger colored dot -->
                   <span class="w-4 h-4 rounded-full shadow-sm" style="background-color:#2563eb;"></span>
-                  <span class="text-sm font-semibold" :class="themeClasses.textPrimary">{{ $t('home.stress.stressScore') }}</span>
+                  <span class="text-sm font-semibold" :class="themeClasses.textPrimary">{{ $t('home.stress.stressScore')
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -610,15 +614,15 @@
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler } from 'chart.js'
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import { useI18n } from 'vue-i18n'
 import { getLatestBMIRecord } from '../services/bmiService'
-import { getHeartRateRecords, getHeartRateDates, getHeartRateStats } from '../services/heartRateService'
-import { getStressRecords, getStressDates, getStressStats } from '../services/stressService'
+import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
+import { getStressRecords, getStressDates } from '../services/stressService'
 import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedHeartRateDates, getCachedStressDates, setCachedStressDates } from '../stores/userStore'
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
 const { isDarkMode, themeClasses } = useTheme()
 const { t, locale } = useI18n()
@@ -631,13 +635,6 @@ const selectedDate = ref('')
 const currentDate = ref('')
 const availableDates = ref([])
 
-// Pressure-specific date selection
-const selectedPressureDate = ref('')
-const currentPressureDate = ref('')
-const showPressureDatePicker = ref(false)
-const pressureCalendarMonth = ref(new Date().getMonth())
-const pressureCalendarYear = ref(new Date().getFullYear())
-
 // Stress-specific date selection (new)
 const availableStressDates = ref([])
 const selectedStressDate = ref('')
@@ -647,8 +644,6 @@ const stressCalendarMonth = ref(new Date().getMonth())
 const stressCalendarYear = ref(new Date().getFullYear())
 
 const stats = ref({ min: 0, max: 0, avg: 0, resting: 0 })
-const overallHrStats = ref(null)
-const overallStressStats = ref(null)
 
 // Stress state (previously missing; avoids reading .avg of undefined in template)
 const stressData = ref([])
@@ -668,64 +663,6 @@ const hasPressureData = ref(false)
 const pressureData = ref([])
 const pressureChartData = ref(null)
 const pressureSummaryData = ref(null)
-
-const updatePressureSummaryChart = (values) => {
-  if (!values || values.length === 0) {
-    pressureSummaryData.value = null
-    return
-  }
-  const mapped = values.map(v => Math.round(((3 - v) / 3) * 100))
-  pressureSummaryData.value = {
-    labels: Array.from({ length: 24 }, (_, h) => `${h.toString().padStart(2, '0')}:00`),
-    datasets: [{
-      label: t('home.pressure.title'),
-      data: mapped,
-      borderColor: '#06b6d4',
-      backgroundColor: 'rgba(6,182,212,0.06)',
-      fill: false,
-      tension: 0.18,
-      pointRadius: 4,
-      pointBackgroundColor: '#06b6d4',
-      borderWidth: 2
-    }]
-  }
-}
-
-const pressureSummaryOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  interaction: { mode: 'index', intersect: false },
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      backgroundColor: isDarkMode.value ? '#1f2937' : '#fff',
-      titleColor: isDarkMode.value ? '#f3f4f6' : '#111827',
-      bodyColor: isDarkMode.value ? '#d1d5db' : '#374151',
-      borderColor: isDarkMode.value ? '#374151' : '#e5e7eb',
-      borderWidth: 1,
-      padding: 8,
-      callbacks: {
-        label: (ctx) => ctx.parsed.y !== undefined ? `${ctx.parsed.y} %` : ''
-      }
-    }
-  },
-  scales: {
-    y: {
-      position: 'right',
-      beginAtZero: true,
-      min: 0,
-      max: 100,
-      ticks: { color: isDarkMode.value ? '#9ca3af' : '#6b7280', font: { size: 12 }, stepSize: 25 },
-      grid: { color: isDarkMode.value ? '#374151' : '#e5e7eb', drawBorder: false, borderDash: [6, 6] }
-    },
-    x: {
-      ticks: { color: isDarkMode.value ? '#9ca3af' : '#6b7280', font: { size: 11 } },
-      grid: { display: false, drawBorder: false }
-    }
-  }
-}))
-
-
 
 const pressureMean = computed(() => {
   if (!pressureData.value || pressureData.value.length === 0) return null
@@ -747,13 +684,6 @@ const pressureCategoryKey = computed(() => {
 })
 
 const pressureCategoryLabel = computed(() => pressureCategoryKey.value ? t(`home.pressure.${pressureCategoryKey.value}`) : '')
-
-const pressureCategoryLabelFull = computed(() => {
-  if (!pressureCategoryKey.value) return ''
-  const label = t(`home.pressure.${pressureCategoryKey.value}`)
-  // In Chinese we prefer no space ("輕度壓力"), in other locales add a space
-  return locale.value === 'zh' ? `${label}${t('home.pressure.title')}` : `${label} ${t('home.pressure.title')}`
-})
 
 // Calendar state
 const showDatePicker = ref(false)
@@ -791,24 +721,7 @@ const loadBMIData = async () => {
   }
 }
 
-// Load overall statistics (uses backend aggregated stats endpoints)
-const loadOverallStats = async () => {
-  try {
-    const hrResp = await getHeartRateStats()
-    if (hrResp && hrResp.success && hrResp.data) overallHrStats.value = hrResp.data
-    else overallHrStats.value = null
-  } catch (e) {
-    overallHrStats.value = null
-  }
 
-  try {
-    const sResp = await getStressStats()
-    if (sResp && sResp.success && sResp.data) overallStressStats.value = sResp.data
-    else overallStressStats.value = null
-  } catch (e) {
-    overallStressStats.value = null
-  }
-}
 
 const bmiCategoryKey = computed(() => {
   const raw = (bmiData.value.category || '').toString().toLowerCase()
@@ -924,20 +837,6 @@ const calendarMonthYear = computed(() => {
   return date.toLocaleDateString(loc, { month: 'long', year: 'numeric' })
 })
 
-// Safe month/year label for pressure picker (avoid Invalid Date when values are unset)
-const pressureCalendarMonthYear = computed(() => {
-  const m = pressureCalendarMonth.value
-  const y = pressureCalendarYear.value
-  if (typeof m !== 'number' || typeof y !== 'number') return ''
-  const date = new Date(y, m, 1)
-  const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
-  try {
-    return date.toLocaleDateString(loc, { month: 'long', year: 'numeric' })
-  } catch (e) {
-    return ''
-  }
-})
-
 // Localized weekday short names for calendar header
 const weekDayNames = computed(() => {
   const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
@@ -1002,50 +901,64 @@ const calendarDays = computed(() => {
   return days
 })
 
-// Separate calendar days for pressure date picker (so the two pickers can be independent)
-const pressureCalendarDays = computed(() => {
+// Stress calendar month/year display
+const stressCalendarMonthYear = computed(() => {
+  const m = stressCalendarMonth.value
+  const y = stressCalendarYear.value
+  if (typeof m !== 'number' || typeof y !== 'number') return ''
+  const date = new Date(y, m, 1)
+  const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
+  try {
+    return date.toLocaleDateString(loc, { month: 'long', year: 'numeric' })
+  } catch (e) {
+    return ''
+  }
+})
+
+// Calendar days for stress picker (uses availableStressDates)
+const stressCalendarDays = computed(() => {
   const days = []
-  const firstDay = new Date(pressureCalendarYear.value, pressureCalendarMonth.value, 1)
-  const lastDay = new Date(pressureCalendarYear.value, pressureCalendarMonth.value + 1, 0)
+  const firstDay = new Date(stressCalendarYear.value, stressCalendarMonth.value, 1)
+  const lastDay = new Date(stressCalendarYear.value, stressCalendarMonth.value + 1, 0)
   const startDay = firstDay.getDay()
   const today = new Date().toISOString().split('T')[0]
 
-  const prevMonthLastDay = new Date(pressureCalendarYear.value, pressureCalendarMonth.value, 0).getDate()
+  const prevMonthLastDay = new Date(stressCalendarYear.value, stressCalendarMonth.value, 0).getDate()
   for (let i = startDay - 1; i >= 0; i--) {
     const dayNum = prevMonthLastDay - i
-    const date = new Date(pressureCalendarYear.value, pressureCalendarMonth.value - 1, dayNum).toISOString().split('T')[0]
+    const date = new Date(stressCalendarYear.value, stressCalendarMonth.value - 1, dayNum).toISOString().split('T')[0]
     days.push({
       dayNumber: dayNum,
       date: date,
       currentMonth: false,
       isToday: date === today,
-      isSelected: date === selectedPressureDate.value,
-      hasData: availableDates.value.includes(date)
+      isSelected: date === selectedStressDate.value,
+      hasData: availableStressDates.value.includes(date)
     })
   }
 
   for (let i = 1; i <= lastDay.getDate(); i++) {
-    const date = new Date(pressureCalendarYear.value, pressureCalendarMonth.value, i).toISOString().split('T')[0]
+    const date = new Date(stressCalendarYear.value, stressCalendarMonth.value, i).toISOString().split('T')[0]
     days.push({
       dayNumber: i,
       date: date,
       currentMonth: true,
       isToday: date === today,
-      isSelected: date === selectedPressureDate.value,
-      hasData: availableDates.value.includes(date)
+      isSelected: date === selectedStressDate.value,
+      hasData: availableStressDates.value.includes(date)
     })
   }
 
   const remaining = 42 - days.length
   for (let i = 1; i <= remaining; i++) {
-    const date = new Date(pressureCalendarYear.value, pressureCalendarMonth.value + 1, i).toISOString().split('T')[0]
+    const date = new Date(stressCalendarYear.value, stressCalendarMonth.value + 1, i).toISOString().split('T')[0]
     days.push({
       dayNumber: i,
       date: date,
       currentMonth: false,
       isToday: date === today,
-      isSelected: date === selectedPressureDate.value,
-      hasData: availableDates.value.includes(date)
+      isSelected: date === selectedStressDate.value,
+      hasData: availableStressDates.value.includes(date)
     })
   }
 
@@ -1091,13 +1004,9 @@ const loadAvailableDates = async () => {
       selectedDate.value = cached[0]
       currentDate.value = formatDateForDisplay(cached[0])
       // initialize pressure selected date to same default
-      selectedPressureDate.value = cached[0]
-      currentPressureDate.value = formatDateForDisplay(cached[0])
       const recentDate = new Date(cached[0])
       calendarMonth.value = recentDate.getMonth()
       calendarYear.value = recentDate.getFullYear()
-      pressureCalendarMonth.value = recentDate.getMonth()
-      pressureCalendarYear.value = recentDate.getFullYear()
       return true
     }
     selectedDate.value = new Date().toISOString().split('T')[0]
@@ -1115,15 +1024,10 @@ const loadAvailableDates = async () => {
       // Set the most recent date as default
       selectedDate.value = response.data.dates[0]
       currentDate.value = formatDateForDisplay(response.data.dates[0])
-      // set pressure selected date to same default
-      selectedPressureDate.value = response.data.dates[0]
-      currentPressureDate.value = formatDateForDisplay(response.data.dates[0])
       // Set calendar to the month of most recent data
       const recentDate = new Date(response.data.dates[0])
       calendarMonth.value = recentDate.getMonth()
       calendarYear.value = recentDate.getFullYear()
-      pressureCalendarMonth.value = recentDate.getMonth()
-      pressureCalendarYear.value = recentDate.getFullYear()
       return true
     }
     // No heart rate data - set today as default date for display
@@ -1313,22 +1217,34 @@ const generateMockPressure = (date) => {
   }, 60)
 }
 
-const loadPressureData = async (date) => {
-  if (!date) date = selectedPressureDate.value
-  isPressureLoading.value = true
-  try {
-    // Placeholder for real API call
-    // If you add a `pressureService`, call it here and use returned values
-    generateMockPressure(date)
-  } catch (err) {
-    console.error('Error loading pressure data:', err)
-    pressureData.value = []
+const updatePressureChartFromData = (values) => {
+  if (!values || values.length === 0) {
     pressureChartData.value = null
-    pressureSummaryData.value = null
-    hasPressureData.value = false
-    isPressureLoading.value = false
+    return
+  }
+  pressureChartData.value = {
+    labels: Array.from({ length: values.length }, (_, i) => `${i.toString().padStart(2, '0')}:00`),
+    datasets: [{
+      label: t('home.pressure.scoreLabel'),
+      data: values,
+      borderColor: '#059669',
+      backgroundColor: 'rgba(5,150,105,0.06)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 0
+    }]
   }
 }
+
+const updatePressureSummaryChart = (values) => {
+  if (!values || values.length === 0) {
+    pressureSummaryData.value = null
+    return
+  }
+  const mean = values.reduce((s, v) => s + v, 0) / values.length
+  pressureSummaryData.value = { mean, min: Math.min(...values), max: Math.max(...values) }
+}
+
 
 // Load stress data from backend for selected date (aggregated format)
 const loadStressData = async (date) => {
@@ -1406,93 +1322,6 @@ const forceReloadStressData = async () => {
     console.error('Error loading stress dates:', error)
   }
 }
-
-// Helper: draw emoji inside colored circle on canvas for pointStyle
-const createEmojiPoint = (emoji, bgColor, size = 40) => {
-  // safe-guard: only run in browser
-  if (typeof document === 'undefined') return null
-  const c = document.createElement('canvas')
-  c.width = size
-  c.height = size
-  const ctx = c.getContext('2d')
-  // Draw circle background
-  ctx.clearRect(0, 0, size, size)
-  ctx.fillStyle = bgColor
-  ctx.beginPath()
-  ctx.arc(size / 2, size / 2, size / 2 - 2, 0, Math.PI * 2)
-  ctx.fill()
-  // Draw emoji centered
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  // Choose font size relative to canvas
-  ctx.font = `${Math.floor(size * 0.5)}px sans-serif`
-  ctx.fillStyle = '#000'
-  ctx.fillText(emoji, size / 2, size / 2 + 1)
-  return c
-}
-
-const updatePressureChartFromData = (values) => {
-  const colorFor = (v) => v === 3 ? '#06b6d4' : v === 2 ? '#84cc16' : v === 1 ? '#f59e0b' : '#f97316'
-  const emojiFor = (v) => v === 3 ? '😄' : v === 2 ? '😐' : v === 1 ? '😕' : '😣'
-
-  const pointStyles = values.map(v => createEmojiPoint(emojiFor(v), colorFor(v), 44))
-
-  pressureChartData.value = {
-    labels: Array.from({ length: 24 }, (_, h) => `${h.toString().padStart(2, '0')}:00`),
-    datasets: [{
-      label: t('home.pressure.title'),
-      data: values,
-      borderColor: '#06b6d4',
-      borderWidth: 2.5,
-      backgroundColor: 'rgba(6,182,212,0.08)',
-      fill: false,
-      tension: 0.2,
-      // use custom point styles (canvas elements)
-      pointRadius: 0, // radius handled by pointStyle canvas size
-      pointStyle: pointStyles,
-      pointBorderColor: '#fff',
-      pointBorderWidth: 2,
-      pointHoverRadius: 24
-    }]
-  }
-}
-
-const pressureChartOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  layout: { padding: { top: 12, bottom: 12 } },
-  interaction: { mode: 'nearest', intersect: true },
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      backgroundColor: isDarkMode.value ? '#1f2937' : '#fff',
-      titleColor: isDarkMode.value ? '#f3f4f6' : '#111827',
-      bodyColor: isDarkMode.value ? '#d1d5db' : '#374151',
-      borderColor: isDarkMode.value ? '#374151' : '#e5e7eb',
-      borderWidth: 1,
-      padding: 10,
-      callbacks: {
-        label: (ctx) => {
-          const map = { 3: t('home.pressure.relaxed'), 2: t('home.pressure.light'), 1: t('home.pressure.moderate'), 0: t('home.pressure.severe') }
-          return ctx.parsed.y !== undefined ? map[Math.round(ctx.parsed.y)] || '' : ''
-        }
-      }
-    }
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      min: 0,
-      max: 3,
-      ticks: { display: false, stepSize: 1 },
-      grid: { color: isDarkMode.value ? '#374151' : '#e5e7eb', drawBorder: false, borderDash: [6, 6] }
-    },
-    x: {
-      ticks: { color: isDarkMode.value ? '#9ca3af' : '#6b7280' },
-      grid: { display: false, drawBorder: false }
-    }
-  }
-}))
 
 const chartOptions = computed(() => ({
   responsive: true,
@@ -1606,12 +1435,6 @@ watch(selectedDate, () => {
   }
 })
 
-watch(selectedPressureDate, () => {
-  if (selectedPressureDate.value) {
-    currentPressureDate.value = formatDateForDisplay(selectedPressureDate.value)
-    loadPressureData(selectedPressureDate.value)
-  }
-})
 
 watch(selectedStressDate, () => {
   if (selectedStressDate.value) {
@@ -1635,37 +1458,6 @@ const changeDate = (days) => {
 
 const previousDate = () => changeDate(-1)
 const nextDate = () => changeDate(1)
-
-// Pressure date helpers
-const changePressureDate = (days) => {
-  const date = new Date(selectedPressureDate.value)
-  date.setDate(date.getDate() + days)
-  selectedPressureDate.value = date.toISOString().split('T')[0]
-  currentPressureDate.value = formatDateForDisplay(selectedPressureDate.value)
-  pressureCalendarMonth.value = date.getMonth()
-  pressureCalendarYear.value = date.getFullYear()
-  loadPressureData()
-}
-const previousPressureDate = () => changePressureDate(-1)
-const nextPressureDate = () => changePressureDate(1)
-
-const previousPressureMonth = () => {
-  if (pressureCalendarMonth.value === 0) {
-    pressureCalendarMonth.value = 11
-    pressureCalendarYear.value--
-  } else {
-    pressureCalendarMonth.value--
-  }
-}
-
-const nextPressureMonth = () => {
-  if (pressureCalendarMonth.value === 11) {
-    pressureCalendarMonth.value = 0
-    pressureCalendarYear.value++
-  } else {
-    pressureCalendarMonth.value++
-  }
-}
 
 // Stress date helpers
 const changeStressDate = (days) => {
@@ -1698,16 +1490,6 @@ const nextStressMonth = () => {
   }
 }
 
-const selectPressureDate = (day) => {
-  if (!day.currentMonth) return
-  selectedPressureDate.value = day.date
-  currentPressureDate.value = formatDateForDisplay(day.date)
-  pressureCalendarMonth.value = new Date(day.date).getMonth()
-  pressureCalendarYear.value = new Date(day.date).getFullYear()
-  showPressureDatePicker.value = false
-  loadPressureData(day.date)
-}
-
 // Select stress date handler
 const selectStressDate = (day) => {
   if (!day.currentMonth) return
@@ -1719,12 +1501,10 @@ const selectStressDate = (day) => {
   loadStressData(day.date)
 }
 
-
 // Close date picker when clicking outside (handle both pickers)
 const closeDatePicker = (event) => {
-  if ((showDatePicker.value || showPressureDatePicker.value || showStressDatePicker.value) && !event.target.closest('.relative')) {
+  if ((showDatePicker.value || showStressDatePicker.value) && !event.target.closest('.relative')) {
     showDatePicker.value = false
-    showPressureDatePicker.value = false
     showStressDatePicker.value = false
   }
 }
@@ -1788,14 +1568,9 @@ onMounted(() => {
   forceReloadStressData()
   // Also load cached/available stress dates and set default stress date
   loadAvailableStressDates()
-  // Load overall stats
-  loadOverallStats()
   window.addEventListener('bmiDataUpdated', forceReloadBMIData)
   window.addEventListener('heartRateDataUpdated', forceReloadHeartRateData)
   window.addEventListener('stressDataUpdated', forceReloadStressData)
-  // Refresh overall stats when data is updated
-  window.addEventListener('heartRateDataUpdated', loadOverallStats)
-  window.addEventListener('stressDataUpdated', loadOverallStats)
   document.addEventListener('click', closeDatePicker)
 })
 
@@ -1803,8 +1578,6 @@ onUnmounted(() => {
   window.removeEventListener('bmiDataUpdated', forceReloadBMIData)
   window.removeEventListener('heartRateDataUpdated', forceReloadHeartRateData)
   window.removeEventListener('stressDataUpdated', forceReloadStressData)
-  window.removeEventListener('heartRateDataUpdated', loadOverallStats)
-  window.removeEventListener('stressDataUpdated', loadOverallStats)
   document.removeEventListener('click', closeDatePicker)
 })
 </script>
