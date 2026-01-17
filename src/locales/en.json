@@ -1,6 +1,8 @@
 {
   "common": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "delete": "Delete",
+    "close": "Close"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -11,7 +13,22 @@
     "rememberMeInfo": "Stay account for 7 days",
     "login": "Sign in",
     "register": "Sign up",
-    "logout": "Logout"
+    "logout": "Logout",
+    "createAccountTitle": "Create Account",
+    "createAccountSubtitle": "Join us and start your journey",
+    "namePlaceholder": "Name",
+    "emailPlaceholder": "Email address",
+    "passwordPlaceholder": "Password",
+    "confirmPasswordPlaceholder": "Confirm password",
+    "createAccountButton": "Create Account",
+    "creatingAccount": "Creating account...",
+    "alreadyHaveAccount": "Already have an account? Sign In",
+    "passwordMismatch": "Password does not match",
+    "invalidResponse": "Invalid response from server",
+    "registrationSuccess": "Account created successfully! Redirecting...",
+    "registrationFailed": "Registration failed. Please try again.",
+    "serverConnectionError": "Cannot connect to server. Please check your internet connection.",
+    "networkError": "Network error. Please check your connection and try again."
   },
   "nav": {
     "title": "Health Monitoring System",
@@ -242,7 +259,11 @@
     "confirmNewPassword": "Confirm New Password",
     "confirmPasswordPlaceholder": "Confirm your new password",
     "updatePassword": "Update Password",
-    "deleteAccount": "Delete Account"
+    "deleteAccount": "Delete Account",
+    "deleteAccountWarning": "Once your account is deleted, all of its resources and data will be permanently deleted.",
+    "deleteAccountDesc": "Please download any data or information you wish to retain before deleting your account.",
+    "enterPasswordToConfirmDeletion": "Enter your password to confirm deletion",
+    "confirmDelete": "Confirm Deletion"
   },
   "aiSupport": {
     "title": "AI Support Chat",

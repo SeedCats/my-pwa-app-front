@@ -164,7 +164,7 @@
               
               <div class="p-6">
                 <div class="max-w-full text-sm mb-4" :class="themeClasses.textSecondary">
-                  <p>{{ $t('userSettings.deleteAccountDownloadData') }}</p>
+                  <p>{{ $t('userSettings.deleteAccountDesc') }}</p>
                 </div>
                 
                 <!-- Password confirmation input (appears when delete is clicked) -->
@@ -252,7 +252,7 @@ const loadUserData = async () => {
     if (res.ok) {
       const data = await res.json()
       const user = data.data?.user || data.user || data.data || data
-      console.log('User data loaded:', user)
+      // populate profile form
       profileForm.value = { name: user.name || '', email: user.email || '' }
     }
   } catch (err) {

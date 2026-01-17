@@ -1,5 +1,6 @@
 // Grok AI Service - Backend API Proxy
 import { fetchWithAuth } from '../utils/fetchWithAuth'
+import { apiRequest } from './apiClient'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -189,107 +190,12 @@ const readFileContent = async (file) => {
 
 // Chat management API calls
 
-export const fetchAichatList = async (page = 1, limit = 20) => {
-    try {
-        const res = await fetchWithAuth(`${API_URL}/api/ai/chat?page=${page}&limit=${limit}`, { credentials: 'include' })
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ message: res.statusText }))
-            throw new Error(err.message || 'Failed to fetch chat list')
-        }
-        return await res.json()
-    } catch (error) {
-        console.error('Fetch AI chat list error:', error)
-        throw error
-    }
-}
-
-export const fetchAichatById = async (id) => {
-    try {
-        const res = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, { credentials: 'include' })
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ message: res.statusText }))
-            throw new Error(err.message || 'Failed to fetch chat')
-        }
-        return await res.json()
-    } catch (error) {
-        console.error('Fetch AI chat by id error:', error)
-        throw error
-    }
-}
-
-export const createAichat = async (title = 'New Conversation', messages = []) => {
-    try {
-        const res = await fetchWithAuth(`${API_URL}/api/ai/chat`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, messages })
-        })
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ message: res.statusText }))
-            throw new Error(err.message || 'Failed to create chat')
-        }
-        return await res.json()
-    } catch (error) {
-        console.error('Create AI chat error:', error)
-        throw error
-    }
-}
-
-export const appendMessagesToAichat = async (id, messages = []) => {
-    try {
-        const res = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ messages, append: true })
-        })
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ message: res.statusText }))
-            throw new Error(err.message || 'Failed to append messages')
-        }
-        return await res.json()
-    } catch (error) {
-        console.error('Append messages to AI chat error:', error)
-        throw error
-    }
-}
-
-export const deleteAichat = async (id) => {
-    try {
-        const res = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
-            method: 'DELETE',
-            credentials: 'include'
-        })
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ message: res.statusText }))
-            throw new Error(err.message || 'Failed to delete chat')
-        }
-        return await res.json()
-    } catch (error) {
-        console.error('Delete AI chat error:', error)
-        throw error
-    }
-}
-
-export const updateAichatTitle = async (id, title) => {
-    try {
-        const res = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title })
-        })
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ message: res.statusText }))
-            throw new Error(err.message || 'Failed to update chat')
-        }
-        return await res.json()
-    } catch (error) {
-        console.error('Update AI chat title error:', error)
-        throw error
-    }
-}
+export const fetchAichatList = async (page = 1, limit = 20) => apiRequest('/api/ai/chat', { query: { page, limit } })
+export const fetchAichatById = async (id) => apiRequest(`/api/ai/chat/${id}`)
+export const createAichat = async (title = 'New Conversation', messages = []) => apiRequest('/api/ai/chat', { method: 'POST', body: { title, messages } })
+export const appendMessagesToAichat = async (id, messages = []) => apiRequest(`/api/ai/chat/${id}`, { method: 'PUT', body: { messages, append: true } })
+export const deleteAichat = async (id) => apiRequest(`/api/ai/chat/${id}`, { method: 'DELETE' })
+export const updateAichatTitle = async (id, title) => apiRequest(`/api/ai/chat/${id}`, { method: 'PUT', body: { title } })
 
 export const updateAichatLastMessage = async (id, lastMessage = null) => {
     if (!id) return { success: false, message: 'Missing chat id' }

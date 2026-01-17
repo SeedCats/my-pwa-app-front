@@ -1,7 +1,6 @@
 {
   "common": {
     "loading": "載入中...",
-    "cancel": "取消",
     "delete": "刪除",
     "close": "關閉"
   },
@@ -14,7 +13,22 @@
     "rememberMeInfo": "保持登入 7 天",
     "login": "登入",
     "register": "註冊",
-    "logout": "登出"
+    "logout": "登出",
+    "createAccountTitle": "建立帳戶",
+    "createAccountSubtitle": "加入我們，開始您的旅程",
+    "namePlaceholder": "姓名",
+    "emailPlaceholder": "電子郵件",
+    "passwordPlaceholder": "密碼",
+    "confirmPasswordPlaceholder": "確認密碼",
+    "createAccountButton": "建立帳戶",
+    "creatingAccount": "建立中...",
+    "alreadyHaveAccount": "已有帳戶？登入",
+    "passwordMismatch": "密碼不一致",
+    "invalidResponse": "伺服器回應無效",
+    "registrationSuccess": "帳戶建立成功！正在跳轉...",
+    "registrationFailed": "註冊失敗。請再試一次。",
+    "serverConnectionError": "無法連接到伺服器。請檢查您的網路連線。",
+    "networkError": "網路錯誤。請檢查您的連線並重試。"
   },
   "nav": {
     "title": "健康監控系統",

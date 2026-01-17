@@ -15,11 +15,11 @@
           </div>
 
           <h2 class="text-xl sm:text-2xl lg:text-4xl font-bold tracking-tight text-gray-900 mb-1 sm:mb-2">
-            Create Account
-          </h2>
+            {{ $t('auth.createAccountTitle') }}
+          </h2> 
           <p class="text-sm sm:text-base lg:text-lg text-gray-600">
-            Join us and start your journey
-          </p>
+            {{ $t('auth.createAccountSubtitle') }}
+          </p> 
         </div>
 
         <!-- Register Card -->
@@ -52,7 +52,7 @@
                   <input id="name" name="name" type="text" autocomplete="name" required v-model="registerForm.name"
                     aria-label="name"
                     class="block w-full rounded-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
-                    placeholder="Name" />
+                    :placeholder="$t('auth.namePlaceholder')" />
                 </div>
               </div>
             </div>
@@ -74,7 +74,7 @@
                     <input id="email-address" name="email" type="email" autocomplete="email" required
                       v-model="registerForm.email" aria-label="Email address"
                       class="block w-full rounded-t-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 border-b border-gray-200 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
-                      placeholder="Email address" />
+                      :placeholder="$t('auth.emailPlaceholder')" />
                   </div>
                 </div>
                 <div class="-mt-px pt-2">
@@ -89,7 +89,7 @@
                     <input id="password" name="password" type="password" autocomplete="new-password" required
                       v-model="registerForm.password" aria-label="Password"
                       class="block w-full rounded-b-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 transition-colors duration-200 touch-manipulation"
-                      placeholder="Password" />
+                      :placeholder="$t('auth.passwordPlaceholder')" />
                   </div>
                 </div>
               </div>
@@ -111,7 +111,7 @@
                   <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password"
                     required v-model="registerForm.confirmPassword" aria-label="Confirm password"
                     class="block w-full rounded-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
-                    placeholder="Confirm password" />
+                    :placeholder="$t('auth.confirmPasswordPlaceholder')" />
                 </div>
               </div>
             </div>
@@ -131,7 +131,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
-                {{ loading ? 'Creating account...' : 'Create Account' }}
+                {{ loading ? $t('auth.creatingAccount') : $t('auth.createAccountButton') }} 
               </button>
 
               <button type="button" @click="handleLogin" :disabled="loading"
@@ -141,7 +141,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                 </svg>
-                Already have an account? Sign In
+                {{ $t('auth.alreadyHaveAccount') }}
               </button>
             </div>
           </form>
@@ -153,8 +153,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
+const { t } = useI18n()
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 // State
@@ -168,7 +170,7 @@ async function handleRegister() {
   success.value = ''
 
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
-    error.value = 'Password does not match'
+    error.value = t('auth.passwordMismatch')
     return
   }
 
@@ -188,21 +190,21 @@ async function handleRegister() {
 
     const data = await response.json().catch(() => null)
     if (!data) {
-      error.value = 'Invalid response from server'
+      error.value = t('auth.invalidResponse')
       return
     }
 
     if (response.ok && data.success) {
-      success.value = data.message || 'Account created successfully! Redirecting...'
+      success.value = data.message || t('auth.registrationSuccess')
       setTimeout(() => router.push('/home'), 1000)
     } else {
-      error.value = data.message || 'Registration failed. Please try again.'
+      error.value = data.message || t('auth.registrationFailed')
     }
   } catch (err) {
     console.error('Registration error:', err)
     error.value = err.name === 'TypeError' && err.message.includes('fetch')
-      ? 'Cannot connect to server. Please check your internet connection.'
-      : 'Network error. Please check your connection and try again.'
+      ? t('auth.serverConnectionError')
+      : t('auth.networkError')
   } finally {
     loading.value = false
   }

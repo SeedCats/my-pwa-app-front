@@ -1,104 +1,20 @@
 // Heart Rate Service - API calls for heart rate data management
-import { fetchWithAuth } from '../utils/fetchWithAuth'
+import { apiRequest, buildQuery } from './apiClient'
 
-const API_URL = import.meta.env.VITE_API_URL || ''
-const getHeaders = () => ({ 'Content-Type': 'application/json' })
-
-const handleResponse = async (response) => {
-    if (response.headers.get('content-type')?.includes('text/html')) {
-        throw new Error(`Server error: ${response.status}. Please check if the backend server is running.`)
-    }
-    const data = await response.json()
-    if (!response.ok) throw new Error(data.message || `HTTP error! status: ${response.status}`)
-    return data
-}
-
-// Upload heart rate CSV file
 export const uploadHeartRateCSV = async (file) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    
-    const response = await fetchWithAuth(`${API_URL}/api/data/heartrate/upload`, {
-        method: 'POST',
-        credentials: 'include',
-        body: formData  // No Content-Type header - browser sets it automatically
-    })
-    return handleResponse(response)
+  const form = new FormData()
+  form.append('file', file)
+  return apiRequest('/api/data/heartrate/upload', { method: 'POST', isForm: true, body: form })
 }
 
-// Upload both heart rate and stress CSV file (server route: /uploadAll)
 export const uploadAllCSV = async (file) => {
-    const formData = new FormData()
-    formData.append('file', file)
-
-    const response = await fetchWithAuth(`${API_URL}/api/data/uploadAll`, {
-        method: 'POST',
-        credentials: 'include',
-        body: formData
-    })
-    return handleResponse(response)
-} 
-
-// Get heart rate records with optional filters
-export const getHeartRateRecords = async (params = {}) => {
-    const queryParams = new URLSearchParams()
-    if (params.date) queryParams.append('date', params.date)
-    if (params.startDate) queryParams.append('startDate', params.startDate)
-    if (params.endDate) queryParams.append('endDate', params.endDate)
-    if (params.page) queryParams.append('page', params.page)
-    if (params.limit) queryParams.append('limit', params.limit)
-    
-    const url = `${API_URL}/api/data/heartrate${queryParams.toString() ? '?' + queryParams.toString() : ''}`
-    const response = await fetchWithAuth(url, { 
-        method: 'GET', 
-        headers: getHeaders(), 
-        credentials: 'include' 
-    })
-    return handleResponse(response)
+  const form = new FormData()
+  form.append('file', file)
+  return apiRequest('/api/data/uploadAll', { method: 'POST', isForm: true, body: form })
 }
 
-// Get available dates with heart rate data
-export const getHeartRateDates = async () => {
-    const response = await fetchWithAuth(`${API_URL}/api/data/heartrate/dates`, { 
-        method: 'GET', 
-        headers: getHeaders(), 
-        credentials: 'include' 
-    })
-    return handleResponse(response)
-}
-
-// Get heart rate statistics
-export const getHeartRateStats = async (params = {}) => {
-    const queryParams = new URLSearchParams()
-    if (params.date) queryParams.append('date', params.date)
-    if (params.startDate) queryParams.append('startDate', params.startDate)
-    if (params.endDate) queryParams.append('endDate', params.endDate)
-    
-    const url = `${API_URL}/api/data/heartrate/stats${queryParams.toString() ? '?' + queryParams.toString() : ''}`
-    const response = await fetchWithAuth(url, { 
-        method: 'GET', 
-        headers: getHeaders(), 
-        credentials: 'include' 
-    })
-    return handleResponse(response)
-}
-
-// Delete all heart rate data
-export const deleteAllHeartRateRecords = async () => {
-    const response = await fetchWithAuth(`${API_URL}/api/data/heartrate`, { 
-        method: 'DELETE', 
-        headers: getHeaders(), 
-        credentials: 'include' 
-    })
-    return handleResponse(response)
-}
-
-// Delete heart rate data for specific date
-export const deleteHeartRateByDate = async (date) => {
-    const response = await fetchWithAuth(`${API_URL}/api/data/heartrate/date/${date}`, { 
-        method: 'DELETE', 
-        headers: getHeaders(), 
-        credentials: 'include' 
-    })
-    return handleResponse(response)
-}
+export const getHeartRateRecords = async (params = {}) => apiRequest('/api/data/heartrate', { query: params })
+export const getHeartRateDates = async () => apiRequest('/api/data/heartrate/dates')
+export const getHeartRateStats = async (params = {}) => apiRequest('/api/data/heartrate/stats', { query: params })
+export const deleteAllHeartRateRecords = async () => apiRequest('/api/data/heartrate', { method: 'DELETE' })
+export const deleteHeartRateByDate = async (date) => apiRequest(`/api/data/heartrate/date/${date}`, { method: 'DELETE' })

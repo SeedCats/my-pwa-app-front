@@ -486,7 +486,7 @@ import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { sendMessageToGrok, sendMessageToGrokWithFile, fetchAichatList, fetchAichatById, createAichat, appendMessagesToAichat, deleteAichat, updateAichatTitle, updateAichatLastMessage } from '../services/grokService'
 import { useI18n } from 'vue-i18n'
-import { useUserStore, getCachedBmiData, getCachedHeartRateDates, getCachedStressDates, setCachedBmiData, setCachedHeartRateDates, setCachedStressDates } from '../stores/userStore'
+import { getCachedBmiData, getCachedHeartRateDates, getCachedStressDates, setCachedBmiData, setCachedHeartRateDates, setCachedStressDates } from '../stores/userStore'
 import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
 import { getStressStats } from '../services/stressService' 
 import { getLatestBMIRecord } from '../services/bmiService' 
@@ -655,37 +655,31 @@ const usePrompt = async (prompt) => {
     const heartRateDates = getCachedHeartRateDates()
     const stressDates = getCachedStressDates()
     
+    // small helper to compute heart rate stats
+    const computeHeartStats = (hourly) => {
+        const hrs = (hourly || []).filter(h => h.avg > 0)
+        if (!hrs.length) return { resting: 0, min: 0, max: 0, avg: 0 }
+        const avgs = hrs.map(h => h.avg)
+        const min = Math.min(...avgs)
+        const max = Math.max(...avgs)
+        const avg = Math.round(avgs.reduce((s, v) => s + v, 0) / avgs.length)
+        const resting = Math.min(...hrs.map(h => h.min))
+        return { resting, min, max, avg }
+    }
+
     if (isHeartRatePrompt) {
         // For heart rate prompts, fetch and include all heart rate statistics
         if (heartRateDates && heartRateDates.length > 0) {
             try {
-                // Fetch the most recent heart rate data
                 const response = await getHeartRateRecords({ date: heartRateDates[0] })
                 if (response.success && response.data.records.length > 0) {
                     const record = response.data.records[0]
-                    
-                    // Calculate actual min/max from hourly data (same as HomeView)
-                    const hourlyValues = record.hourlyData.filter(h => h.avg > 0)
-                    const avgValues = hourlyValues.map(h => h.avg)
-                    const actualMin = avgValues.length > 0 
-                        ? Math.min(...avgValues)
-                        : 0
-                    const actualMax = avgValues.length > 0 
-                        ? Math.max(...avgValues)
-                        : 0
-                    const actualAvg = avgValues.length > 0
-                        ? Math.round(avgValues.reduce((sum, v) => sum + v, 0) / avgValues.length)
-                        : 0
-                    // Resting heart rate is the actual minimum from all hourly min values
-                    const resting = hourlyValues.length > 0
-                        ? Math.min(...hourlyValues.map(h => h.min))
-                        : 0
-                    
+                    const stats = computeHeartStats(record.hourlyData)
                     // Include all heart rate metrics
-                    healthContext.push(`Resting Heart Rate: ${resting} bpm`)
-                    healthContext.push(`Max Heart Rate: ${actualMax} bpm`)
-                    healthContext.push(`Min Heart Rate: ${actualMin} bpm`)
-                    healthContext.push(`Average Heart Rate: ${actualAvg} bpm`)
+                    healthContext.push(`Resting Heart Rate: ${stats.resting} bpm`)
+                    healthContext.push(`Max Heart Rate: ${stats.max} bpm`)
+                    healthContext.push(`Min Heart Rate: ${stats.min} bpm`)
+                    healthContext.push(`Average Heart Rate: ${stats.avg} bpm`)
                 }
             } catch (error) {
                 console.error('Failed to fetch heart rate stats:', error)
@@ -829,43 +823,6 @@ const loadChatList = async (page = 1) => {
         historyError.value = e.message || 'Failed to load chats'
     } finally {
         historyLoading.value = false
-    }
-}
-
-// Upsert a chat in the local chatList: update existing or insert at top
-// options: { insertIfMissing: true } - when false, do not add a new item into the currently visible list; instead update totals
-const upsertChatList = (id, { title, lastMessage, updatedAt } = {}, options = { insertIfMissing: true }) => {
-    if (!id) return
-    const idx = (chatList.value || []).findIndex(c => parseId(c._id || c.id) === id)
-    const existing = idx >= 0 ? chatList.value[idx] : null
-    const item = {
-        _id: id,
-        title: title || (existing && (existing.title || 'Untitled')) || 'Untitled',
-        messages: existing && Array.isArray(existing.messages) ? existing.messages.slice() : [],
-        updatedAt: updatedAt || new Date()
-    }
-    // update last message preview
-    if (lastMessage) {
-        // append a lightweight message preview if no messages array or last message differs
-        if (!item.messages || item.messages.length === 0) item.messages = [{ content: lastMessage, timestamp: updatedAt || new Date(), role: 'assistant' }]
-        else {
-            const last = item.messages[item.messages.length - 1]
-            if (!last || (last.content || '').toString().trim() !== (lastMessage || '').toString().trim()) {
-                item.messages.push({ content: lastMessage, timestamp: updatedAt || new Date(), role: 'assistant' })
-            }
-        }
-    }
-    // remove existing
-    if (idx >= 0) chatList.value.splice(idx, 1)
-
-    // If already existed, always insert at top (refresh order). If missing, only insert if allowed by options
-    if (idx >= 0 || (options && options.insertIfMissing !== false)) {
-        chatList.value.unshift(item)
-    } else {
-        // We didn't insert locally (because it belongs on another page). Ensure historyTotal reflects server-side count
-        try {
-            historyTotal.value = Math.max(historyTotal.value || 0, (chatList.value || []).length + 1)
-        } catch (e) { /* ignore */ }
     }
 }
 
