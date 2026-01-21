@@ -7,7 +7,7 @@ import RegisterView from '../views/RegisterView.vue'
 import DataSettingView from '../views/DataSettingView.vue'
 import AISupportView from '../views/AISupportView.vue'
 import ManualSupportView from '../views/ManualSupportView.vue'
-import { checkAuth } from '../stores/userStore.js'
+import { checkAuth, hasRole } from '../stores/userStore.js'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -66,6 +66,18 @@ const router = createRouter({
       component: () => import('../views/BookingSystemView.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/admin',
+      name: 'AdminDashboard',
+      component: () => import('../views/adminView/AdminDashboard.vue'),
+      meta: { requiresAuth: true, requiresRole: 'admin' }
+    },
+    {
+      path: '/admin/users',
+      name: 'UserManagement',
+      component: () => import('../views/adminView/UserManagementView.vue'),
+      meta: { requiresAuth: true, requiresRole: 'admin' }
+    }
   ]
 })
 
@@ -77,6 +89,15 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth && !isAuthenticated) {
     // Redirect to login page
     next({ name: 'Login' })
+  }
+  // Route requires a specific role
+  else if (to.meta.requiresRole) {
+    if (!hasRole(to.meta.requiresRole)) {
+      // Not authorized: redirect to home
+      next({ name: 'home' })
+    } else {
+      next()
+    }
   }
   // Route is for guests only (login/register) but user is authenticated
   else if (to.meta.requiresGuest && isAuthenticated) {

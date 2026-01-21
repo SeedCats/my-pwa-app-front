@@ -50,7 +50,9 @@
     "userSettings": "使用者設定",
     "aiSupport": "AI 支援",
     "manualSupport": "人工支援",
-    "bookingSystem": "預約系統"
+    "bookingSystem": "預約系統",
+    "admin": "管理面板",
+    "userManagement": "使用者管理"
   },
   "home": {
     "title": "首頁",

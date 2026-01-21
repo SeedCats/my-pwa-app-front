@@ -126,5 +126,17 @@ export const clearAllCaches = () => {
   state.lastHeartRateDatesLoad = 0
 }
 
+// Helper to check if current user has a role
+export const hasRole = (role) => {
+  try {
+    return !!(state.user && state.user.role === role)
+  } catch {
+    return false
+  }
+}
+
+// Convenience check for admin role
+export const isAdmin = () => hasRole('admin')
+
 // Export readonly state for components
 export const useUserStore = () => readonly(state)

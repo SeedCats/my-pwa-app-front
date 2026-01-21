@@ -51,7 +51,7 @@
                                         </li>
                                         <li class="mt-auto">
 
-                                            <router-link to="/setting"
+                                            <router-link v-if="!isAdmin()" to="/setting"
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
                                                 :class="isActiveRoute('/setting')
                                                     ? 'bg-gray-800 text-white'
@@ -60,7 +60,7 @@
                                                 {{ t('nav.formatSettings') }}
                                             </router-link>
 
-                                            <router-link to="/user"
+                                            <router-link v-if="!isAdmin()" to="/user"
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
                                                 :class="isActiveRoute('/user')
                                                     ? 'bg-gray-800 text-white'
@@ -107,13 +107,13 @@
                             </ul>
                         </li>
                         <li class="mt-auto">
-                            <router-link to="/setting"
+                            <router-link v-if="!isAdmin()" to="/setting"
                                 class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95 text-gray-400 hover:bg-gray-800 hover:text-white">
                                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                                 {{ t('nav.formatSettings') }}
                             </router-link>
 
-                            <router-link to="/user"
+                            <router-link v-if="!isAdmin()" to="/user"
                                 class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95 text-gray-400 hover:bg-gray-800 hover:text-white">
                                 <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
                                 {{ t('nav.userSettings') }}
@@ -249,7 +249,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import { useLanguage } from '../composables/useLanguage'
-import { clearAllCaches } from '../stores/userStore'
+import { clearAllCaches, useUserStore, isAdmin } from '../stores/userStore'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import {
     Dialog,
@@ -278,13 +278,25 @@ const API_URL = import.meta.env.VITE_API_URL || ''
 
 const emit = defineEmits(['update:sidebarState'])
 
-const navigation = computed(() => [
-    { name: t('nav.home'), to: '/home', icon: HomeIcon },
-    { name: t('nav.dataSettings'), to: '/data-setting', icon: HomeIcon },
-    { name: t('nav.aiSupport'), to: '/ai-support', icon: HomeIcon },
-    { name: t('nav.manualSupport'), to: '/manual-support', icon: HomeIcon },
-    { name: t('nav.bookingSystem'), to: '/booking-system', icon: HomeIcon },
-])
+const userStore = useUserStore()
+const navigation = computed(() => {
+    // If Admin, show only admin navigation
+    if (isAdmin()) {
+        return [
+            { name: t('nav.admin'), to: '/admin', icon: HomeIcon },
+            { name: t('nav.userManagement'), to: '/admin/users', icon: UsersIcon }
+        ]
+    }
+
+    // Regular user navigation
+    return [
+        { name: t('nav.home'), to: '/home', icon: HomeIcon },
+        { name: t('nav.dataSettings'), to: '/data-setting', icon: HomeIcon },
+        { name: t('nav.aiSupport'), to: '/ai-support', icon: HomeIcon },
+        { name: t('nav.manualSupport'), to: '/manual-support', icon: HomeIcon },
+        { name: t('nav.bookingSystem'), to: '/booking-system', icon: HomeIcon }
+    ]
+})
 
 // State
 const sidebarOpen = ref(false)

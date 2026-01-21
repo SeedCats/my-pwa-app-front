@@ -50,7 +50,9 @@
     "userSettings": "User Settings",
     "aiSupport": "AI Support",
     "manualSupport": "Manual Support",
-    "bookingSystem": "Booking System"
+    "bookingSystem": "Booking System",
+    "admin": "Admin Panel",
+    "userManagement": "User Management"
   },
   "home": {
     "title": "Home",
