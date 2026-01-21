@@ -54,6 +54,22 @@
     "admin": "Admin Panel",
     "userManagement": "User Management"
   },
+  "admin": {
+    "description": "Basic administrative panel. Use the links below to manage the system.",
+    "manageUsersCard": "Manage user accounts, roles and status",
+    "userManagementTitle": "User Management",
+    "id": "ID",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "roleUpdated": "Role updated",
+    "userDeleted": "User deleted",
+    "failedLoadUsers": "Failed to load users",
+    "failedUpdateRole": "Failed to update role",
+    "failedDeleteUser": "Failed to delete user",
+    "confirmDelete": "Delete user {email}?",
+    "operation": "Operation"
+  },
   "home": {
     "title": "Home",
     "dataAnalysis": "Data Analysis",

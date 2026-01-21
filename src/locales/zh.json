@@ -54,6 +54,22 @@
     "admin": "管理面板",
     "userManagement": "使用者管理"
   },
+  "admin": {
+    "description": "基本管理面板。使用下列連結來管理系統。",
+    "manageUsersCard": "管理使用者帳號、角色和狀態",
+    "userManagementTitle": "使用者管理",
+    "id": "編號",
+    "name": "姓名",
+    "email": "電子郵件",
+    "role": "角色",
+    "roleUpdated": "角色已更新",
+    "userDeleted": "使用者已刪除",
+    "failedLoadUsers": "載入使用者失敗",
+    "failedUpdateRole": "更新角色失敗",
+    "failedDeleteUser": "刪除使用者失敗",
+    "confirmDelete": "要刪除使用者 {email} 嗎？",
+    "operation": "操作"
+  },
   "home": {
     "title": "首頁",
     "dataAnalysis": "數據分析",
