@@ -23,10 +23,22 @@
     "createAccountButton": "Create Account",
     "creatingAccount": "Creating account...",
     "alreadyHaveAccount": "Already have an account? Sign In",
+    "becomeProviderBtn": "Want to be a Healthcare Provider?",
+    "cancelProviderBtn": "Cancel provider request",
+    "providerRequestButton": "Send Provider Request",
+    "providerNamePlaceholder": "Name of Provider",
+    "providerMessagePlaceholder": "Message (briefly describe your enquiries)",
+    "providerSubjectPlaceholder": "Subject (e.g., collaboration, registration)",
+    "fillProviderFields": "Please fill in provider name, email, subject and message.",
+    "providerRequestSuccess": "Provider request submitted. We'll contact you soon.",
+    "providerRequestFailed": "Failed to submit provider request. Please try again.",
     "passwordMismatch": "Password does not match",
     "invalidResponse": "Invalid response from server",
     "registrationSuccess": "Account created successfully! Redirecting...",
     "registrationFailed": "Registration failed. Please try again.",
+
+    "loginSuccess": "Login successful! Redirecting...",
+    "loginFailed": "Login failed. Please check your credentials.",
     "serverConnectionError": "Cannot connect to server. Please check your internet connection.",
     "networkError": "Network error. Please check your connection and try again."
   },
@@ -120,13 +132,15 @@
         "excellent": "Excellent",
         "good": "Good",
         "fair": "Fair",
-        "poor": "Poor"
+        "poor": "Poor",
+        "critical": "Critical"
       },
       "summary": {
         "excellent": "Excellent overall health based on current BMI, heart rate and stress.",
         "good": "Good overall health. Keep maintaining healthy habits.",
         "fair": "Fair health. Consider small improvements to lifestyle.",
-        "poor": "Indicators suggest potential concerns. Consider consulting a healthcare professional."
+        "poor": "Indicators suggest potential concerns. Consider consulting a healthcare professional.",
+        "critical": "Critical condition detected — seek immediate medical attention."
       },
       "advice": {
         "underweight": "Increase caloric intake with nutrient-dense foods and consult a nutritionist.",
@@ -136,7 +150,8 @@
         "highHr": "Reduce stress and stimulants; consult a doctor if high heart rate persists.",
         "lowHr": "If you experience symptoms with low heart rate, seek medical advice.",
         "moderateStress": "Manage stress with relaxation techniques, regular sleep, and consider counseling if persistent.",
-        "highStress": "High stress detected — prioritize stress reduction strategies and consult a professional if necessary."
+        "highStress": "High stress detected — prioritize stress reduction strategies and consult a professional if necessary.",
+        "critical": "Seek immediate medical attention or call emergency services if you feel unwell."
       }
     } 
   },

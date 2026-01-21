@@ -126,8 +126,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n' 
 
 const router = useRouter()
+const { t } = useI18n()
 const REMEMBER_EMAIL_KEY = 'rememberedEmail'
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -187,7 +189,7 @@ async function handleLogin() {
 
     const data = await response.json().catch(() => null)
     if (!data) {
-      error.value = 'Invalid response from server'
+      error.value = t('auth.invalidResponse')
       return
     }
 
@@ -199,16 +201,16 @@ async function handleLogin() {
         localStorage.removeItem(REMEMBER_EMAIL_KEY)
       }
       
-      success.value = data.message || 'Login successful! Redirecting...'
+      success.value = data.message || t('auth.loginSuccess')
       setTimeout(() => router.push('/home'), 1000)
     } else {
-      error.value = data.message || 'Login failed. Please check your credentials.'
+      error.value = data.message || t('auth.loginFailed')
     }
   } catch (err) {
     console.error('Login error:', err)
     error.value = err.name === 'TypeError' && err.message.includes('fetch')
-      ? 'Cannot connect to server. Please check your internet connection.'
-      : 'Network error. Please check your connection and try again.'
+      ? t('auth.serverConnectionError')
+      : t('auth.networkError')
   } finally {
     loading.value = false
   }

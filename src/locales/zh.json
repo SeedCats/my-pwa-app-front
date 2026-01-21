@@ -23,10 +23,22 @@
     "createAccountButton": "建立帳戶",
     "creatingAccount": "建立中...",
     "alreadyHaveAccount": "已有帳戶？登入",
+    "becomeProviderBtn": "想成為醫護人員？",
+    "cancelProviderBtn": "取消醫護申請",
+    "providerRequestButton": "送出醫護申請",
+    "providerNamePlaceholder": "醫護機構／姓名",
+    "providerMessagePlaceholder": "留言（簡要說明需求）",
+    "providerSubjectPlaceholder": "主旨（例如：合作、註冊）",
+    "fillProviderFields": "請填寫機構/姓名、電子郵件、主旨與留言。",
+
+    "providerRequestSuccess": "醫護申請已送出，我們會儘速聯絡您。",
+    "providerRequestFailed": "提交申請失敗，請再試一次。",
     "passwordMismatch": "密碼不一致",
     "invalidResponse": "伺服器回應無效",
     "registrationSuccess": "帳戶建立成功！正在跳轉...",
     "registrationFailed": "註冊失敗。請再試一次。",
+    "loginSuccess": "登入成功！正在跳轉...",
+    "loginFailed": "登入失敗。請檢查您的帳號密碼。",
     "serverConnectionError": "無法連接到伺服器。請檢查您的網路連線。",
     "networkError": "網路錯誤。請檢查您的連線並重試。"
   },
@@ -121,13 +133,15 @@
         "excellent": "優良",
         "good": "良好",
         "fair": "一般",
-        "poor": "請注意"
+        "poor": "請注意",
+        "critical": "危急"
       },
       "summary": {
         "excellent": "依目前 BMI、心率與壓力判斷，整體狀態良好。",
         "good": "整體狀態不錯，請繼續維持健康習慣。",
         "fair": "整體狀態普通，建議稍作生活習慣調整。",
-        "poor": "指標顯示需注意，建議諮詢醫療專業人員。"
+        "poor": "指標顯示需注意，建議諮詢醫療專業人員。",
+        "critical": "檢測到危急情況 — 請立即就醫。"
       },
       "advice": {
         "underweight": "增加營養密度高的熱量攝取並諮詢營養師。",
@@ -137,7 +151,8 @@
         "highHr": "減少壓力與刺激性物質，若心率持續偏高請就醫。",
         "lowHr": "若低心率伴隨症狀，請儘速就醫。",
         "moderateStress": "透過放鬆技巧與規律睡眠管理壓力，如持續建議諮詢專業。",
-        "highStress": "壓力指數過高：優先採取壓力舒緩方法，必要時尋求專業協助。"
+        "highStress": "壓力指數過高：優先採取壓力舒緩方法，必要時尋求專業協助。",
+        "critical": "請立即就醫，若感到不適請撥打急救電話。"
       }
     }
   },

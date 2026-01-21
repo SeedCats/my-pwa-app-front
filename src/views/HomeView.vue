@@ -790,6 +790,7 @@ const showOverallAnalysis = computed(() => {
 })
 
 // Simple heuristic to compute an overall health score (0-100) using BMI, heart rate and stress
+// Enhanced: detect extreme/critical cases and ensure final score reflects critical risk
 const overallAnalysis = computed(() => {
   const bmi = parseFloat(bmiData.value?.bmi)
   const hr = parseFloat(stats.value?.avg)
@@ -818,15 +819,27 @@ const overallAnalysis = computed(() => {
 
   let score = Math.max(0, Math.min(100, 100 - bmiPenalty - hrPenalty - stressPenalty))
 
-  // Status mapping
+  // Detect extreme/critical conditions (examples: severe underweight/obesity, dangerously low/high HR, extreme stress)
+  const extremeBMI = (bmi <= 15 || bmi >= 40)
+  const extremeHR = (hr <= 35 || hr >= 130)
+  const extremeStress = (stressVal >= 90)
+  const isCritical = extremeBMI || extremeHR || extremeStress
+
+  // If any extreme condition is present, strongly lower the final score to reflect critical risk
+  if (isCritical) {
+    score = Math.min(score, 20) // cap score at 20 for critical cases
+  }
+
+  // Status mapping (critical overrides other categories)
   let statusKey = 'excellent'
-  if (score >= 85) statusKey = 'excellent'
+  if (isCritical || score < 25) statusKey = 'critical'
+  else if (score >= 85) statusKey = 'excellent'
   else if (score >= 70) statusKey = 'good'
   else if (score >= 50) statusKey = 'fair'
   else statusKey = 'poor'
 
-  const badgeMap = { excellent: 'bg-green-500', good: 'bg-teal-500', fair: 'bg-yellow-500', poor: 'bg-orange-500' }
-  const progressMap = { excellent: 'bg-green-500', good: 'bg-teal-500', fair: 'bg-yellow-500', poor: 'bg-orange-500' }
+  const badgeMap = { excellent: 'bg-green-500', good: 'bg-teal-500', fair: 'bg-yellow-500', poor: 'bg-orange-500', critical: 'bg-red-600' }
+  const progressMap = { excellent: 'bg-green-500', good: 'bg-teal-500', fair: 'bg-yellow-500', poor: 'bg-orange-500', critical: 'bg-red-600' }
 
   // Advice generation
   const advice = []
@@ -842,6 +855,9 @@ const overallAnalysis = computed(() => {
   // Stress advice
   if (stressVal >= 80) advice.push(t('home.overallAnalysis.advice.highStress'))
   else if (stressVal >= 50) advice.push(t('home.overallAnalysis.advice.moderateStress'))
+
+  // Add urgent advice for critical conditions
+  if (isCritical) advice.push(t('home.overallAnalysis.advice.critical'))
 
   return { score, statusKey, summary: t(`home.overallAnalysis.summary.${statusKey}`), advice, badgeClass: badgeMap[statusKey], progressClass: progressMap[statusKey] }
 })

@@ -36,33 +36,119 @@
           </div>
 
           <form @submit.prevent="handleRegister" class="space-y-4 sm:space-y-6">
-            <!-- Name Input -->
-            <div class="relative">
-              <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
-              </div>
-              <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+            <!-- User or Provider Inputs -->
+
+            <!-- Standard user form (default) -->
+            <template v-if="!showProviderForm">
+              <!-- Name Input -->
+              <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
+                </div>
+                <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <input id="name" name="name" type="text" autocomplete="name" required v-model="registerForm.name"
+                      aria-label="name"
+                      class="block w-full rounded-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
+                      :placeholder="$t('auth.namePlaceholder')" />
                   </div>
-                  <input id="name" name="name" type="text" autocomplete="name" required v-model="registerForm.name"
-                    aria-label="name"
-                    class="block w-full rounded-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
-                    :placeholder="$t('auth.namePlaceholder')" />
                 </div>
               </div>
-            </div>
 
-            <!-- Email and Password Input Group -->
-            <div class="relative">
-              <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
+              <!-- Email and Password Input Group -->
+              <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
+                </div>
+                <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                  <div class="col-span-2">
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                          stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                        </svg>
+                      </div>
+                      <input id="email-address" name="email" type="email" autocomplete="email" required
+                        v-model="registerForm.email" aria-label="Email address"
+                        class="block w-full rounded-t-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 border-b border-gray-200 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
+                        :placeholder="$t('auth.emailPlaceholder')" />
+                    </div>
+                  </div>
+                  <div class="-mt-px pt-2">
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                          stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <input id="password" name="password" type="password" autocomplete="new-password" required
+                        v-model="registerForm.password" aria-label="Password"
+                        class="block w-full rounded-b-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 transition-colors duration-200 touch-manipulation"
+                        :placeholder="$t('auth.passwordPlaceholder')" />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                <div class="col-span-2">
+
+              <!-- Confirm Password Input -->
+              <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
+                </div>
+                <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password"
+                      required v-model="registerForm.confirmPassword" aria-label="Confirm password"
+                      class="block w-full rounded-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
+                      :placeholder="$t('auth.confirmPasswordPlaceholder')" />
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- Provider request form -->
+            <template v-if="showProviderForm">
+              <!-- Provider Name -->
+              <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
+                </div>
+                <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <input id="provider-name" name="providerName" type="text" autocomplete="name" required v-model="registerForm.providerName"
+                      aria-label="Provider name"
+                      class="block w-full rounded-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
+                      :placeholder="$t('auth.providerNamePlaceholder')" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Provider Email -->
+              <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
+                </div>
+                <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
                   <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
@@ -71,50 +157,45 @@
                           d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                       </svg>
                     </div>
-                    <input id="email-address" name="email" type="email" autocomplete="email" required
-                      v-model="registerForm.email" aria-label="Email address"
-                      class="block w-full rounded-t-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 border-b border-gray-200 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
+                    <input id="provider-email" name="providerEmail" type="email" autocomplete="email" required
+                      v-model="registerForm.providerEmail" aria-label="Provider Email"
+                      class="block w-full rounded-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
                       :placeholder="$t('auth.emailPlaceholder')" />
                   </div>
                 </div>
-                <div class="-mt-px pt-2">
+              </div>
+
+              <!-- Subject -->
+              <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
+                </div>
+                <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
                   <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          d="M8 9l3 3-3 3m5-6l3 3-3 3" />
                       </svg>
                     </div>
-                    <input id="password" name="password" type="password" autocomplete="new-password" required
-                      v-model="registerForm.password" aria-label="Password"
-                      class="block w-full rounded-b-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 transition-colors duration-200 touch-manipulation"
-                      :placeholder="$t('auth.passwordPlaceholder')" />
+                    <input id="provider-subject" name="providerSubject" type="text" required
+                      v-model="registerForm.providerSubject" aria-label="Subject"
+                      class="block w-full rounded-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
+                      :placeholder="$t('auth.providerSubjectPlaceholder')" />
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Confirm Password Input -->
-            <div class="relative">
-              <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
-              </div>
-              <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password"
-                    required v-model="registerForm.confirmPassword" aria-label="Confirm password"
-                    class="block w-full rounded-xl bg-white pl-10 sm:pl-12 pr-4 py-4 sm:py-4 lg:py-5 text-base sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"
-                    :placeholder="$t('auth.confirmPasswordPlaceholder')" />
+              <!-- Message -->
+              <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl blur-sm">
+                </div>
+                <div class="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                  <textarea v-model="registerForm.providerMessage" required rows="4" :placeholder="$t('auth.providerMessagePlaceholder')"
+                    class="w-full rounded-xl bg-white p-4 text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:border-indigo-500 transition-colors duration-200 touch-manipulation"></textarea>
                 </div>
               </div>
-            </div>
+            </template>
 
             <!-- Buttons -->
             <div class="space-y-3 sm:space-y-4">
@@ -131,7 +212,17 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
-                {{ loading ? $t('auth.creatingAccount') : $t('auth.createAccountButton') }} 
+                {{ loading ? $t('auth.creatingAccount') : (showProviderForm ? $t('auth.providerRequestButton') : $t('auth.createAccountButton')) }} 
+              </button>
+
+              <button type="button" @click="toggleProvider" :disabled="loading"
+                class="group flex w-full justify-center items-center rounded-xl sm:rounded-2xl bg-white border-2 border-gray-300 px-4 py-4 sm:py-4 lg:py-5 text-xs sm:text-sm lg:text-lg font-semibold text-gray-700 hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md active:scale-[0.98] touch-manipulation min-h-[48px] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none">
+                <svg class="w-5 h-5 sm:w-5 sm:h-5 mr-2 group-hover:animate-pulse" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+                {{ showProviderForm ? $t('auth.cancelProviderBtn') : $t('auth.becomeProviderBtn') }}
               </button>
 
               <button type="button" @click="handleLogin" :disabled="loading"
@@ -163,12 +254,76 @@ const API_URL = import.meta.env.VITE_API_URL || ''
 const loading = ref(false)
 const error = ref('')
 const success = ref('')
-const registerForm = ref({ name: '', email: '', password: '', confirmPassword: '', acceptTerms: false })
+const showProviderForm = ref(false)
+const registerForm = ref({ name: '', email: '', password: '', confirmPassword: '', acceptTerms: false, isProvider: false, providerName: '', providerEmail: '', providerSubject: '', providerMessage: '' })
+
+const toggleProvider = () => {
+  showProviderForm.value = !showProviderForm.value
+  registerForm.value.isProvider = showProviderForm.value
+  if (!showProviderForm.value) {
+    registerForm.value.providerName = ''
+    registerForm.value.providerEmail = ''
+    registerForm.value.providerSubject = ''
+    registerForm.value.providerMessage = ''
+  }
+}
 
 async function handleRegister() {
   error.value = ''
   success.value = ''
 
+  // Provider request flow
+  if (registerForm.value.isProvider) {
+    if (!registerForm.value.providerName || !registerForm.value.providerEmail || !registerForm.value.providerSubject || !registerForm.value.providerMessage) {
+      error.value = t('auth.fillProviderFields')
+      return
+    }
+
+    loading.value = true
+    try {
+      const response = await fetch(`${API_URL}/api/provider/request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          name: registerForm.value.providerName,
+          email: registerForm.value.providerEmail,
+          subject: registerForm.value.providerSubject,
+          message: registerForm.value.providerMessage
+        }),
+      })
+
+      const data = await response.json().catch(() => null)
+      if (!data) {
+        error.value = t('auth.invalidResponse')
+        return
+      }
+
+      if (response.ok && data.success) {
+        success.value = data.message || t('auth.providerRequestSuccess')
+        // reset and exit provider mode
+        registerForm.value.providerName = ''
+        registerForm.value.providerEmail = ''
+        registerForm.value.providerSubject = ''
+        registerForm.value.providerMessage = ''
+        showProviderForm.value = false
+        registerForm.value.isProvider = false
+      } else {
+        error.value = data.message || t('auth.providerRequestFailed')
+      }
+    } catch (err) {
+      console.error('Provider request error:', err)
+      error.value = err.name === 'TypeError' && err.message.includes('fetch')
+        ? t('auth.serverConnectionError')
+        : t('auth.networkError')
+    } finally {
+      loading.value = false
+    }
+
+    return
+  }
+
+  // Standard user registration
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
     error.value = t('auth.passwordMismatch')
     return
