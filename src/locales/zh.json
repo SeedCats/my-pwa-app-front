@@ -58,7 +58,7 @@
     "description": "基本管理面板。使用下列連結來管理系統。",
     "manageUsersCard": "管理使用者帳號、角色和狀態",
     "userManagementTitle": "使用者管理",
-    "id": "編號",
+    "id": "id",
     "name": "姓名",
     "email": "電子郵件",
     "role": "角色",
@@ -72,7 +72,15 @@
     "assignedUsersTitle": "分配的使用者",
     "assignedUsersDesc": "查看分配給您的使用者",
     "failedLoadAssignedUsers": "載入指派使用者失敗",
-    "noAssignedUsers": "沒有分配的使用者"
+    "noAssignedUsers": "沒有分配的使用者",
+    "created": "建立時間",
+    "view": "查看詳情",
+    "userCount": "{count} 位使用者",
+    "serviceCompletion": "服務完成",
+    "dashboard": "儀表板",
+    "confirmServiceComplete": "要將 {email} 的服務標記為完成嗎？",
+    "serviceCompleted": "服務已標記為完成",
+    "serviceCompleteFailed": "標記服務完成失敗"
   },
   "home": {
     "title": "首頁",

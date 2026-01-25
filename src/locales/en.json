@@ -72,7 +72,15 @@
     "assignedUsersTitle": "Assigned Users",
     "assignedUsersDesc": "View users assigned to you",
     "failedLoadAssignedUsers": "Failed to load assigned users",
-    "noAssignedUsers": "No assigned users found"
+    "noAssignedUsers": "No assigned users found",
+    "created": "Created",
+    "view": "View Details",
+    "userCount": "{count} User(s)",
+    "serviceCompletion": "Service completion",
+    "dashboard": "Dash Board",
+    "confirmServiceComplete": "Mark service as complete for {email}?",
+    "serviceCompleted": "Service marked complete",
+    "serviceCompleteFailed": "Failed to mark service complete"
   },
   "home": {
     "title": "Home",
