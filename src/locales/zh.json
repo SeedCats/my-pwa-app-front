@@ -68,7 +68,11 @@
     "failedUpdateRole": "更新角色失敗",
     "failedDeleteUser": "刪除使用者失敗",
     "confirmDelete": "要刪除使用者 {email} 嗎？",
-    "operation": "操作"
+    "operation": "操作",
+    "assignedUsersTitle": "分配的使用者",
+    "assignedUsersDesc": "查看分配給您的使用者",
+    "failedLoadAssignedUsers": "載入指派使用者失敗",
+    "noAssignedUsers": "沒有分配的使用者"
   },
   "home": {
     "title": "首頁",

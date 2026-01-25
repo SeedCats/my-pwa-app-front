@@ -51,7 +51,7 @@
                                         </li>
                                         <li class="mt-auto">
 
-                                            <router-link v-if="!isAdmin()" to="/setting"
+                                            <router-link to="/setting"
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
                                                 :class="isActiveRoute('/setting')
                                                     ? 'bg-gray-800 text-white'
@@ -60,7 +60,7 @@
                                                 {{ t('nav.formatSettings') }}
                                             </router-link>
 
-                                            <router-link v-if="!isAdmin()" to="/user"
+                                            <router-link to="/user"
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
                                                 :class="isActiveRoute('/user')
                                                     ? 'bg-gray-800 text-white'
@@ -107,13 +107,13 @@
                             </ul>
                         </li>
                         <li class="mt-auto">
-                            <router-link v-if="!isAdmin()" to="/setting"
+                            <router-link to="/setting"
                                 class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95 text-gray-400 hover:bg-gray-800 hover:text-white">
                                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                                 {{ t('nav.formatSettings') }}
                             </router-link>
 
-                            <router-link v-if="!isAdmin()" to="/user"
+                            <router-link to="/user"
                                 class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95 text-gray-400 hover:bg-gray-800 hover:text-white">
                                 <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
                                 {{ t('nav.userSettings') }}

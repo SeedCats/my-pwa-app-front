@@ -68,7 +68,11 @@
     "failedUpdateRole": "Failed to update role",
     "failedDeleteUser": "Failed to delete user",
     "confirmDelete": "Delete user {email}?",
-    "operation": "Operation"
+    "operation": "Operation",
+    "assignedUsersTitle": "Assigned Users",
+    "assignedUsersDesc": "View users assigned to you",
+    "failedLoadAssignedUsers": "Failed to load assigned users",
+    "noAssignedUsers": "No assigned users found"
   },
   "home": {
     "title": "Home",
