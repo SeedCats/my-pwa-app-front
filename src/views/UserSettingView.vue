@@ -13,12 +13,9 @@
             <div>
               <strong class="mr-2">{{ $t('home.viewingUser') }}</strong>
               <span>
-                <template v-if="profileForm.email">{{ profileForm.email }}</template>
-                <template v-else-if="viewedUserEmail">{{ viewedUserEmail }}</template>
-                <template v-else>{{ viewedUserId }}</template>
+                <template v-if="displayedUserEmail">{{ displayedUserEmail }}</template>                <template v-else>{{ viewedUserId }}</template>
               </span>
             </div>
-
             <div class="flex items-center gap-2">
               <button @click="goBackToUserManagement" class="underline text-sm">{{ $t('home.returnToUserManagement') }}</button>
             </div>
@@ -246,7 +243,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import Sidebar from '../components/Side_and_Top_Bar.vue'
-import { getUserById } from '../services/adminService'
+import { getUserById, updateUserById, deleteUserById } from '../services/adminService'
 import { useUserStore } from '../stores/userStore'
 
 const router = useRouter()
@@ -260,6 +257,18 @@ const sidebarHidden = ref(false)
 const profileForm = ref({ name: '', email: '' })
 const targetUserId = ref(null)
 const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
+
+// For admin viewing another user: keep the loaded user separate from the editable form
+const viewedUserData = ref(null)
+
+const displayedUserEmail = computed(() => {
+  // When an admin is viewing another user, show the saved email (not the live edit buffer)
+  if (isViewingOtherUser.value) {
+    return viewedUserData.value?.email || viewedUserEmail.value || viewedUserId.value
+  }
+  // When viewing self, show the live form value (so changes reflect immediately)
+  return profileForm.value.email || viewedUserEmail.value || viewedUserId.value
+})
 
 // Computed property to check if viewing another user (similar to HomeView)
 const currentUserId = computed(() => userState.user?.id || null)
@@ -311,6 +320,14 @@ const loadUserData = async () => {
       profileForm.value = { name: user.name || '', email: user.email || '' }
       // If no explicit targetUserId set above, set it to the current user's id
       if (!targetUserId.value && user.id) targetUserId.value = user.id
+
+      // If an admin is viewing another user's settings, keep the loaded user separate
+      if (isViewingOtherUser.value && userState.user && userState.user.role === 'admin') {
+        viewedUserData.value = user
+      } else {
+        // viewing self or no special view: clear viewedUserData so banner reflects live form
+        viewedUserData.value = null
+      }
     }
   } catch (err) {
     console.error('Failed to load user data:', err)
@@ -330,29 +347,36 @@ const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 const updateProfile = async () => {
   clearMessages()
   profileLoading.value = true
-  
-  try {
-    // If an admin is editing another user, send the update to the admin endpoint
-    let url = `${API_URL}/api/user/profile`
-    let method = 'PUT'
-    let body = JSON.stringify(profileForm.value)
 
+  try {
+    // Admin editing another user's profile
     if (targetUserId.value && userState.user && userState.user.role === 'admin' && String(targetUserId.value) !== String(userState.user?.id)) {
-      // Use admin endpoint to update target user
-      url = `${API_URL}/api/admin/users/${targetUserId.value}`
-      method = 'PUT'
-      body = JSON.stringify(profileForm.value)
+      const data = await updateUserById(targetUserId.value, profileForm.value)
+      if (data && data.success) {
+        // Sync the saved user data with the viewing buffer so the banner updates only on success
+        const updatedUser = data?.data?.user || data?.user || data
+        if (updatedUser) {
+          viewedUserData.value = updatedUser
+          profileForm.value = { name: updatedUser.name || '', email: updatedUser.email || '' }
+        }
+        successMessage.value = data.message || 'Profile updated successfully!'
+      } else {
+        errorMessage.value = data?.message || 'Failed to update profile'
+      }
+      scrollToTop()
+      return
     }
 
-    const response = await fetch(url, {
-      method,
+    // Regular user updating own profile
+    const response = await fetch(`${API_URL}/api/user/profile`, {
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body
+      body: JSON.stringify(profileForm.value)
     })
-    
+
     const data = await response.json()
-    
+
     if (response.ok && data.success) {
       window.dispatchEvent(new CustomEvent('userUpdated', { detail: data.data.user }))
       successMessage.value = data.message || 'Profile updated successfully!'
@@ -422,17 +446,36 @@ const updatePassword = async () => {
 
 const deleteAccount = async () => {
   deleteLoading.value = true
-  
+
   try {
+    // If admin is viewing another user, call admin delete endpoint
+    if (isViewingOtherUser.value && userState.user && userState.user.role === 'admin' && targetUserId.value) {
+      const data = await deleteUserById(targetUserId.value)
+      if (data && data.success) {
+        errorMessage.value = ''
+        successMessage.value = data.message || 'User deleted successfully!'
+        showDeletePassword.value = false
+        deletePassword.value = ''
+        scrollToTop()
+        setTimeout(() => router.push({ name: 'UserManagement' }), 1500)
+      } else {
+        successMessage.value = ''
+        errorMessage.value = data?.message || 'Failed to delete user'
+        scrollToTop()
+      }
+      return
+    }
+
+    // Regular user delete self
     const response = await fetch(`${API_URL}/api/user/delete`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({ password: deletePassword.value })
     })
-    
+
     const data = await response.json()
-    
+
     if (response.ok && data.success) {
       errorMessage.value = ''
       successMessage.value = data.message || 'Account deleted successfully!'

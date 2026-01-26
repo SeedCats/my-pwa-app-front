@@ -344,6 +344,13 @@ const loadUserData = async () => {
 
 onMounted(() => {
     loadUserData()
-    window.addEventListener('userUpdated', (e) => userData.value = e.detail)
+    window.addEventListener('userUpdated', (e) => {
+        // Only update top-right displayed user when the event payload matches the current logged-in user
+        const updated = e?.detail || {}
+        const currentId = userStore.user?.id || userStore.user?._id || userData.value?.id || userData.value?._id
+        if (updated && currentId && (String(updated.id) === String(currentId) || String(updated._id) === String(currentId))) {
+            userData.value = updated
+        }
+    })
 })
 </script>
