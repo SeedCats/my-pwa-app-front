@@ -101,8 +101,12 @@ router.beforeEach(async (to, from, next) => {
   }
   // Route is for guests only (login/register) but user is authenticated
   else if (to.meta.requiresGuest && isAuthenticated) {
-    // Redirect to home page
-    next({ name: 'home' })
+    // Redirect based on role: admins go to Admin Dashboard, others go to home
+    if (hasRole('admin')) {
+      next({ name: 'AdminDashboard' })
+    } else {
+      next({ name: 'home' })
+    }
   }
   // Allow navigation
   else {
