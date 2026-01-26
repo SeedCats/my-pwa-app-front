@@ -13,8 +13,20 @@ export const uploadAllCSV = async (file) => {
   return apiRequest('/api/data/uploadAll', { method: 'POST', isForm: true, body: form })
 }
 
-export const getHeartRateRecords = async (params = {}) => apiRequest('/api/data/heartrate', { query: params })
-export const getHeartRateDates = async (params = {}) => apiRequest('/api/data/heartrate/dates', { query: params })
-export const getHeartRateStats = async (params = {}) => apiRequest('/api/data/heartrate/stats', { query: params })
+export const getHeartRateRecords = async (params = {}) => {
+  const { userId, ...rest } = params || {}
+  if (userId) return apiRequest(`/api/admin/users/${userId}/heartrate`, { query: rest })
+  return apiRequest('/api/data/heartrate', { query: params })
+}
+export const getHeartRateDates = async (params = {}) => {
+  const { userId, ...rest } = params || {}
+  if (userId) return apiRequest(`/api/admin/users/${userId}/heartrate/dates`, { query: rest })
+  return apiRequest('/api/data/heartrate/dates', { query: params })
+}
+export const getHeartRateStats = async (params = {}) => {
+  const { userId, ...rest } = params || {}
+  if (userId) return apiRequest(`/api/admin/users/${userId}/heartrate/stats`, { query: rest })
+  return apiRequest('/api/data/heartrate/stats', { query: params })
+}
 export const deleteAllHeartRateRecords = async () => apiRequest('/api/data/heartrate', { method: 'DELETE' })
 export const deleteHeartRateByDate = async (date) => apiRequest(`/api/data/heartrate/date/${date}`, { method: 'DELETE' })

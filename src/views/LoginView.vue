@@ -126,7 +126,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n' 
+import { useI18n } from 'vue-i18n'
+import { checkAuth, useUserStore } from '../stores/userStore.js' 
 
 const router = useRouter()
 const { t } = useI18n()
@@ -163,8 +164,15 @@ onMounted(async () => {
   }
 
   try {
-    const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
-    if (res.ok) router.push('/home')
+    const authed = await checkAuth()
+    if (authed) {
+      const state = useUserStore()
+      if (state.user && state.user.role === 'admin') {
+        router.push({ name: 'AdminDashboard' })
+      } else {
+        router.push({ name: 'home' })
+      }
+    }
   } catch { /* not authenticated */ }
 })
 
@@ -202,7 +210,14 @@ async function handleLogin() {
       }
       
       success.value = data.message || t('auth.loginSuccess')
-      setTimeout(() => router.push('/home'), 1000)
+      // Refresh auth state then redirect based on role
+      await checkAuth(true)
+      const state = useUserStore()
+      if (state.user && state.user.role === 'admin') {
+        router.push({ name: 'AdminDashboard' })
+      } else {
+        router.push({ name: 'home' })
+      }
     } else {
       error.value = data.message || t('auth.loginFailed')
     }

@@ -10,12 +10,20 @@ const buildBMIPayload = (bmiData) => ({
 })
 
 export const saveBMIData = async (bmiData) => apiRequest('/api/data/bmi', { method: 'POST', body: buildBMIPayload(bmiData) })
-export const getBMIRecords = async (params = {}) => apiRequest('/api/data/bmi', { query: params })
+export const getBMIRecords = async (params = {}) => {
+  const { userId, ...rest } = params || {}
+  if (userId) return apiRequest(`/api/admin/users/${userId}/bmi`, { query: rest })
+  return apiRequest('/api/data/bmi', { query: params })
+}
 export const getLatestBMIRecord = async (params = {}) => {
   const res = await getBMIRecords(params)
   return res.success && res.data?.records?.length ? { success: true, data: res.data.records[0] } : { success: true, data: null }
 }
-export const getBMIRecordById = async (id) => apiRequest(`/api/data/bmi/${id}`)
+export const getBMIRecordById = async (id, params = {}) => {
+  const { userId } = params || {}
+  if (userId) return apiRequest(`/api/admin/users/${userId}/bmi/${id}`)
+  return apiRequest(`/api/data/bmi/${id}`)
+}
 export const updateBMIRecord = async (id, bmiData) => apiRequest(`/api/data/bmi/${id}`, { method: 'PUT', body: buildBMIPayload(bmiData) })
 export const deleteBMIRecord = async (id) => apiRequest(`/api/data/bmi/${id}`, { method: 'DELETE' })
 export const deleteAllBMIRecords = async () => apiRequest('/api/data/bmi', { method: 'DELETE' })

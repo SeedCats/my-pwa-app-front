@@ -2,16 +2,34 @@
   <div class="min-h-screen" :class="themeClasses.background">
     <Sidebar @update:sidebarState="updateSidebarState" />
     <div :class=" [
-      'transition-all duration-300 ease-in-out',
+      'transition-all duration-300 ease-in-out pt-16',
       sidebarHidden ? 'lg:ml-0' : 'lg:ml-72'
     ]">
-      <main>
-        <div class="px-3 sm:px-4 md:px-6 lg:px-8 pt-4 pb-8">
-          <!-- Header -->
-          <div class="mb-8 pt-16">
-            <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('userSettings.title') }}</h1>
-            <p class="mt-2 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.subtitle') }}</p>
+      <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-8">
+        
+        <!-- Admin banner when editing another user's settings -->
+        <div v-if="isViewingOtherUser" class="mb-4 p-3 rounded-md text-sm" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800 text-white' : 'bg-blue-50 text-blue-900']">
+          <div class="flex items-center justify-between">
+            <div>
+              <strong class="mr-2">{{ $t('home.viewingUser') }}</strong>
+              <span>
+                <template v-if="profileForm.email">{{ profileForm.email }}</template>
+                <template v-else-if="viewedUserEmail">{{ viewedUserEmail }}</template>
+                <template v-else>{{ viewedUserId }}</template>
+              </span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button @click="goBackToUserManagement" class="underline text-sm">{{ $t('home.returnToUserManagement') }}</button>
+            </div>
           </div>
+        </div>
+
+        <!-- Header -->
+        <div class="mb-8 pt-4">
+          <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('userSettings.title') }}</h1>
+          <p class="mt-2 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.subtitle') }}</p>
+        </div>
 
           <!-- Success/Error Messages -->
           <div v-if="successMessage" class="mb-6 p-4 rounded-lg" :class="isDarkMode ? 'bg-green-900 border border-green-700' : 'bg-green-50 border border-green-200'">
@@ -218,26 +236,39 @@
               </div>
             </div>
           </div>
-        </div>
       </main>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import Sidebar from '../components/Side_and_Top_Bar.vue'
+import { getUserById } from '../services/adminService'
+import { useUserStore } from '../stores/userStore'
 
 const router = useRouter()
+const route = useRoute()
+const userState = useUserStore()
 const { isDarkMode, themeClasses } = useTheme()
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 // State
 const sidebarHidden = ref(false)
 const profileForm = ref({ name: '', email: '' })
+const targetUserId = ref(null)
 const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
+
+// Computed property to check if viewing another user (similar to HomeView)
+const currentUserId = computed(() => userState.user?.id || null)
+const viewedUserId = computed(() => route.query.userId || null)
+const viewedUserEmail = computed(() => route.query.userEmail || null)
+const isViewingOtherUser = computed(() => {
+  // Check if we have a userId in query params and it's different from current user
+  return viewedUserId.value && currentUserId.value && String(viewedUserId.value) !== String(currentUserId.value)
+})
 const profileLoading = ref(false)
 const passwordLoading = ref(false)
 const deleteLoading = ref(false)
@@ -248,16 +279,46 @@ const deletePassword = ref('')
 
 const loadUserData = async () => {
   try {
-    const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
-    if (res.ok) {
-      const data = await res.json()
-      const user = data.data?.user || data.user || data.data || data
+    // If an admin is viewing another user's settings, allow loading that user via ?userId=...
+    const idFromQuery = route.query.userId || null
+    let user = null
+
+    if (idFromQuery && userState.user && userState.user.role === 'admin') {
+      try {
+        const res = await getUserById(idFromQuery)
+        if (res) {
+          // handle different response shapes as other services do
+          user = res?.data?.user || res?.data || res?.user || res || null
+          if (user && user.id) targetUserId.value = user.id
+        }
+      } catch (e) {
+        // fallback to current user if admin fetch fails
+        console.warn('Failed to load specified user, falling back to current user:', e)
+      }
+    }
+
+    // If no target user loaded, load current user
+    if (!user) {
+      const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
+      if (res.ok) {
+        const data = await res.json()
+        user = data.data?.user || data.user || data.data || data
+      }
+    }
+
+    if (user) {
       // populate profile form
       profileForm.value = { name: user.name || '', email: user.email || '' }
+      // If no explicit targetUserId set above, set it to the current user's id
+      if (!targetUserId.value && user.id) targetUserId.value = user.id
     }
   } catch (err) {
     console.error('Failed to load user data:', err)
   }
+}
+
+const goBackToUserManagement = () => {
+  router.push({ name: 'UserManagement' })
 }
 
 onMounted(loadUserData)
@@ -271,11 +332,23 @@ const updateProfile = async () => {
   profileLoading.value = true
   
   try {
-    const response = await fetch(`${API_URL}/api/user/profile`, {
-      method: 'PUT',
+    // If an admin is editing another user, send the update to the admin endpoint
+    let url = `${API_URL}/api/user/profile`
+    let method = 'PUT'
+    let body = JSON.stringify(profileForm.value)
+
+    if (targetUserId.value && userState.user && userState.user.role === 'admin' && String(targetUserId.value) !== String(userState.user?.id)) {
+      // Use admin endpoint to update target user
+      url = `${API_URL}/api/admin/users/${targetUserId.value}`
+      method = 'PUT'
+      body = JSON.stringify(profileForm.value)
+    }
+
+    const response = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify(profileForm.value)
+      body
     })
     
     const data = await response.json()

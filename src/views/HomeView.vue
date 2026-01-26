@@ -22,6 +22,11 @@
             </div>
 
             <div class="flex items-center gap-2">
+              <template v-if="viewedUser">
+                <span :class="['inline-block px-2 py-1 rounded text-sm font-semibold', (viewedUser && viewedUser.serviceStatusKey === 'completed') ? (isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800') : (isDarkMode ? 'bg-yellow-700 text-white' : 'bg-yellow-100 text-yellow-800') ]">
+                  {{ viewedUser ? (viewedUser.serviceStatusKey === 'completed' ? $t('admin.statusCompleted') : $t('admin.statusOnGoing')) : '' }}
+                </span>
+              </template>
               <button @click="goBackToUserManagement" class="underline text-sm">{{ $t('home.returnToUserManagement') }}</button>
             </div>
           </div>
@@ -642,6 +647,8 @@ import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateSer
 import { getStressRecords, getStressDates } from '../services/stressService'
 import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedHeartRateDates, getCachedStressDates, setCachedStressDates, useUserStore } from '../stores/userStore'
 import { getUserById } from '../services/adminService'
+import { fetchWithAuth } from '../utils/fetchWithAuth'
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -1421,6 +1428,23 @@ const loadViewedUser = async () => {
 
     // Support multiple response shapes: { data: { user } }, { data }, { user }, or raw object
     viewedUser.value = res?.data?.user || res?.data || res?.user || res || null
+
+    // Fetch user's service status from the new API
+    if (viewedUser.value && id) {
+      try {
+        const resStatus = await fetchWithAuth(`${API_URL}/api/data/status?userId=${id}`, { credentials: 'include' })
+        if (resStatus.ok) {
+          const j = await resStatus.json().catch(() => null)
+          const s = j?.data?.status || 'On-going'
+          const key = String(s).toLowerCase() === 'completed' ? 'completed' : 'ongoing'
+          viewedUser.value.serviceStatusKey = key
+          viewedUser.value.serviceStatus = key === 'completed' ? t('admin.statusCompleted') : t('admin.statusOnGoing')
+        }
+      } catch (e) {
+        // ignore and keep no service status
+      }
+    }
+
   } catch (err) {
     // Show a friendly message for network/server issues
     viewedUserError.value = err.message || t('home.userLoadFailed')

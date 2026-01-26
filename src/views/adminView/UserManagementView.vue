@@ -30,6 +30,7 @@
                     <th :class="['px-6 py-3 text-left text-xs font-medium uppercase tracking-wider', themeClasses.textSecondary]">{{ $t('admin.id') }}</th>
                     <th :class="['px-6 py-3 text-left text-xs font-medium uppercase tracking-wider', themeClasses.textSecondary]">{{ $t('admin.created') }}</th>
                     <th :class="['px-6 py-3 text-center text-xs font-medium uppercase tracking-wider', themeClasses.textSecondary]">{{ $t('admin.operation') }}</th>
+                    <th :class="['px-6 py-3 text-center text-xs font-medium uppercase tracking-wider', themeClasses.textSecondary]">{{ $t('admin.status') }}</th>
                   </tr>
                 </thead>
                 <tbody :class="[themeClasses.cardBackground, 'divide-y', isDarkMode ? 'divide-gray-700' : 'divide-gray-200']">
@@ -41,6 +42,11 @@
                     <td :class="['px-6 py-4 whitespace-nowrap text-sm', themeClasses.textSecondary]">{{ formatDate(u.createdAt) }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                       <button @click="openOperations(u)" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 mx-auto">{{ $t('admin.operation') }}</button>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                      <span :class="['inline-block px-2 py-1 rounded text-xs font-semibold', u.serviceStatusKey === 'completed' ? (isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800') : (isDarkMode ? 'bg-yellow-700 text-white' : 'bg-yellow-100 text-yellow-800')]">
+                        {{ u.serviceStatusKey === 'completed' ? $t('admin.statusCompleted') : $t('admin.statusOnGoing') }}
+                      </span>
                     </td>
                   </tr>
                 </tbody>
@@ -75,7 +81,13 @@
                 </button>
               </div>
               <div>
-                <p :class="['text-sm mb-4', themeClasses.textSecondary]">{{ selectedUser ? selectedUser.email : '' }}</p>
+                <p :class="['text-sm mb-2', themeClasses.textSecondary]">{{ selectedUser ? selectedUser.email : '' }}</p>
+                <div class="mb-2">
+                  <strong class="text-sm mr-2">{{ $t('admin.status') }}:</strong>
+                  <span :class="['inline-block px-2 py-1 rounded text-sm font-semibold', (selectedUser && selectedUser.serviceStatusKey === 'completed') ? (isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800') : (isDarkMode ? 'bg-yellow-700 text-white' : 'bg-yellow-100 text-yellow-800') ]">
+                    {{ selectedUser ? (selectedUser.serviceStatusKey === 'completed' ? $t('admin.statusCompleted') : $t('admin.statusOnGoing')) : $t('admin.statusOnGoing') }}
+                  </span>
+                </div>
                 <div class="mb-4">
                   <div>
                     <button @click="viewDetails" :class="['flex items-center gap-2 px-4 py-2 rounded text-sm', themeClasses.inputBackground, themeClasses.textSecondary, themeClasses.border, themeClasses.hoverBackground]">
@@ -89,13 +101,6 @@
 
                   <div class="mt-3 flex flex-col gap-3">
                     <div class="flex gap-3">
-                      <button @click="completeService(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        {{ $t('admin.serviceCompletion') }}
-                      </button>
-
                       <button @click="goToDashboard(selectedUser)" :class="['flex-1 flex items-center gap-2 px-4 py-2 rounded text-sm', themeClasses.inputBackground, themeClasses.textSecondary, themeClasses.border, themeClasses.hoverBackground]">
                         <svg class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18" />
@@ -103,10 +108,35 @@
                         </svg>
                         {{ $t('admin.dashboard') }}
                       </button>
+
+                      <button @click="goToUserSetting(selectedUser)" :class="['flex-1 flex items-center gap-2 px-4 py-2 rounded text-sm', themeClasses.inputBackground, themeClasses.textSecondary, themeClasses.border, themeClasses.hoverBackground]">
+                        <svg class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5v14" />
+                        </svg>
+                        {{ $t('admin.userSetting') }}
+                      </button>
+                    </div>
+
+                    <div class="flex gap-3">
+                      <button @click="completeService(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {{ $t('admin.serviceCompletion') }}
+                      </button>
+                    </div>
+
+                    <div class="flex gap-3">
+                      <button @click="setOnGoingService(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700">
+                        <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 5a1 1 0 112 0v4l3 2a1 1 0 11-1 1l-3-2V5z" clip-rule="evenodd" />
+                        </svg>
+                        {{ $t('admin.ongoingService') }}
+                      </button>
                     </div>
                   </div>
 
-                  <div v-if="info" :class="['mt-2 text-sm', isDarkMode ? 'text-green-400' : 'text-green-600']">{{ info }}</div>
+                  <div v-if="info" :class="['mt-2 text-sm', (info === t('admin.serviceSetOnGoing') ? (isDarkMode ? 'text-orange-400' : 'text-orange-600') : (isDarkMode ? 'text-green-400' : 'text-green-600'))]">{{ info }}</div>
                 </div>
 
                 <div v-if="showDetails" :class="['mt-2 border rounded p-4 text-sm', themeClasses.inputBackground, themeClasses.textSecondary, themeClasses.border]">
@@ -132,6 +162,7 @@ import { useRouter } from 'vue-router'
 import Sidebar from '../../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../../composables/useTheme'
 import { useLanguage } from '../../composables/useLanguage'
+import { fetchWithAuth } from '../../utils/fetchWithAuth'
 const { t } = useLanguage()
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -140,7 +171,7 @@ const users = ref([])
 const loading = ref(true)
 const error = ref('')
 const page = ref(1)
-const limit = ref(50)
+const limit = ref(10) // show up to 10 users per page
 const total = ref(0)
 
 const loadUsers = async () => {
@@ -151,15 +182,39 @@ const loadUsers = async () => {
     if (!res.ok) throw new Error(t('admin.failedLoadAssignedUsers'))
     const json = await res.json()
     const data = json.data || json
-    users.value = data.users || []
+    // Initialize users with a default 'ongoing' status, then fetch actual status (if any)
+    users.value = (data.users || []).map(u => ({ ...u, serviceStatusKey: 'ongoing', serviceStatus: t('admin.statusOnGoing') }))
+    // Fetch each user's status in parallel using the new API endpoint
+    await Promise.all(users.value.map(async (u, idx) => {
+      try {
+        const resStatus = await fetchWithAuth(`${API_URL}/api/data/status?userId=${u.id}`, { credentials: 'include' })
+        if (resStatus.ok) {
+          const jsonStatus = await resStatus.json().catch(() => null)
+          const statusText = jsonStatus?.data?.status || 'On-going'
+          const key = String(statusText).toLowerCase() === 'completed' ? 'completed' : 'ongoing'
+          users.value[idx] = { ...users.value[idx], serviceStatusKey: key, serviceStatus: key === 'completed' ? t('admin.statusCompleted') : t('admin.statusOnGoing') }
+        }
+      } catch (e) {
+        // Keep default status if status fetch fails
+      }
+    }))
+
     total.value = data.total || users.value.length
     page.value = data.page || page.value
     limit.value = data.limit || limit.value
+    sortUsers()
   } catch (err) {
     error.value = err.message || t('admin.failedLoadAssignedUsers')
   } finally {
     loading.value = false
   }
+}
+
+const sortUsers = () => {
+  users.value.sort((a, b) => {
+    const rank = (u) => u.serviceStatusKey === 'ongoing' ? 0 : 1
+    return rank(a) - rank(b)
+  })
 }
 
 const totalPages = computed(() => Math.max(1, Math.ceil(total.value / limit.value)))
@@ -206,12 +261,22 @@ const completeService = async (user) => {
   error.value = ''
   info.value = ''
   try {
-    const res = await fetch(`${API_URL}/api/admin/users/${user.id}/service-complete`, {
+    const res = await fetchWithAuth(`${API_URL}/api/data/status/complete?userId=${user.id}`, {
       method: 'POST',
       credentials: 'include'
     })
     if (!res.ok) throw new Error(t('admin.serviceCompleteFailed'))
     info.value = t('admin.serviceCompleted')
+    // Update local status immediately and re-sort
+    const idx = users.value.findIndex(u => u.id === user.id)
+    if (idx !== -1) {
+      users.value[idx] = { ...users.value[idx], serviceStatusKey: 'completed', serviceStatus: t('admin.statusCompleted') }
+      if (selectedUser.value && selectedUser.value.id === user.id) {
+        selectedUser.value.serviceStatusKey = 'completed'
+        selectedUser.value.serviceStatus = t('admin.statusCompleted')
+      }
+      sortUsers()
+    }
     await loadUsers()
   } catch (err) {
     error.value = err.message || t('admin.serviceCompleteFailed')
@@ -222,6 +287,51 @@ const goToDashboard = (user) => {
   if (!user) return
   closeOperations()
   router.push({ name: 'home', query: { userId: user.id, userEmail: user.email } })
+}
+
+const goToUserSetting = (user) => {
+  if (!user) return
+  closeOperations()
+  // Navigate to the User Setting page and pass the user's id and email via query
+  router.push({ name: 'UserSetting', query: { userId: user.id, userEmail: user.email } })
+}
+
+const setOnGoingService = async (user) => {
+  if (!user) return
+  if (!confirm(t('admin.confirmSetOnGoing', { email: user.email }))) return
+  error.value = ''
+  info.value = ''
+  try {
+    // Try a dedicated endpoint first, then fallback to a generic status update
+    let res = await fetchWithAuth(`${API_URL}/api/data/status/ongoing?userId=${user.id}`, { method: 'POST', credentials: 'include' })
+    if (!res.ok) {
+      // fallback: POST /api/data/status with JSON body { status: 'On-going' }
+      res = await fetchWithAuth(`${API_URL}/api/data/status?userId=${user.id}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'On-going' })
+      })
+    }
+
+    if (!res.ok) throw new Error(t('admin.serviceSetOnGoingFailed'))
+
+    info.value = t('admin.serviceSetOnGoing')
+    // Update local status immediately and re-sort
+    const idx = users.value.findIndex(u => u.id === user.id)
+    if (idx !== -1) {
+      users.value[idx] = { ...users.value[idx], serviceStatusKey: 'ongoing', serviceStatus: t('admin.statusOnGoing') }
+      if (selectedUser.value && selectedUser.value.id === user.id) {
+        selectedUser.value.serviceStatusKey = 'ongoing'
+        selectedUser.value.serviceStatus = t('admin.statusOnGoing')
+      }
+      sortUsers()
+    }
+
+    await loadUsers()
+  } catch (err) {
+    error.value = err.message || t('admin.serviceSetOnGoingFailed')
+  }
 }
 
 const formatDate = (d) => {
