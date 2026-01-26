@@ -6,6 +6,18 @@
             sidebarHidden ? 'lg:ml-0' : 'lg:ml-72'
         ]">
             <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-6">
+                        <div v-if="isViewingOtherUser" class="mb-4 p-3 rounded-md text-sm" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800 text-white' : 'bg-blue-50 text-blue-900']">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <strong class="mr-2">{{ $t('home.viewingUser') }}</strong>
+                                    <span>{{ route.query.userEmail || viewedUserId }}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button @click="router.push({ name: 'UserManagement' })" class="underline text-sm">{{ $t('home.returnToUserManagement') }}</button>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Header -->
                         <div class="mb-4 pt-4">
                             <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('dataSettings.title') }}</h1>
@@ -291,11 +303,17 @@
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { saveBMIData, getLatestBMIRecord, updateBMIRecord, deleteAllBMIRecords } from '../services/bmiService' 
 import { uploadHeartRateCSV, uploadAllCSV, deleteAllHeartRateRecords, getHeartRateDates } from '../services/heartRateService' 
 import { uploadStressCSV, deleteAllStressRecords, getStressDates } from '../services/stressService' 
-import { invalidateBmiCache, invalidateHeartRateCache, invalidateStressCache } from '../stores/userStore' 
+import { invalidateBmiCache, invalidateHeartRateCache, invalidateStressCache, useUserStore } from '../stores/userStore' 
+import { apiRequest } from '../services/apiClient' 
+
+const route = useRoute()
+const router = useRouter()
+const userState = useUserStore()
 
 const { isDarkMode, themeClasses } = useTheme()
 const { t } = useI18n()
@@ -372,11 +390,17 @@ const bmiCategoryColor = computed(() => {
 })
 
 const updateSidebarState = (state) => sidebarHidden.value = state
+const viewedUserId = computed(() => route.query.userId || null)
+const currentUserId = computed(() => userState.user?.id || null)
+const isViewingOtherUser = computed(() => {
+    return viewedUserId.value && currentUserId.value && String(viewedUserId.value) !== String(currentUserId.value)
+})
 
 const loadExistingBMIData = async () => {
     isLoadingData.value = true
     try {
-        const { success, data } = await getLatestBMIRecord()
+        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
+        const { success, data } = await getLatestBMIRecord(params)
         if (success && data) {
             existingBMIRecord.value = data
             bmiForm.value = {
@@ -384,13 +408,23 @@ const loadExistingBMIData = async () => {
                 weight: data.weight?.toString() || '',
                 age: data.age?.toString() || ''
             }
+        } else {
+            existingBMIRecord.value = null
         }
     } catch (error) {
         // No existing BMI data
+        existingBMIRecord.value = null
     } finally {
         isLoadingData.value = false
     }
 }
+
+// Reload data when viewed user changes
+watch(() => route.query.userId, () => {
+    loadExistingBMIData()
+    checkHeartRateData()
+    checkStressData()
+})
 
 const submitBMIData = async () => {
     if (!bmiForm.value.height || !bmiForm.value.weight) {
@@ -413,11 +447,26 @@ const submitBMIData = async () => {
     
     try {
         const recordId = existingBMIRecord.value?._id || existingBMIRecord.value?.id
-        const response = isUpdateMode.value 
-            ? await updateBMIRecord(recordId, bmiData) 
-            : await saveBMIData(bmiData)
-        
-        if (response.success) {
+        let response
+
+        if (isViewingOtherUser.value && viewedUserId.value) {
+            // Admin editing another user's BMI - try admin endpoints first
+            try {
+                if (isUpdateMode.value && recordId) {
+                    response = await apiRequest(`/api/admin/users/${viewedUserId.value}/bmi/${recordId}`, { method: 'PUT', body: bmiData })
+                } else {
+                    response = await apiRequest(`/api/admin/users/${viewedUserId.value}/bmi`, { method: 'POST', body: bmiData })
+                }
+            } catch (adminErr) {
+                // Fallback to user-level endpoints if admin path not available
+                console.warn('Admin BMI endpoint failed, falling back:', adminErr)
+                response = isUpdateMode.value ? await updateBMIRecord(recordId, bmiData) : await saveBMIData(bmiData)
+            }
+        } else {
+            response = isUpdateMode.value ? await updateBMIRecord(recordId, bmiData) : await saveBMIData(bmiData)
+        }
+
+        if (response && response.success) {
             if (response.data) {
                 existingBMIRecord.value = { ...response.data, _id: response.data._id || response.data.id }
             }
@@ -428,7 +477,7 @@ const submitBMIData = async () => {
             invalidateBmiCache()  // Invalidate cache so HomeView fetches fresh data
             window.dispatchEvent(new CustomEvent('bmiDataUpdated'))
         } else {
-            submitStatus.value = { type: 'error', message: response.message || t('dataSettings.saveFailed') }
+            submitStatus.value = { type: 'error', message: (response && response.message) || t('dataSettings.saveFailed') }
         }
     } catch (error) {
         console.error('BMI submission error:', error)
@@ -451,9 +500,19 @@ const deleteBMIData = async () => {
     deleteBMIStatus.value = null
     
     try {
-        const response = await deleteAllBMIRecords()
+        let response
+        if (isViewingOtherUser.value && viewedUserId.value) {
+            try {
+                response = await apiRequest(`/api/admin/users/${viewedUserId.value}/bmi`, { method: 'DELETE' })
+            } catch (adminErr) {
+                console.warn('Admin BMI delete endpoint failed, falling back:', adminErr)
+                response = await deleteAllBMIRecords()
+            }
+        } else {
+            response = await deleteAllBMIRecords()
+        }
         
-        if (response.success) {
+        if (response && response.success) {
             deleteBMIStatus.value = { 
                 type: 'success', 
                 message: t('dataSettings.bmiDeleted')
@@ -464,7 +523,7 @@ const deleteBMIData = async () => {
             invalidateBmiCache()
             window.dispatchEvent(new CustomEvent('bmiDataUpdated'))
         } else {
-            deleteBMIStatus.value = { type: 'error', message: response.message || t('dataSettings.deleteFailed') }
+            deleteBMIStatus.value = { type: 'error', message: (response && response.message) || t('dataSettings.deleteFailed') }
         }
     } catch (error) {
         console.error('BMI delete error:', error)
@@ -480,7 +539,8 @@ const deleteBMIData = async () => {
 // Check if heart rate data exists
 const checkHeartRateData = async () => {
     try {
-        const response = await getHeartRateDates()
+        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
+        const response = await getHeartRateDates(params)
         
         // Check if there are dates available (backend returns data.dates array)
         if (
@@ -502,7 +562,8 @@ const checkHeartRateData = async () => {
 // Check if stress data exists
 const checkStressData = async () => {
     try {
-        const response = await getStressDates()
+        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
+        const response = await getStressDates(params)
         if (
             response &&
             response.success &&
@@ -529,9 +590,19 @@ const deleteAllHeartRateData = async () => {
     deleteStatus.value = null
     
     try {
-        const response = await deleteAllHeartRateRecords()
+        let response
+        if (isViewingOtherUser.value && viewedUserId.value) {
+            try {
+                response = await apiRequest(`/api/admin/users/${viewedUserId.value}/heartrate`, { method: 'DELETE' })
+            } catch (adminErr) {
+                console.warn('Admin HR delete failed, falling back:', adminErr)
+                response = await deleteAllHeartRateRecords()
+            }
+        } else {
+            response = await deleteAllHeartRateRecords()
+        }
         
-        if (response.success) {
+        if (response && response.success) {
             deleteStatus.value = { 
                 type: 'success', 
                 message: response.message || t('dataSettings.allHeartRateDeleted')
@@ -540,7 +611,7 @@ const deleteAllHeartRateData = async () => {
             invalidateHeartRateCache()
             window.dispatchEvent(new CustomEvent('heartRateDataUpdated'))
         } else {
-            deleteStatus.value = { type: 'error', message: response.message || t('dataSettings.deleteFailed') }
+            deleteStatus.value = { type: 'error', message: (response && response.message) || t('dataSettings.deleteFailed') }
         }
     } catch (error) {
         console.error('Heart rate delete error:', error)
@@ -664,6 +735,25 @@ function processCsvText(text) {
 
 const uploadProcessedCsv = async (csvText, filename = 'heart_rate_stress_combined.csv') => {
     const processedFile = new File([csvText], filename, { type: 'text/csv' })
+
+    if (isViewingOtherUser.value && viewedUserId.value) {
+        // Try admin upload endpoints first
+        const form = new FormData()
+        form.append('file', processedFile)
+        try {
+            if (isHeartOnlyUpload.value) return await apiRequest(`/api/admin/users/${viewedUserId.value}/heartrate/upload`, { method: 'POST', isForm: true, body: form })
+            if (isStressOnlyUpload.value) return await apiRequest(`/api/admin/users/${viewedUserId.value}/stress/upload`, { method: 'POST', isForm: true, body: form })
+            // fallback name for combined upload
+            return await apiRequest(`/api/admin/users/${viewedUserId.value}/uploadAll`, { method: 'POST', isForm: true, body: form })
+        } catch (adminErr) {
+            console.warn('Admin upload endpoints failed, falling back to user-level upload:', adminErr)
+            if (isHeartOnlyUpload.value) return await uploadHeartRateCSV(processedFile)
+            if (isStressOnlyUpload.value) return await uploadStressCSV(processedFile)
+            return await uploadAllCSV(processedFile)
+        }
+    }
+
+
     if (isHeartOnlyUpload.value) return await uploadHeartRateCSV(processedFile)
     if (isStressOnlyUpload.value) return await uploadStressCSV(processedFile)
     return await uploadAllCSV(processedFile)
