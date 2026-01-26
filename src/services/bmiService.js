@@ -10,9 +10,9 @@ const buildBMIPayload = (bmiData) => ({
 })
 
 export const saveBMIData = async (bmiData) => apiRequest('/api/data/bmi', { method: 'POST', body: buildBMIPayload(bmiData) })
-export const getBMIRecords = async () => apiRequest('/api/data/bmi')
-export const getLatestBMIRecord = async () => {
-  const res = await getBMIRecords()
+export const getBMIRecords = async (params = {}) => apiRequest('/api/data/bmi', { query: params })
+export const getLatestBMIRecord = async (params = {}) => {
+  const res = await getBMIRecords(params)
   return res.success && res.data?.records?.length ? { success: true, data: res.data.records[0] } : { success: true, data: null }
 }
 export const getBMIRecordById = async (id) => apiRequest(`/api/data/bmi/${id}`)

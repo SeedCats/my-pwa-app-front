@@ -8,7 +8,7 @@ export const uploadStressCSV = async (file) => {
 }
 
 export const getStressRecords = async (params = {}) => apiRequest('/api/data/stress', { query: params })
-export const getStressDates = async () => apiRequest('/api/data/stress/dates')
+export const getStressDates = async (params = {}) => apiRequest('/api/data/stress/dates', { query: params })
 export const getStressStats = async (params = {}) => apiRequest('/api/data/stress/stats', { query: params })
 export const deleteAllStressRecords = async () => apiRequest('/api/data/stress', { method: 'DELETE' })
 export const deleteStressByDate = async (date) => apiRequest(`/api/data/stress/date/${date}`, { method: 'DELETE' })

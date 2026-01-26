@@ -7,6 +7,26 @@
     ]">
       <main class="px-3 sm:px-4 md:px-6 lg:px-6 pb-4">
 
+        <!-- Banner shown to admins when viewing another user's home -->
+        <div v-if="isViewingOtherUser" class="mb-4 p-3 rounded-md text-sm" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800 text-white' : 'bg-blue-50 text-blue-900']">
+          <div class="flex items-center justify-between">
+            <div>
+              <strong class="mr-2">{{ $t('home.viewingUser') }}</strong>
+              <span>
+                <template v-if="viewedUserLoading">{{ $t('home.loadingUser') }}</template>
+                <template v-else-if="viewedUser && viewedUser.email">{{ viewedUser.email }}</template>
+                <template v-else-if="viewedUserEmail">{{ viewedUserEmail }}</template>
+                <template v-else-if="viewedUserError">{{ viewedUserError }}</template>
+                <template v-else>{{ viewedUserId }}</template>
+              </span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button @click="goBackToUserManagement" class="underline text-sm">{{ $t('home.returnToUserManagement') }}</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Overall Analysis Section -->
         <div v-if="showOverallAnalysis" class="mb-6 pt-4">
           <div class="rounded-lg shadow-sm p-4 border flex items-center justify-between"
@@ -513,7 +533,7 @@
         </div>
 
         <!-- Quick Actions Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-if="!hideQuickActions" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Data Setting Card -->
           <router-link to="/data-setting" class="block transform transition-transform duration-200 hover:scale-105">
             <div
@@ -613,13 +633,15 @@
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import { useI18n } from 'vue-i18n'
 import { getLatestBMIRecord } from '../services/bmiService'
 import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
 import { getStressRecords, getStressDates } from '../services/stressService'
-import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedHeartRateDates, getCachedStressDates, setCachedStressDates } from '../stores/userStore'
+import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedHeartRateDates, getCachedStressDates, setCachedStressDates, useUserStore } from '../stores/userStore'
+import { getUserById } from '../services/adminService'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -633,6 +655,26 @@ const chartData = ref(null)
 const selectedDate = ref('')
 const currentDate = ref('')
 const availableDates = ref([])
+
+// Viewed user info (when admin views another user's home)
+const viewedUser = ref(null)
+const viewedUserLoading = ref(false)
+const viewedUserError = ref('')
+const userState = useUserStore()
+const currentUserId = computed(() => userState.user?.id || null)
+const isViewingOtherUser = computed(() => viewedUserId.value && viewedUserId.value !== currentUserId.value)
+const hideQuickActions = computed(() => {
+  // Hide quick action cards when an admin is viewing another user's dashboard
+  return isViewingOtherUser.value && userState.user && userState.user.role === 'admin'
+})
+const route = useRoute()
+const router = useRouter()
+const viewedUserId = computed(() => route.query.userId || null)
+const viewedUserEmail = computed(() => route.query.userEmail || null)
+
+const goBackToUserManagement = () => {
+  router.push({ name: 'UserManagement' })
+}
 
 // Stress-specific date selection (new)
 const availableStressDates = ref([])
@@ -705,16 +747,19 @@ const calendarMonth = ref(new Date().getMonth())
 const calendarYear = ref(new Date().getFullYear())
 
 const loadBMIData = async () => {
-  // Check cache first
-  const cached = getCachedBmiData()
-  if (cached) {
-    bmiData.value = cached
-    return
+  const userId = viewedUserId.value
+  // Use cache only when viewing current user
+  if (!userId) {
+    const cached = getCachedBmiData()
+    if (cached) {
+      bmiData.value = cached
+      return
+    }
   }
 
   isBMILoading.value = true
   try {
-    const { success, data } = await getLatestBMIRecord()
+    const { success, data } = await getLatestBMIRecord({ userId })
     const result = success && data ? {
       bmi: data.bmi,
       category: data.category,
@@ -726,7 +771,7 @@ const loadBMIData = async () => {
     } : { bmi: null, category: '', height: null, weight: null, age: null }
 
     bmiData.value = result
-    setCachedBmiData(result)  // Cache the result
+    if (!userId) setCachedBmiData(result)  // Cache only for current user
   } catch (error) {
     console.error('Failed to load BMI data:', error)
     bmiData.value = { bmi: null, category: '', height: null, weight: null, age: null }
@@ -1037,31 +1082,34 @@ const selectDate = (day) => {
 
 // Load available dates from backend
 const loadAvailableDates = async () => {
-  // Check cache first
-  const cached = getCachedHeartRateDates()
-  if (cached) {
-    availableDates.value = cached
-    hasHeartRateData.value = cached.length > 0
-    if (cached.length > 0) {
-      selectedDate.value = cached[0]
-      currentDate.value = formatDateForDisplay(cached[0])
-      // initialize pressure selected date to same default
-      const recentDate = new Date(cached[0])
-      calendarMonth.value = recentDate.getMonth()
-      calendarYear.value = recentDate.getFullYear()
-      return true
+  const userId = viewedUserId.value
+  // Use cache only when viewing current user
+  if (!userId) {
+    const cached = getCachedHeartRateDates()
+    if (cached) {
+      availableDates.value = cached
+      hasHeartRateData.value = cached.length > 0
+      if (cached.length > 0) {
+        selectedDate.value = cached[0]
+        currentDate.value = formatDateForDisplay(cached[0])
+        // initialize pressure selected date to same default
+        const recentDate = new Date(cached[0])
+        calendarMonth.value = recentDate.getMonth()
+        calendarYear.value = recentDate.getFullYear()
+        return true
+      }
+      selectedDate.value = new Date().toISOString().split('T')[0]
+      currentDate.value = formatDateForDisplay(selectedDate.value)
+      return false
     }
-    selectedDate.value = new Date().toISOString().split('T')[0]
-    currentDate.value = formatDateForDisplay(selectedDate.value)
-    return false
   }
 
   try {
-    const response = await getHeartRateDates()
+    const response = await getHeartRateDates({ userId })
 
     if (response.success && response.data.dates && response.data.dates.length > 0) {
       availableDates.value = response.data.dates
-      setCachedHeartRateDates(response.data.dates)  // Cache the result
+      if (!userId) setCachedHeartRateDates(response.data.dates)  // Cache the result only for current user
       hasHeartRateData.value = true
       // Set the most recent date as default
       selectedDate.value = response.data.dates[0]
@@ -1107,10 +1155,11 @@ const loadAvailableStressDates = async () => {
   }
 
   try {
-    const response = await getStressDates()
+    const userId = viewedUserId.value
+    const response = await getStressDates({ userId })
     if (response.success && response.data && Array.isArray(response.data.dates) && response.data.dates.length > 0) {
       availableStressDates.value = response.data.dates
-      setCachedStressDates(response.data.dates)
+      if (!userId) setCachedStressDates(response.data.dates)
       hasStressData.value = true
       selectedStressDate.value = response.data.dates[0]
       currentStressDate.value = formatDateForDisplay(response.data.dates[0])
@@ -1132,10 +1181,11 @@ const loadAvailableStressDates = async () => {
 // Load heart rate data from backend for selected date (aggregated format)
 const loadHeartRateData = async () => {
   if (!selectedDate.value) return
+  const userId = viewedUserId.value
 
   isHeartRateLoading.value = true
   try {
-    const response = await getHeartRateRecords({ date: selectedDate.value })
+    const response = await getHeartRateRecords({ date: selectedDate.value, userId })
 
     if (response.success && response.data.records.length > 0) {
       const record = response.data.records[0]  // One document per day
@@ -1296,7 +1346,8 @@ const loadStressData = async (date) => {
   if (!useDate) return
   isStressLoading.value = true
   try {
-    const response = await getStressRecords({ date: useDate })
+    const userId = viewedUserId.value
+    const response = await getStressRecords({ date: useDate, userId })
     if (response.success && response.data.records && response.data.records.length > 0) {
       const record = response.data.records[0]
       stressData.value = record.hourlyData || []
@@ -1349,11 +1400,43 @@ const updateStressChartFromAggregated = (hourlyData) => {
   }
 }
 
+// Load viewed user's basic info (used only when admin views another user's home)
+const loadViewedUser = async () => {
+  const id = viewedUserId.value
+  if (!id) {
+    viewedUser.value = null
+    return
+  }
+  viewedUserLoading.value = true
+  viewedUserError.value = ''
+  try {
+    const res = await getUserById(id)
+
+    // Not found (we normalized 404 responses in service)
+    if (!res || (res.success === false && res.status === 404)) {
+      viewedUserError.value = t('home.userNotFound')
+      viewedUser.value = null
+      return
+    }
+
+    // Support multiple response shapes: { data: { user } }, { data }, { user }, or raw object
+    viewedUser.value = res?.data?.user || res?.data || res?.user || res || null
+  } catch (err) {
+    // Show a friendly message for network/server issues
+    viewedUserError.value = err.message || t('home.userLoadFailed')
+    viewedUser.value = null
+  } finally {
+    viewedUserLoading.value = false
+  }
+}
+
+
 const forceReloadStressData = async () => {
   try {
-    const response = await getStressDates()
+    const userId = viewedUserId.value
+    const response = await getStressDates({ userId })
     if (response.success && response.data.dates && response.data.dates.length > 0) {
-      setCachedStressDates(response.data.dates)
+      if (!userId) setCachedStressDates(response.data.dates)
       hasStressData.value = true
       // If current selected date is not set or not in list, set the latest
       if (!selectedStressDate.value || !response.data.dates.includes(selectedStressDate.value)) {
@@ -1563,9 +1646,10 @@ const closeDatePicker = (event) => {
 
 // Force reload BMI data (bypassing cache)
 const forceReloadBMIData = async () => {
+  const userId = viewedUserId.value
   isBMILoading.value = true
   try {
-    const { success, data } = await getLatestBMIRecord()
+    const { success, data } = await getLatestBMIRecord({ userId })
     const result = success && data ? {
       bmi: data.bmi,
       category: data.category,
@@ -1577,7 +1661,7 @@ const forceReloadBMIData = async () => {
     } : { bmi: null, category: '', height: null, weight: null, age: null }
 
     bmiData.value = result
-    setCachedBmiData(result)
+    if (!userId) setCachedBmiData(result)
   } catch (error) {
     console.error('Failed to load BMI data:', error)
     bmiData.value = { bmi: null, category: '', height: null, weight: null, age: null }
@@ -1589,10 +1673,11 @@ const forceReloadBMIData = async () => {
 // Force reload heart rate dates (bypassing cache)
 const forceReloadHeartRateData = async () => {
   try {
-    const response = await getHeartRateDates()
+    const userId = viewedUserId.value
+    const response = await getHeartRateDates({ userId })
     if (response.success && response.data.dates && response.data.dates.length > 0) {
       availableDates.value = response.data.dates
-      setCachedHeartRateDates(response.data.dates)
+      if (!userId) setCachedHeartRateDates(response.data.dates)
       hasHeartRateData.value = true
       selectedDate.value = response.data.dates[0]
       currentDate.value = formatDateForDisplay(response.data.dates[0])
@@ -1613,11 +1698,22 @@ const initHeartRateData = async () => {
   }
 }
 
+watch(viewedUserId, async () => {
+  // Re-initialize data when admin switches to view a specific user's home
+  await loadViewedUser()
+  await initHeartRateData()
+  await loadAvailableStressDates()
+  await loadBMIData()
+}, { immediate: true })
+
 onMounted(() => {
   initHeartRateData()
   loadBMIData()
   // Also attempt to load stress dates (if stress-only CSV was uploaded)
   forceReloadStressData()
+
+  // Ensure initial viewed user is loaded if needed
+  if (viewedUserId.value) loadViewedUser()
   // Also load cached/available stress dates and set default stress date
   loadAvailableStressDates()
   window.addEventListener('bmiDataUpdated', forceReloadBMIData)

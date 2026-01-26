@@ -154,6 +154,11 @@
       }
     },
     "selectDate": "Select Date",
+    "viewingUser": "Viewing user:",
+    "loadingUser": "Loading user...",
+    "userNotFound": "User not found",
+    "userLoadFailed": "Failed to load user",
+    "returnToUserManagement": "Return to user management",
     "overallAnalysis": {
       "title": "Overall Analysis",
       "noData": "Not enough data to analyze. Add BMI, heart rate and stress records.",

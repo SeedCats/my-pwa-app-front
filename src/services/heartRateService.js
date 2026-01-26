@@ -14,7 +14,7 @@ export const uploadAllCSV = async (file) => {
 }
 
 export const getHeartRateRecords = async (params = {}) => apiRequest('/api/data/heartrate', { query: params })
-export const getHeartRateDates = async () => apiRequest('/api/data/heartrate/dates')
+export const getHeartRateDates = async (params = {}) => apiRequest('/api/data/heartrate/dates', { query: params })
 export const getHeartRateStats = async (params = {}) => apiRequest('/api/data/heartrate/stats', { query: params })
 export const deleteAllHeartRateRecords = async () => apiRequest('/api/data/heartrate', { method: 'DELETE' })
 export const deleteHeartRateByDate = async (date) => apiRequest(`/api/data/heartrate/date/${date}`, { method: 'DELETE' })
