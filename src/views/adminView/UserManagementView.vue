@@ -101,16 +101,16 @@
 
                   <div class="mt-3 flex flex-col gap-3">
                     <div class="flex gap-3">
-                      <button @click="goToDashboard(selectedUser)" :class="['flex-1 flex items-center gap-2 px-4 py-2 rounded text-sm', themeClasses.inputBackground, themeClasses.textSecondary, themeClasses.border, themeClasses.hoverBackground]">
-                        <svg class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <button @click="goToDashboard(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 rounded text-sm bg-blue-600 text-white hover:bg-blue-700">
+                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18" />
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9h18M9 21V9" />
                         </svg>
                         {{ $t('admin.dashboard') }}
                       </button>
 
-                      <button @click="goToUserSetting(selectedUser)" :class="['flex-1 flex items-center gap-2 px-4 py-2 rounded text-sm', themeClasses.inputBackground, themeClasses.textSecondary, themeClasses.border, themeClasses.hoverBackground]">
-                        <svg class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <button @click="goToUserSetting(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 rounded text-sm bg-indigo-600 text-white hover:bg-indigo-700">
+                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5v14" />
                         </svg>
                         {{ $t('admin.userSetting') }}

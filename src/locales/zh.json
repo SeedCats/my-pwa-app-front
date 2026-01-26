@@ -168,6 +168,7 @@
     "userNotFound": "找不到該使用者",
     "userLoadFailed": "載入使用者失敗",
     "returnToUserManagement": "返回使用者管理",
+    "modifyHealthData": "修改健康資料",
     "overallAnalysis": {
       "title": "整體健康分析",
       "noData": "資料不足，請新增 BMI、心率與壓力紀錄以進行分析。",

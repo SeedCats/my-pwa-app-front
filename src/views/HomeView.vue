@@ -19,12 +19,20 @@
                 <template v-else-if="viewedUserError">{{ viewedUserError }}</template>
                 <template v-else>{{ viewedUserId }}</template>
               </span>
+
+              <!-- Admin-only action: Modify Health Data (appears under viewing user text) -->
+              <div v-if="isViewingOtherUser && userState.user && userState.user.role === 'admin'" class="mt-2">
+                <button @click="goToModifyHealthData" class="px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 text-sm">
+                  {{ $t('home.modifyHealthData') }}
+                </button>
+              </div>
             </div>
 
             <div class="flex items-center gap-2">
-              <template v-if="viewedUser">
-                <span :class="['inline-block px-2 py-1 rounded text-sm font-semibold', (viewedUser && viewedUser.serviceStatusKey === 'completed') ? (isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800') : (isDarkMode ? 'bg-yellow-700 text-white' : 'bg-yellow-100 text-yellow-800') ]">
-                  {{ viewedUser ? (viewedUser.serviceStatusKey === 'completed' ? $t('admin.statusCompleted') : $t('admin.statusOnGoing')) : '' }}
+              <!-- Show badge only when service is completed; hide the 'On-going' badge -->
+              <template v-if="viewedUser && viewedUser.serviceStatusKey === 'completed'">
+                <span :class="['inline-block px-2 py-1 rounded text-sm font-semibold', isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800']">
+                  {{ $t('admin.statusCompleted') }}
                 </span>
               </template>
               <button @click="goBackToUserManagement" class="underline text-sm">{{ $t('home.returnToUserManagement') }}</button>
@@ -681,6 +689,11 @@ const viewedUserEmail = computed(() => route.query.userEmail || null)
 
 const goBackToUserManagement = () => {
   router.push({ name: 'UserManagement' })
+}
+
+const goToModifyHealthData = () => {
+  if (!viewedUserId.value) return
+  router.push({ name: 'DataSetting', query: { userId: viewedUserId.value } })
 }
 
 // Stress-specific date selection (new)
