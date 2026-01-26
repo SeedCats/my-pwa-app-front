@@ -13,7 +13,7 @@
                                     <span>{{ route.query.userEmail || viewedUserId }}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <button @click="router.push({ name: 'UserManagement' })" class="underline text-sm">{{ $t('home.returnToUserManagement') }}</button>
+                                    <button @click="goBackToReferrer" class="underline text-sm">{{ $t('home.returnToDashboard') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -317,6 +317,25 @@ const userState = useUserStore()
 
 const { isDarkMode, themeClasses } = useTheme()
 const { t } = useI18n()
+
+// Navigate back to the referrer if provided; otherwise fall back to history or Admin dashboard
+const goBackToReferrer = () => {
+    const from = route.query.from || null
+    if (from) {
+        // route.query.from may be a string path
+        try {
+            router.push(from)
+            return
+        } catch (e) {
+            // ignore and fallback
+        }
+    }
+    if (window.history.length > 1) {
+        router.back()
+    } else {
+        router.push({ name: 'AdminDashboard' })
+    }
+}
 
 // State
 const sidebarHidden = ref(false)

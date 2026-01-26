@@ -168,6 +168,7 @@
     "userNotFound": "找不到該使用者",
     "userLoadFailed": "載入使用者失敗",
     "returnToUserManagement": "返回使用者管理",
+    "returnToDashboard": "返回儀表板",
     "modifyHealthData": "修改健康資料",
     "overallAnalysis": {
       "title": "整體健康分析",

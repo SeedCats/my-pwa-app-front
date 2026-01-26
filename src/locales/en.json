@@ -167,6 +167,7 @@
     "userNotFound": "User not found",
     "userLoadFailed": "Failed to load user",
     "returnToUserManagement": "Return to user management",
+    "returnToDashboard": "Return to DashBoard",
     "modifyHealthData": "Modify Health Data",
     "overallAnalysis": {
       "title": "Overall Analysis",

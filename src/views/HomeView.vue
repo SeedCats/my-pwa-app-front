@@ -693,8 +693,10 @@ const goBackToUserManagement = () => {
 
 const goToModifyHealthData = () => {
   if (!viewedUserId.value) return
-  router.push({ name: 'DataSetting', query: { userId: viewedUserId.value } })
-}
+  // Include the user's email so DataSetting banner can display it, and include the current page as 'from'
+  const email = viewedUser.value?.email || viewedUserEmail.value || ''
+  router.push({ name: 'DataSetting', query: { userId: viewedUserId.value, userEmail: email, from: route.fullPath } })
+} 
 
 // Stress-specific date selection (new)
 const availableStressDates = ref([])
