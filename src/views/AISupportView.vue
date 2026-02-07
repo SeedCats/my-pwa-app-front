@@ -416,7 +416,7 @@
                                             :title="isChatBusy ? 'Finish current response before loading another chat' : 'Load'"
                                             :class="isChatBusy ? 'px-2 py-1 text-sm rounded bg-blue-400 text-white cursor-not-allowed' : 'px-2 py-1 text-sm rounded bg-blue-600 text-white'">Load</button>
                                         <div class="relative">
-                                            <button @click.prevent="confirmDeleteId = parseId(chat._id || chat.id)" 
+                                            <button @click.prevent="confirmDeleteId = confirmDeleteId === parseId(chat._id || chat.id) ? null : parseId(chat._id || chat.id)" 
                                                 :disabled="isChatBusy" 
                                                 :aria-disabled="isChatBusy"
                                                 :title="isChatBusy ? $t('aiSupport.waitForResponse') : $t('common.delete')"
