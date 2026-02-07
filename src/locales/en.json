@@ -169,6 +169,8 @@
     "returnToUserManagement": "Return to user management",
     "returnToDashboard": "Return to DashBoard",
     "modifyHealthData": "Modify Health Data",
+    "adminNote": "Admin Note",
+    "adminPasswordNote": "You are setting a new password for this user.",
     "overallAnalysis": {
       "title": "Overall Analysis",
       "noData": "Not enough data to analyze. Add BMI, heart rate and stress records.",
@@ -323,7 +325,9 @@
     "deleteAccountWarning": "Once your account is deleted, all of its resources and data will be permanently deleted.",
     "deleteAccountDesc": "Please download any data or information you wish to retain before deleting your account.",
     "enterPasswordToConfirmDeletion": "Enter your password to confirm deletion",
-    "confirmDelete": "Confirm Deletion"
+    "confirmDelete": "Confirm Deletion",
+    "deleting": "Deleting...",
+    "adminCannotDeleteSelf": "Admins cannot delete their own account. Please contact another administrator or system owner."
   },
   "aiSupport": {
     "title": "AI Support Chat",

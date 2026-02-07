@@ -170,6 +170,8 @@
     "returnToUserManagement": "返回使用者管理",
     "returnToDashboard": "返回儀表板",
     "modifyHealthData": "修改健康資料",
+    "adminNote": "管理員注意",
+    "adminPasswordNote": "您正在為此使用者設定新密碼",
     "overallAnalysis": {
       "title": "整體健康分析",
       "noData": "資料不足，請新增 BMI、心率與壓力紀錄以進行分析。",
@@ -335,7 +337,9 @@
     "enterPasswordToConfirmDeletion": "輸入您的密碼以確認刪除",
     "confirmDelete": "確認刪除",
     "deleteAccountDesc": "帳戶刪除後，其所有資源和資料將被永久刪除。",
-    "deleteAccountButton": "刪除帳戶"
+    "deleteAccountButton": "刪除帳戶",
+    "deleting": "刪除中...",
+    "adminCannotDeleteSelf": "管理員無法刪除自己的帳戶。請聯絡其他管理員或系統擁有者。"
   },
   "aiSupport": {
     "title": "AI 支援聊天",

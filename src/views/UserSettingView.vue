@@ -103,10 +103,17 @@
                 <p class="mt-1 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.changePasswordDesc') }}</p>
               </div>
               
+              <!-- Admin notice when editing another user -->
+              <div v-if="isViewingOtherUser" class="px-6 pt-4 pb-2">
+                <div class="p-3 rounded-md text-sm" :class="isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-50 text-blue-900'">
+                  <strong>{{ $t('home.adminNote') }}:</strong> {{ $t('home.adminPasswordNote') }}
+                </div>
+              </div>
+              
               <form @submit.prevent="updatePassword" class="p-6 space-y-6">
                 <div class="grid grid-cols-1 gap-6">
-                  <!-- Current Password -->
-                  <div>
+                  <!-- Current Password (only shown when user is editing their own password) -->
+                  <div v-if="!isViewingOtherUser">
                     <label for="current-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{ $t('userSettings.currentPassword') }}</label>
                     <input 
                       type="password" 
@@ -178,12 +185,17 @@
               </div>
               
               <div class="p-6">
-                <div class="max-w-full text-sm mb-4" :class="themeClasses.textSecondary">
+                <!-- Admin warning when trying to delete own account -->
+                <div v-if="userState.user && userState.user.role === 'admin' && !isViewingOtherUser" class="mb-4 p-3 rounded-md text-sm" :class="isDarkMode ? 'bg-red-900 text-red-200' : 'bg-red-50 text-red-900'">
+                  <strong>{{ $t('userSettings.adminCannotDeleteSelf') }}</strong>
+                </div>
+                
+                <div v-else class="max-w-full text-sm mb-4" :class="themeClasses.textSecondary">
                   <p>{{ $t('userSettings.deleteAccountDesc') }}</p>
                 </div>
                 
-                <!-- Password confirmation input (appears when delete is clicked) -->
-                <div v-if="showDeletePassword" class="mb-4">
+                <!-- Password confirmation input (appears when delete is clicked and user is not admin viewing other user) -->
+                <div v-if="showDeletePassword && !isViewingOtherUser" class="mb-4">
                   <label for="delete-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">
                     {{ $t('userSettings.enterPasswordToConfirmDeletion') }}
                   </label>
@@ -202,7 +214,7 @@
                 
                 <div class="flex gap-3">
                   <button 
-                    v-if="!showDeletePassword"
+                    v-if="!showDeletePassword && !(userState.user && userState.user.role === 'admin' && !isViewingOtherUser)"
                     @click="showDeletePassword = true"
                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
@@ -212,7 +224,7 @@
                   <template v-if="showDeletePassword">
                     <button 
                       @click="deleteAccount"
-                      :disabled="deleteLoading || !deletePassword.trim()"
+                      :disabled="deleteLoading || (!isViewingOtherUser && !deletePassword.trim())"
                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg v-if="deleteLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -243,7 +255,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import Sidebar from '../components/Side_and_Top_Bar.vue'
-import { getUserById, updateUserById, deleteUserById } from '../services/adminService'
+import { getUserById, updateUserById, deleteUserById, updateUserPasswordById } from '../services/adminService'
 import { useUserStore } from '../stores/userStore'
 
 const router = useRouter()
@@ -404,6 +416,22 @@ const updatePassword = async () => {
   passwordLoading.value = true
   
   try {
+    // Admin editing another user's password
+    if (targetUserId.value && userState.user && userState.user.role === 'admin' && String(targetUserId.value) !== String(userState.user?.id)) {
+      const data = await updateUserPasswordById(targetUserId.value, passwordForm.value.newPassword)
+      if (data && data.success) {
+        // Clear the password form
+        passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
+        successMessage.value = data.message || 'Password updated successfully!'
+      } else {
+        errorMessage.value = data?.message || 'Failed to update password'
+      }
+      scrollToTop()
+      passwordLoading.value = false
+      return
+    }
+
+    // Regular user updating own password
     const response = await fetch(`${API_URL}/api/user/password`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -445,6 +473,13 @@ const updatePassword = async () => {
 }
 
 const deleteAccount = async () => {
+  // Prevent admin from deleting themselves
+  if (userState.user && userState.user.role === 'admin' && !isViewingOtherUser.value) {
+    errorMessage.value = 'Admins cannot delete their own account'
+    scrollToTop()
+    return
+  }
+
   deleteLoading.value = true
 
   try {
@@ -463,6 +498,7 @@ const deleteAccount = async () => {
         errorMessage.value = data?.message || 'Failed to delete user'
         scrollToTop()
       }
+      deleteLoading.value = false
       return
     }
 

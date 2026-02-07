@@ -115,3 +115,41 @@ export const deleteUserById = async (id) => {
 
   return { success: false, status: 404, message: 'User not found' }
 }
+
+// Update a user's password (admin only)
+export const updateUserPasswordById = async (id, newPassword) => {
+  if (!id) throw new Error('Missing user id')
+  if (!newPassword) throw new Error('Missing new password')
+
+  const endpoints = [
+    (id) => `/api/admin/user/${id}/password`,
+    (id) => `/api/admin/users/${id}/password`
+  ]
+
+  for (const ep of endpoints) {
+    const url = `${API_URL}${ep(id)}`
+    try {
+      const res = await fetchWithAuth(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ newPassword })
+      })
+
+      if (res.status === 404) continue
+
+      const ct = res.headers.get('content-type') || ''
+      if (ct.includes('application/json')) {
+        const json = await res.json().catch(() => null)
+        return json
+      }
+
+      const text = await res.text().catch(() => null)
+      return { data: text }
+    } catch (err) {
+      throw err
+    }
+  }
+
+  return { success: false, status: 404, message: 'Endpoint not found' }
+}
