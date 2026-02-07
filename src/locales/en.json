@@ -52,7 +52,8 @@
     "manualSupport": "Manual Support",
     "bookingSystem": "Booking System",
     "admin": "Admin Panel",
-    "userManagement": "User Management"
+    "userManagement": "User Management",
+    "provider": "Provider"
   },
   "admin": {
     "description": "Basic administrative panel. Use the links below to manage the system.",

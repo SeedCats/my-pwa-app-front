@@ -153,6 +153,14 @@
                 aria-hidden="true" />
 
             <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+                <!-- Provider Name (for user role group only) -->
+                <div v-if="!isAdmin() && providerName" class="flex items-center">
+                    <span class="text-sm" :class="themeClasses.textSecondary">
+                        {{ t('nav.provider') }}: 
+                        <span class="font-medium" :class="themeClasses.textPrimary">{{ providerName }}</span>
+                    </span>
+                </div>
+
                 <!-- Right side of top bar -->
                 <div class="flex flex-1 justify-end">
                     <div class="flex items-center gap-x-4 lg:gap-x-6">
@@ -305,10 +313,12 @@ const userData = ref(null)
 
 const userName = computed(() => userData.value?.name || 'User')
 
-// Language computed properties
-const currentLanguageFlag = computed(() => {
-    const lang = languages.find(l => l.code === currentLanguage.value)
-    return lang?.flag || '🇺🇸'
+// Provider name - check multiple possible field names
+const providerName = computed(() => {
+    const user = userData.value
+    if (!user) return null
+    // Check multiple possible field names for provider
+    return user.provider || user.providerName || user.assignedProvider || user.healthcare_provider || null
 })
 
 const currentLanguageName = computed(() => {
@@ -339,7 +349,10 @@ const loadUserData = async () => {
             const json = await res.json()
             userData.value = json.data?.user || json.data || json.user || json
         }
-    } catch { userData.value = null }
+    } catch (err) { 
+        console.error('Error loading user data:', err)
+        userData.value = null 
+    }
 }
 
 onMounted(() => {
