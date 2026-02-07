@@ -305,7 +305,7 @@ import { useTheme } from '../composables/useTheme'
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { saveBMIData, getLatestBMIRecord, updateBMIRecord, deleteAllBMIRecords } from '../services/bmiService' 
+import { saveBMIData, getLatestBMIRecord, updateBMIRecord, deleteBMIRecord, deleteAllBMIRecords } from '../services/bmiService' 
 import { uploadHeartRateCSV, uploadAllCSV, deleteAllHeartRateRecords, getHeartRateDates } from '../services/heartRateService' 
 import { uploadStressCSV, deleteAllStressRecords, getStressDates } from '../services/stressService' 
 import { invalidateBmiCache, invalidateHeartRateCache, invalidateStressCache, useUserStore } from '../stores/userStore' 
@@ -466,23 +466,13 @@ const submitBMIData = async () => {
     
     try {
         const recordId = existingBMIRecord.value?._id || existingBMIRecord.value?.id
+        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
         let response
 
-        if (isViewingOtherUser.value && viewedUserId.value) {
-            // Admin editing another user's BMI - try admin endpoints first
-            try {
-                if (isUpdateMode.value && recordId) {
-                    response = await apiRequest(`/api/admin/users/${viewedUserId.value}/bmi/${recordId}`, { method: 'PUT', body: bmiData })
-                } else {
-                    response = await apiRequest(`/api/admin/users/${viewedUserId.value}/bmi`, { method: 'POST', body: bmiData })
-                }
-            } catch (adminErr) {
-                // Fallback to user-level endpoints if admin path not available
-                console.warn('Admin BMI endpoint failed, falling back:', adminErr)
-                response = isUpdateMode.value ? await updateBMIRecord(recordId, bmiData) : await saveBMIData(bmiData)
-            }
+        if (isUpdateMode.value && recordId) {
+            response = await updateBMIRecord(recordId, bmiData, params)
         } else {
-            response = isUpdateMode.value ? await updateBMIRecord(recordId, bmiData) : await saveBMIData(bmiData)
+            response = await saveBMIData(bmiData, params)
         }
 
         if (response && response.success) {
@@ -519,16 +509,16 @@ const deleteBMIData = async () => {
     deleteBMIStatus.value = null
     
     try {
+        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
+        const recordId = existingBMIRecord.value?._id || existingBMIRecord.value?.id
         let response
-        if (isViewingOtherUser.value && viewedUserId.value) {
-            try {
-                response = await apiRequest(`/api/admin/users/${viewedUserId.value}/bmi`, { method: 'DELETE' })
-            } catch (adminErr) {
-                console.warn('Admin BMI delete endpoint failed, falling back:', adminErr)
-                response = await deleteAllBMIRecords()
-            }
+        
+        // If there's a specific record displayed, delete that record by ID
+        if (recordId) {
+            response = await deleteBMIRecord(recordId, params)
         } else {
-            response = await deleteAllBMIRecords()
+            // Otherwise delete all BMI records
+            response = await deleteAllBMIRecords(params)
         }
         
         if (response && response.success) {
@@ -609,17 +599,8 @@ const deleteAllHeartRateData = async () => {
     deleteStatus.value = null
     
     try {
-        let response
-        if (isViewingOtherUser.value && viewedUserId.value) {
-            try {
-                response = await apiRequest(`/api/admin/users/${viewedUserId.value}/heartrate`, { method: 'DELETE' })
-            } catch (adminErr) {
-                console.warn('Admin HR delete failed, falling back:', adminErr)
-                response = await deleteAllHeartRateRecords()
-            }
-        } else {
-            response = await deleteAllHeartRateRecords()
-        }
+        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
+        const response = await deleteAllHeartRateRecords(params)
         
         if (response && response.success) {
             deleteStatus.value = { 
@@ -655,7 +636,8 @@ const deleteAllStressData = async () => {
     deleteStatus.value = null
     
     try {
-        const response = await deleteAllStressRecords()
+        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
+        const response = await deleteAllStressRecords(params)
         
         if (response.success) {
             deleteStatus.value = { 
@@ -754,28 +736,11 @@ function processCsvText(text) {
 
 const uploadProcessedCsv = async (csvText, filename = 'heart_rate_stress_combined.csv') => {
     const processedFile = new File([csvText], filename, { type: 'text/csv' })
+    const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
 
-    if (isViewingOtherUser.value && viewedUserId.value) {
-        // Try admin upload endpoints first
-        const form = new FormData()
-        form.append('file', processedFile)
-        try {
-            if (isHeartOnlyUpload.value) return await apiRequest(`/api/admin/users/${viewedUserId.value}/heartrate/upload`, { method: 'POST', isForm: true, body: form })
-            if (isStressOnlyUpload.value) return await apiRequest(`/api/admin/users/${viewedUserId.value}/stress/upload`, { method: 'POST', isForm: true, body: form })
-            // fallback name for combined upload
-            return await apiRequest(`/api/admin/users/${viewedUserId.value}/uploadAll`, { method: 'POST', isForm: true, body: form })
-        } catch (adminErr) {
-            console.warn('Admin upload endpoints failed, falling back to user-level upload:', adminErr)
-            if (isHeartOnlyUpload.value) return await uploadHeartRateCSV(processedFile)
-            if (isStressOnlyUpload.value) return await uploadStressCSV(processedFile)
-            return await uploadAllCSV(processedFile)
-        }
-    }
-
-
-    if (isHeartOnlyUpload.value) return await uploadHeartRateCSV(processedFile)
-    if (isStressOnlyUpload.value) return await uploadStressCSV(processedFile)
-    return await uploadAllCSV(processedFile)
+    if (isHeartOnlyUpload.value) return await uploadHeartRateCSV(processedFile, params)
+    if (isStressOnlyUpload.value) return await uploadStressCSV(processedFile, params)
+    return await uploadAllCSV(processedFile, params)
 }
 
 const submitFileUpload = async () => {
