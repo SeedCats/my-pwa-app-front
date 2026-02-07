@@ -95,7 +95,7 @@
             <!-- No Data Message -->
             <div v-else-if="!bmiData.bmi" class="text-center py-8">
               <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.bmi.noData') }}</p>
-              <router-link to="/data-setting"
+              <router-link v-if="!isViewingOtherUser" to="/data-setting"
                 class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                 {{ $t('home.bmi.addData') }}
               </router-link>
@@ -304,7 +304,7 @@
 
           <div v-else class="text-center py-8">
             <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.heartRate.noData') }}</p>
-            <router-link to="/data-setting"
+            <router-link v-if="!isViewingOtherUser" to="/data-setting"
               class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               {{ $t('home.heartRate.addData') }}
             </router-link>
@@ -482,9 +482,9 @@
 
         <div v-else class="text-center py-6">
           <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.stress.noData') }}</p>
-          <router-link to="/data-setting"
+          <router-link v-if="!isViewingOtherUser" to="/data-setting"
             class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            {{ $t('home.heartRate.addData') }}</router-link>
+            {{ $t('home.stress.addData') }}</router-link>
         </div>
 
         <!-- Stress Chart -->

@@ -140,6 +140,7 @@
       "name": "Average Stress",
       "loading": "Loading stress data...",
       "noData": "No stress data available",
+      "addData": "Add Stress Data",
       "average": "Average",
       "stressScore": "Stress Score",
       "stressScoreWithUnit": "Stress Score (score)",
