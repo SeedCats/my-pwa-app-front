@@ -49,7 +49,7 @@
     "formatSettings": "系統設定",
     "userSettings": "使用者設定",
     "aiSupport": "AI 支援",
-    "manualSupport": "人工支援",
+    "chat": "聊天",
     "bookingSystem": "預約系統",
     "admin": "管理面板",
     "userManagement": "使用者管理",
@@ -421,9 +421,14 @@
     "showingPage": "顯示第 {page} 頁，共 {total} 頁",
     "renameFailed": "重新命名失敗"
   },
-  "manualSupport": {
-    "title": "人工支援",
-    "contactUs": "聯絡我們",
-    "faq": "常見問題"
+  "chat": {
+    "title": "聊天",
+    "healthcareProvider": "醫護人員",
+    "offline": "離線",
+    "noMessages": "尚無訊息",
+    "startConversation": "開始與您的醫護人員對話",
+    "typePlaceholder": "輸入訊息...",
+    "sendHint": "按 Enter 發送，Shift+Enter 換行",
+    "autoResponse": "感謝您的訊息。您的醫護人員將儘快回覆。"
   }
 }

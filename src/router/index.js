@@ -6,7 +6,7 @@ import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import DataSettingView from '../views/DataSettingView.vue'
 import AISupportView from '../views/AISupportView.vue'
-import ManualSupportView from '../views/ManualSupportView.vue'
+import ChatView from '../views/ChatView.vue'
 import { checkAuth, hasRole } from '../stores/userStore.js'
 
 const router = createRouter({
@@ -55,9 +55,9 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/manual-support',
-      name: 'ManualSupport',
-      component: ManualSupportView,
+      path: '/chat',
+      name: 'Chat',
+      component: ChatView,
       meta: { requiresAuth: true }
     },
     {

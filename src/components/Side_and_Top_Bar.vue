@@ -301,7 +301,7 @@ const navigation = computed(() => {
         { name: t('nav.home'), to: '/home', icon: HomeIcon },
         { name: t('nav.dataSettings'), to: '/data-setting', icon: HomeIcon },
         { name: t('nav.aiSupport'), to: '/ai-support', icon: HomeIcon },
-        { name: t('nav.manualSupport'), to: '/manual-support', icon: HomeIcon },
+        { name: t('nav.chat'), to: '/chat', icon: HomeIcon },
         { name: t('nav.bookingSystem'), to: '/booking-system', icon: HomeIcon }
     ]
 })
