@@ -90,12 +90,12 @@
                 </div>
                 <div class="mb-4">
                   <div>
-                    <button @click="viewDetails" :class="['flex items-center gap-2 px-4 py-2 rounded text-sm', themeClasses.inputBackground, themeClasses.textSecondary, themeClasses.border, themeClasses.hoverBackground]">
+                    <button @click="viewDetails" :class="['flex items-center gap-2 px-4 py-2 rounded text-sm', themeClasses.inputBackground, themeClasses.textSecondary, themeClasses.border, themeClasses.hoverBackground]" :aria-label="selectedUser ? `${$t('admin.view')} ${selectedUser.name}` : $t('admin.view')">
                       <svg class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
-                      {{ $t('admin.view') }}
+                      <span>{{ $t('admin.view') }}</span>
                     </button>
                   </div>
 
@@ -118,20 +118,20 @@
                     </div>
 
                     <div class="flex gap-3">
-                      <button @click="completeService(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        {{ $t('admin.serviceCompletion') }}
-                      </button>
-                    </div>
-
-                    <div class="flex gap-3">
                       <button @click="setOnGoingService(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700">
                         <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                           <path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 5a1 1 0 112 0v4l3 2a1 1 0 11-1 1l-3-2V5z" clip-rule="evenodd" />
                         </svg>
                         {{ $t('admin.ongoingService') }}
+                      </button>
+                    </div>
+
+                    <div class="flex gap-3">
+                      <button @click="completeService(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {{ $t('admin.serviceCompletion') }}
                       </button>
                     </div>
                   </div>
@@ -141,6 +141,7 @@
 
                 <div v-if="showDetails" :class="['mt-2 border rounded p-4 text-sm', themeClasses.inputBackground, themeClasses.textSecondary, themeClasses.border]">
                   <dl class="grid grid-cols-1 gap-2">
+                    <div><dt class="font-semibold inline">{{ $t('admin.name') }}:</dt> <dd class="inline">{{ selectedUser ? selectedUser.name : '' }}</dd></div>
                     <div><dt class="font-semibold inline">{{ $t('admin.id') }}:</dt> <dd class="inline">{{ selectedUser ? selectedUser.id : '' }}</dd></div>
                     <div><dt class="font-semibold inline">{{ $t('admin.role') }}:</dt> <dd class="inline">{{ selectedUser ? selectedUser.role : '' }}</dd></div>
                     <div><dt class="font-semibold inline">{{ $t('admin.created') }}:</dt> <dd class="inline">{{ selectedUser ? formatDate(selectedUser.createdAt) : '' }}</dd></div>
