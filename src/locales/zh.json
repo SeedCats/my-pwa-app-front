@@ -103,13 +103,10 @@
     "averageHeartRate": "平均心率",
     "quickAdd": "快速新增",
     "availableAlways": "全天候可用",
-    "learnMore": "了解更多",
     "recordData": "立即記錄您的資料，幫助我們更好地追蹤您的健康狀態。",
     "getAdvice": "根據您的心率資料和健康趨勢，獲得由 AI 提供的個人化健康建議。",
-    "accessGuides": "存取完整的指南和文件，更好地了解您的健康指標。",
     "addRecord": "新增紀錄",
     "getAdviceButton": "取得建議",
-    "viewManual": "查看手冊",
     "bmi": {
       "title": "BMI 資訊",
       "loading": "載入 BMI 資料中...",

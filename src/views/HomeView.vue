@@ -605,37 +605,6 @@
               </div>
             </div>
           </router-link>
-
-          <!-- Manual Support Card -->
-          <router-link to="/manual-support" class="block transform transition-transform duration-200 hover:scale-105">
-            <div
-              class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
-              :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-green-300']">
-              <div class="flex items-center mb-4">
-                <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-green-900/30' : 'bg-green-100'">
-                  <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-                    </path>
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.manualSupport') }}
-                  </h3>
-                  <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.learnMore') }}</p>
-                </div>
-              </div>
-              <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
-                {{ $t('home.accessGuides') }}
-              </p>
-              <div class="flex items-center text-green-600 text-xs font-medium mt-auto">
-                <span>{{ $t('home.viewManual') }}</span>
-                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </div>
-            </div>
-          </router-link>
         </div>
       </main>
     </div>

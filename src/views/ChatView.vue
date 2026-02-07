@@ -130,10 +130,17 @@ onMounted(async () => {
 const sendMessage = () => {
     if (!newMessage.value.trim()) return
 
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hours = String(now.getHours()).padStart(2, '0')
+    const minutes = String(now.getMinutes()).padStart(2, '0')
+
     const message = {
         id: Date.now(),
         text: newMessage.value,
-        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        time: `${year}/${month}/${day} ${hours}:${minutes}`,
         isUser: true
     }
 
@@ -150,10 +157,17 @@ const sendMessage = () => {
 
     // Simulate provider response (remove this in production)
     setTimeout(() => {
+        const now = new Date()
+        const year = now.getFullYear()
+        const month = String(now.getMonth() + 1).padStart(2, '0')
+        const day = String(now.getDate()).padStart(2, '0')
+        const hours = String(now.getHours()).padStart(2, '0')
+        const minutes = String(now.getMinutes()).padStart(2, '0')
+
         messages.value.push({
             id: Date.now(),
             text: t('chat.autoResponse'),
-            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+            time: `${year}/${month}/${day} ${hours}:${minutes}`,
             isUser: false
         })
         nextTick(() => {

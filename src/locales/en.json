@@ -102,13 +102,10 @@
     "averageHeartRate": "Average Heart Rate",
     "quickAdd": "Quick Add",
     "availableAlways": "24/7 Available",
-    "learnMore": "Learn More",
     "recordData": "Record your data immediately to help us better track your health status.",
     "getAdvice": "Get personalized health advice powered by AI, based on your heart rate data and health trends.",
-    "accessGuides": "Access comprehensive guides and documentation to understand your health metrics better.",
     "addRecord": "Add Record",
     "getAdviceButton": "Get Advice",
-    "viewManual": "View Manual",
     "bmi": {
       "title": "BMI Information",
       "loading": "Loading BMI data...",
