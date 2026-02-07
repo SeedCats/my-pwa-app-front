@@ -29,6 +29,11 @@ export const deleteAllStressRecords = async (params = {}) => {
   if (userId) return apiRequest(`/api/admin/users/${userId}/stress`, { method: 'DELETE' })
   return apiRequest('/api/data/stress', { method: 'DELETE' })
 }
+export const deleteStressById = async (id, params = {}) => {
+  const { userId } = params || {}
+  if (userId) return apiRequest(`/api/admin/users/${userId}/stress/${id}`, { method: 'DELETE' })
+  return apiRequest(`/api/data/stress/${id}`, { method: 'DELETE' })
+}
 export const deleteStressByDate = async (date, params = {}) => {
   const { userId } = params || {}
   if (userId) return apiRequest(`/api/admin/users/${userId}/stress/date/${date}`, { method: 'DELETE' })

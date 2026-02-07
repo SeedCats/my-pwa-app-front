@@ -37,6 +37,11 @@ export const deleteAllHeartRateRecords = async (params = {}) => {
   if (userId) return apiRequest(`/api/admin/users/${userId}/heartrate`, { method: 'DELETE' })
   return apiRequest('/api/data/heartrate', { method: 'DELETE' })
 }
+export const deleteHeartRateById = async (id, params = {}) => {
+  const { userId } = params || {}
+  if (userId) return apiRequest(`/api/admin/users/${userId}/heartrate/${id}`, { method: 'DELETE' })
+  return apiRequest(`/api/data/heartrate/${id}`, { method: 'DELETE' })
+}
 export const deleteHeartRateByDate = async (date, params = {}) => {
   const { userId } = params || {}
   if (userId) return apiRequest(`/api/admin/users/${userId}/heartrate/date/${date}`, { method: 'DELETE' })
