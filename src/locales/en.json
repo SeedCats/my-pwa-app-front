@@ -199,7 +199,22 @@
         "highStress": "High stress detected — prioritize stress reduction strategies and consult a professional if necessary.",
         "critical": "Seek immediate medical attention or call emergency services if you feel unwell."
       }
-    } 
+    },
+    "offline": {
+      "title": "Offline",
+      "message": "You are currently offline. Showing cached data when available.",
+      "retry": "Try Again"
+    },
+    "cached": {
+      "title": "Cached Data",
+      "message": "Displaying previously downloaded data. Connect to get latest updates.",
+      "refresh": "Refresh Now"
+    },
+    "chat": {
+      "available": "Connect anytime",
+      "description": "Message your healthcare provider directly and get timely support for your health concerns.",
+      "openChat": "Open Chat"
+    }
   },
   "dataSettings": {
     "title": "Data Setting",

@@ -14,7 +14,54 @@ export default defineConfig({
 
       workbox: {
         clientsClaim: true,
-        skipWaiting: true
+        skipWaiting: true,
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/data/heartrate'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-heart-rate',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              },
+              networkTimeoutSeconds: 10
+            }
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/data/stress'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-stress',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              },
+              networkTimeoutSeconds: 10
+            }
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/data/bmi'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-bmi',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              },
+              networkTimeoutSeconds: 10
+            }
+          }
+        ]
       },
       
       includeAssets: ['vite.svg', 'screenshot.png'],  // Assets to cache
