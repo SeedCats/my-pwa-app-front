@@ -7,6 +7,11 @@
     ]">
       <main class="px-3 sm:px-4 md:px-6 lg:px-6 pb-4">
 
+        <div v-if="isOffline" class="mb-4 p-3 rounded-md text-sm border" :class="[themeClasses.border, isDarkMode ? 'bg-yellow-900/40 text-yellow-100' : 'bg-yellow-50 text-yellow-900']">
+          <strong>{{ $t('home.offlineTitle') }}</strong>
+          <span class="ml-2">{{ $t('home.offlineMessage') }}</span>
+        </div>
+
         <!-- Banner shown to admins when viewing another user's home -->
         <div v-if="isViewingOtherUser" class="mb-4 p-3 rounded-md text-sm" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800 text-white' : 'bg-blue-50 text-blue-900']">
           <div class="flex items-center justify-between">
@@ -655,6 +660,8 @@ const route = useRoute()
 const router = useRouter()
 const viewedUserId = computed(() => route.query.userId || null)
 const viewedUserEmail = computed(() => route.query.userEmail || null)
+const isOffline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
+const showOfflineBanner = computed(() => isOffline.value)
 
 const goBackToUserManagement = () => {
   router.push({ name: 'UserManagement' })
@@ -1095,6 +1102,15 @@ const loadAvailableDates = async () => {
     }
   }
 
+  if (showOfflineBanner.value) {
+    hasHeartRateData.value = availableDates.value.length > 0
+    if (!hasHeartRateData.value) {
+      selectedDate.value = new Date().toISOString().split('T')[0]
+      currentDate.value = formatDateForDisplay(selectedDate.value)
+    }
+    return hasHeartRateData.value
+  }
+
   try {
     const response = await getHeartRateDates({ userId })
 
@@ -1145,6 +1161,11 @@ const loadAvailableStressDates = async () => {
     return false
   }
 
+  if (showOfflineBanner.value) {
+    hasStressData.value = availableStressDates.value.length > 0
+    return hasStressData.value
+  }
+
   try {
     const userId = viewedUserId.value
     const response = await getStressDates({ userId })
@@ -1173,6 +1194,11 @@ const loadAvailableStressDates = async () => {
 const loadHeartRateData = async () => {
   if (!selectedDate.value) return
   const userId = viewedUserId.value
+
+  if (showOfflineBanner.value) {
+    isHeartRateLoading.value = false
+    return
+  }
 
   isHeartRateLoading.value = true
   try {
@@ -1335,6 +1361,12 @@ const loadStressData = async (date) => {
   // Use passed date -> selectedStressDate -> fallback to selected heart-rate date
   const useDate = date || selectedStressDate.value || selectedDate.value
   if (!useDate) return
+
+  if (showOfflineBanner.value) {
+    isStressLoading.value = false
+    return
+  }
+
   isStressLoading.value = true
   try {
     const userId = viewedUserId.value
@@ -1652,6 +1684,10 @@ const closeDatePicker = (event) => {
   }
 }
 
+const updateNetworkStatus = () => {
+  isOffline.value = typeof navigator !== 'undefined' ? !navigator.onLine : false
+}
+
 // Force reload BMI data (bypassing cache)
 const forceReloadBMIData = async () => {
   const userId = viewedUserId.value
@@ -1727,6 +1763,9 @@ onMounted(() => {
   window.addEventListener('bmiDataUpdated', forceReloadBMIData)
   window.addEventListener('heartRateDataUpdated', forceReloadHeartRateData)
   window.addEventListener('stressDataUpdated', forceReloadStressData)
+  window.addEventListener('online', updateNetworkStatus)
+  window.addEventListener('offline', updateNetworkStatus)
+  updateNetworkStatus()
   document.addEventListener('click', closeDatePicker)
 })
 
@@ -1734,6 +1773,8 @@ onUnmounted(() => {
   window.removeEventListener('bmiDataUpdated', forceReloadBMIData)
   window.removeEventListener('heartRateDataUpdated', forceReloadHeartRateData)
   window.removeEventListener('stressDataUpdated', forceReloadStressData)
+  window.removeEventListener('online', updateNetworkStatus)
+  window.removeEventListener('offline', updateNetworkStatus)
   document.removeEventListener('click', closeDatePicker)
 })
 </script>

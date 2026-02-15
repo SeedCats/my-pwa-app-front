@@ -93,6 +93,8 @@
   },
   "home": {
     "title": "Home",
+    "offlineTitle": "Offline mode",
+    "offlineMessage": "You are offline. Showing cached dashboard data when available.",
     "dataAnalysis": "Data Analysis",
     "todayOverview": "Today Heart Rate Overview",
     "todayStressOverview": "Today Stress Overview",

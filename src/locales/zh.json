@@ -93,6 +93,8 @@
   },
   "home": {
     "title": "首頁",
+    "offlineTitle": "離線模式",
+    "offlineMessage": "您目前離線中。若有快取資料，儀表板將顯示快取內容。",
     "dataAnalysis": "數據分析",
     "todayOverview": "今日心率概括",
     "todayStressOverview": "今日壓力概括",

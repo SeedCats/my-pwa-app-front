@@ -8,6 +8,10 @@ let lastPrefetchAt = 0
 let inFlightPrefetch = null
 
 export const prefetchHealthDataForOffline = async ({ force = false } = {}) => {
+  if (!force && typeof navigator !== 'undefined' && !navigator.onLine) {
+    return
+  }
+
   const now = Date.now()
   if (!force && now - lastPrefetchAt < PREFETCH_INTERVAL_MS) {
     return
@@ -41,11 +45,10 @@ export const prefetchHealthDataForOffline = async ({ force = false } = {}) => {
           await Promise.allSettled(followUps)
         }
       })
-
-      lastPrefetchAt = Date.now()
     } catch {
       // Ignore prefetch failures to avoid blocking navigation.
     } finally {
+      lastPrefetchAt = Date.now()
       inFlightPrefetch = null
     }
   })()
