@@ -11,45 +11,10 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',  // Automatically updates the service worker
       devOptions: { enabled: true },  // Enables PWA in development mode for testing
-
       workbox: {
         clientsClaim: true,
-        skipWaiting: true,
-        cleanupOutdatedCaches: true,
-        inlineWorkboxRuntime: true,
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-runtime-cache',
-              networkTimeoutSeconds: 5,
-              cacheableResponse: {
-                statuses: [0, 200]
-              },
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 24 * 60 * 60
-              }
-            }
-          }
-        ]
+        skipWaiting: true
       },
-      
-      includeAssets: ['vite.svg', 'screenshot.png'],  // Assets to cache
-      injectRegister: 'auto',  // Automatically injects the service worker registration
-
-      manifest: {
-        id: '/',
-        name: 'My Vue PWA',
-        short_name: 'VuePWA',
-        description: 'A Progressive Web App built with Vue and Vite',
-        start_url: '/',
-        scope: '/',
-        display: 'standalone',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
-
         icons: [
           {
             src: 'icon192.png',
@@ -73,8 +38,6 @@ export default defineConfig({
           }
         ]
       }
-
-    })
   ],
   
   server: {

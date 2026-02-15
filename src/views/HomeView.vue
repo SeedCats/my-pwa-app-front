@@ -45,6 +45,40 @@
           </div>
         </div>
 
+        <!-- Offline Indicator Banner -->
+        <div v-if="!isOnline" class="mb-4 p-3 rounded-md text-sm flex items-center justify-between" :class="[themeClasses.border, isDarkMode ? 'bg-orange-900/30 text-orange-200 border-orange-700' : 'bg-orange-50 text-orange-900 border-orange-200']">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3"></path>
+            </svg>
+            <strong>{{ $t('home.offline.title') }}</strong>
+            <span>{{ $t('home.offline.message') }}</span>
+          </div>
+          <button 
+            @click="manualRefreshAllData" 
+            class="px-3 py-1 rounded text-sm font-semibold transition-colors"
+            :class="isDarkMode ? 'bg-orange-700 hover:bg-orange-600 text-white' : 'bg-orange-200 hover:bg-orange-300 text-orange-900'">
+            {{ $t('home.offline.retry') }}
+          </button>
+        </div>
+
+        <!-- Cached Data Indicator (shown when displaying offline data) -->
+        <div v-if="showingCachedData" class="mb-4 p-3 rounded-md text-sm flex items-center justify-between" :class="[themeClasses.border, isDarkMode ? 'bg-blue-900/30 text-blue-200 border-blue-700' : 'bg-blue-50 text-blue-900 border-blue-200']">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+            </svg>
+            <strong>{{ $t('home.cached.title') }}</strong>
+            <span>{{ $t('home.cached.message') }}</span>
+          </div>
+          <button 
+            @click="manualRefreshAllData" 
+            class="px-3 py-1 rounded text-sm font-semibold transition-colors"
+            :class="isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-200 hover:bg-blue-300 text-blue-900'">
+            {{ $t('home.cached.refresh') }}
+          </button>
+        </div>
+
         <!-- Overall Analysis Section -->
         <div v-if="showOverallAnalysis" class="mb-6 pt-4">
           <div class="rounded-lg shadow-sm p-4 border flex items-center justify-between"
@@ -610,6 +644,36 @@
               </div>
             </div>
           </router-link>
+
+          <!-- Chat Card -->
+          <router-link to="/chat" class="block transform transition-transform duration-200 hover:scale-105">
+            <div
+              class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
+              :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-green-300']">
+              <div class="flex items-center mb-4">
+                <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-green-900/30' : 'bg-green-100'">
+                  <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                    </path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.chat') }}</h3>
+                  <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.chat.available') }}</p>
+                </div>
+              </div>
+              <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
+                {{ $t('home.chat.description') }}
+              </p>
+              <div class="flex items-center text-green-600 text-xs font-medium mt-auto">
+                <span>{{ $t('home.chat.openChat') }}</span>
+                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </div>
+            </div>
+          </router-link>
         </div>
       </main>
     </div>
@@ -627,7 +691,7 @@ import { useI18n } from 'vue-i18n'
 import { getLatestBMIRecord } from '../services/bmiService'
 import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
 import { getStressRecords, getStressDates } from '../services/stressService'
-import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedHeartRateDates, getCachedStressDates, setCachedStressDates, useUserStore } from '../stores/userStore'
+import { getCachedBmiData, setCachedBmiData, getCachedHeartRateDates, setCachedHeartRateDates, getCachedStressDates, setCachedStressDates, getCachedHeartRateRecord, setCachedHeartRateRecord, getCachedStressRecord, setCachedStressRecord, useUserStore } from '../stores/userStore'
 import { getUserById } from '../services/adminService'
 import { fetchWithAuth } from '../utils/fetchWithAuth'
 const API_URL = import.meta.env.VITE_API_URL || ''
@@ -695,6 +759,10 @@ const bmiData = ref({ bmi: null, category: '', height: null, weight: null, age: 
 const isBMILoading = ref(false)
 const isHeartRateLoading = ref(false)
 const hasHeartRateData = ref(false)
+
+// Online/offline and cache state
+const isOnline = ref(navigator.onLine)
+const showingCachedData = ref(false)
 
 // Pressure visualization state
 const isPressureLoading = ref(false)
@@ -770,9 +838,19 @@ const loadBMIData = async () => {
 
     bmiData.value = result
     if (!userId) setCachedBmiData(result)  // Cache only for current user
+    if (success && data && data.bmi) showingCachedData.value = false
   } catch (error) {
     console.error('Failed to load BMI data:', error)
-    bmiData.value = { bmi: null, category: '', height: null, weight: null, age: null }
+    
+    // Try to load from cache when network fails
+    const cached = getCachedBmiData()
+    if (cached && cached.bmi) {
+      console.log('Loading BMI data from offline cache')
+      showingCachedData.value = true
+      bmiData.value = cached
+    } else {
+      bmiData.value = { bmi: null, category: '', height: null, weight: null, age: null }
+    }
   } finally {
     isBMILoading.value = false
   }
@@ -1117,6 +1195,7 @@ const loadAvailableDates = async () => {
     if (response.success && response.data.dates && response.data.dates.length > 0) {
       availableDates.value = response.data.dates
       if (!userId) setCachedHeartRateDates(response.data.dates)  // Cache the result only for current user
+      showingCachedData.value = false
       hasHeartRateData.value = true
       // Set the most recent date as default
       selectedDate.value = response.data.dates[0]
@@ -1134,6 +1213,22 @@ const loadAvailableDates = async () => {
     return false
   } catch (error) {
     console.error('Error loading available dates:', error)
+    
+    // Try to load from cache when network fails (even for admin viewing other users)
+    const cached = getCachedHeartRateDates()
+    if (cached && cached.length > 0) {
+      console.log('Loading heart rate dates from offline cache')
+      showingCachedData.value = true
+      availableDates.value = cached
+      hasHeartRateData.value = true
+      selectedDate.value = cached[0]
+      currentDate.value = formatDateForDisplay(cached[0])
+      const recentDate = new Date(cached[0])
+      calendarMonth.value = recentDate.getMonth()
+      calendarYear.value = recentDate.getFullYear()
+      return true
+    }
+    
     hasHeartRateData.value = false
     // Set today as default date
     selectedDate.value = new Date().toISOString().split('T')[0]
@@ -1172,6 +1267,7 @@ const loadAvailableStressDates = async () => {
     if (response.success && response.data && Array.isArray(response.data.dates) && response.data.dates.length > 0) {
       availableStressDates.value = response.data.dates
       if (!userId) setCachedStressDates(response.data.dates)
+      showingCachedData.value = false
       hasStressData.value = true
       selectedStressDate.value = response.data.dates[0]
       currentStressDate.value = formatDateForDisplay(response.data.dates[0])
@@ -1185,6 +1281,23 @@ const loadAvailableStressDates = async () => {
     return false
   } catch (error) {
     console.error('Error loading available stress dates:', error)
+    
+    // Try to load from cache when network fails
+    const cachedFallback = getCachedStressDates()
+    if (cachedFallback && cachedFallback.length > 0) {
+      console.log('Loading stress dates from offline cache')
+      showingCachedData.value = true
+      availableStressDates.value = cachedFallback
+      hasStressData.value = true
+      selectedStressDate.value = cachedFallback[0]
+      currentStressDate.value = formatDateForDisplay(cachedFallback[0])
+      const recentDate = new Date(cachedFallback[0])
+      stressCalendarMonth.value = recentDate.getMonth()
+      stressCalendarYear.value = recentDate.getFullYear()
+      await loadStressData(cachedFallback[0])
+      return true
+    }
+    
     hasStressData.value = false
     return false
   }
@@ -1206,6 +1319,10 @@ const loadHeartRateData = async () => {
 
     if (response.success && response.data.records.length > 0) {
       const record = response.data.records[0]  // One document per day
+
+      // Cache the record for offline use (only for current user)
+      if (!userId) setCachedHeartRateRecord(selectedDate.value, record)
+      showingCachedData.value = false
 
       // Use aggregated hourly data directly
       heartRateData.value = record.hourlyData
@@ -1263,9 +1380,38 @@ const loadHeartRateData = async () => {
     }
   } catch (error) {
     console.error('Error loading heart rate data:', error)
-    heartRateData.value = []
-    stats.value = { min: 0, max: 0, avg: 0, resting: 0, count: 0 }
-    chartData.value = null
+    
+    // Try to load from cache when network fails
+    const cached = getCachedHeartRateRecord(selectedDate.value)
+    if (cached) {
+      console.log('Loading heart rate data from offline cache')
+      showingCachedData.value = true
+      const record = cached
+      
+      heartRateData.value = record.hourlyData
+      const hourlyValues = record.hourlyData.filter(h => h.avg > 0)
+      const avgValues = hourlyValues.map(h => h.avg)
+      const actualMin = avgValues.length > 0 ? Math.min(...avgValues) : 0
+      const actualMax = avgValues.length > 0 ? Math.max(...avgValues) : 0
+      const actualAvg = avgValues.length > 0 ? Math.round(avgValues.reduce((sum, v) => sum + v, 0) / avgValues.length) : 0
+      const actualRestingMin = hourlyValues.length > 0 ? Math.min(...hourlyValues.map(h => h.min)) : 0
+      
+      stats.value = {
+        min: actualMin,
+        max: actualMax,
+        avg: actualAvg,
+        resting: actualRestingMin,
+        count: record.dailyStats?.count || 0
+      }
+      
+      hasHeartRateData.value = true
+      updateChartFromAggregated(record.hourlyData)
+      generateMockPressure()
+    } else {
+      heartRateData.value = []
+      stats.value = { min: 0, max: 0, avg: 0, resting: 0, count: 0 }
+      chartData.value = null
+    }
   } finally {
     isHeartRateLoading.value = false
   }
@@ -1373,6 +1519,11 @@ const loadStressData = async (date) => {
     const response = await getStressRecords({ date: useDate, userId })
     if (response.success && response.data.records && response.data.records.length > 0) {
       const record = response.data.records[0]
+      
+      // Cache the record for offline use (only for current user)
+      if (!userId) setCachedStressRecord(useDate, record)
+      showingCachedData.value = false
+      
       stressData.value = record.hourlyData || []
       const hourlyValues = stressData.value.filter(h => h.avg !== undefined && h.avg !== null)
       const avgValuesAll = hourlyValues.map(h => Number(h.avg)).filter(v => !isNaN(v))
@@ -1391,10 +1542,30 @@ const loadStressData = async (date) => {
     }
   } catch (err) {
     console.error('Error loading stress data:', err)
-    stressData.value = []
-    stressStats.value = { min: null, max: null, avg: null }
-    stressChartData.value = null
-    hasStressData.value = false
+    
+    // Try to load from cache when network fails
+    const cached = getCachedStressRecord(useDate)
+    if (cached) {
+      console.log('Loading stress data from offline cache')
+      showingCachedData.value = true
+      const record = cached
+      
+      stressData.value = record.hourlyData || []
+      const hourlyValues = stressData.value.filter(h => h.avg !== undefined && h.avg !== null)
+      const avgValuesAll = hourlyValues.map(h => Number(h.avg)).filter(v => !isNaN(v))
+      const avgValuesNonZero = avgValuesAll.filter(v => v !== 0)
+      const actualMin = avgValuesNonZero.length > 0 ? Math.min(...avgValuesNonZero) : null
+      const actualMax = avgValuesAll.length > 0 ? Math.max(...avgValuesAll) : null
+      const actualAvg = avgValuesNonZero.length > 0 ? Math.round(avgValuesNonZero.reduce((s, v) => s + v, 0) / avgValuesNonZero.length) : null
+      stressStats.value = { min: actualMin, max: actualMax, avg: actualAvg }
+      hasStressData.value = avgValuesAll.length > 0
+      updateStressChartFromAggregated(stressData.value)
+    } else {
+      stressData.value = []
+      stressStats.value = { min: null, max: null, avg: null }
+      stressChartData.value = null
+      hasStressData.value = false
+    }
   } finally {
     isStressLoading.value = false
   }
@@ -1686,6 +1857,7 @@ const closeDatePicker = (event) => {
 
 const updateNetworkStatus = () => {
   isOffline.value = typeof navigator !== 'undefined' ? !navigator.onLine : false
+  isOnline.value = !isOffline.value
 }
 
 // Force reload BMI data (bypassing cache)
@@ -1740,6 +1912,27 @@ const initHeartRateData = async () => {
   if (hasData) {
     await loadHeartRateData()
   }
+}
+
+// Manual refresh all data (for refresh button)
+const manualRefreshAllData = async () => {
+  showingCachedData.value = false
+  await Promise.all([
+    forceReloadBMIData(),
+    forceReloadHeartRateData(),
+    forceReloadStressData()
+  ])
+}
+
+// Handle online/offline events
+const handleOnline = () => {
+  isOnline.value = true
+  console.log('Connection restored - you can refresh to get latest data')
+}
+
+const handleOffline = () => {
+  isOnline.value = false
+  console.log('Connection lost - showing cached data when available')
 }
 
 watch(viewedUserId, async () => {
