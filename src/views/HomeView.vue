@@ -7,11 +7,6 @@
     ]">
       <main class="px-3 sm:px-4 md:px-6 lg:px-6 pb-4">
 
-        <div v-if="isOffline" class="mb-4 p-3 rounded-md text-sm border" :class="[themeClasses.border, isDarkMode ? 'bg-yellow-900/40 text-yellow-100' : 'bg-yellow-50 text-yellow-900']">
-          <strong>{{ $t('home.offlineTitle') }}</strong>
-          <span class="ml-2">{{ $t('home.offlineMessage') }}</span>
-        </div>
-
         <!-- Banner shown to admins when viewing another user's home -->
         <div v-if="isViewingOtherUser" class="mb-4 p-3 rounded-md text-sm" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800 text-white' : 'bg-blue-50 text-blue-900']">
           <div class="flex items-center justify-between">

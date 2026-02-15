@@ -7,7 +7,6 @@ export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
-
     VitePWA({
       registerType: 'autoUpdate',  // Automatically updates the service worker
       devOptions: { enabled: true },  // Enables PWA in development mode for testing
@@ -15,6 +14,7 @@ export default defineConfig({
         clientsClaim: true,
         skipWaiting: true
       },
+      manifest: {
         icons: [
           {
             src: 'icon192.png',
@@ -27,19 +27,18 @@ export default defineConfig({
             type: 'image/png'
           }
         ],
-
-        "screenshots": [
+        screenshots: [
           {
-            "src": "screenshot.png",
-            "sizes": "1600x800",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "Homepage"
+            src: "screenshot.png",
+            sizes: "1600x800",
+            type: "image/png",
+            form_factor: "wide",
+            label: "Homepage"
           }
         ]
       }
+    })
   ],
-  
   server: {
     proxy: {
       '/api': {
@@ -48,5 +47,4 @@ export default defineConfig({
       }
     }
   },
-
 });
