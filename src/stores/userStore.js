@@ -121,9 +121,11 @@ export const clearAllCaches = () => {
   state.user = null
   state.bmiData = null
   state.heartRateDates = null
+  state.stressDates = null
   state.lastAuthCheck = 0
   state.lastBmiLoad = 0
   state.lastHeartRateDatesLoad = 0
+  state.lastStressDatesLoad = 0
 }
 
 // Helper to check if current user has a role

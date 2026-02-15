@@ -8,6 +8,7 @@ import DataSettingView from '../views/DataSettingView.vue'
 import AISupportView from '../views/AISupportView.vue'
 import ChatView from '../views/ChatView.vue'
 import { checkAuth, hasRole } from '../stores/userStore.js'
+import { prefetchHealthDataForOffline } from '../services/offlinePrefetchService'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -84,6 +85,10 @@ const router = createRouter({
 // Navigation guard middleware (uses cached auth check)
 router.beforeEach(async (to, from, next) => {
   const isAuthenticated = await checkAuth()
+
+  if (isAuthenticated) {
+    prefetchHealthDataForOffline().catch(() => {})
+  }
   
   // Route requires authentication
   if (to.meta.requiresAuth && !isAuthenticated) {

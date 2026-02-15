@@ -14,7 +14,24 @@ export default defineConfig({
 
       workbox: {
         clientsClaim: true,
-        skipWaiting: true
+        skipWaiting: true,
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-runtime-cache',
+              networkTimeoutSeconds: 5,
+              cacheableResponse: {
+                statuses: [0, 200]
+              },
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 24 * 60 * 60
+              }
+            }
+          }
+        ]
       },
       
       includeAssets: ['vite.svg', 'screenshot.png'],  // Assets to cache
