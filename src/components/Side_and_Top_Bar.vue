@@ -164,6 +164,57 @@
                 <!-- Right side of top bar -->
                 <div class="flex flex-1 justify-end">
                     <div class="flex items-center gap-x-4 lg:gap-x-6">
+                        <!-- Notification Button -->
+                        <div ref="notificationPanelRef" class="relative">
+                            <button
+                                type="button"
+                                @click.stop="toggleNotificationPanel"
+                                class="relative -m-1.5 flex items-center p-1.5 rounded-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
+                                :class="[isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200']"
+                                :aria-label="'Notifications'"
+                                :title="'Notifications'"
+                            >
+                                <BellIcon class="w-5 h-5" :class="themeClasses.textPrimary" aria-hidden="true" />
+                                <span
+                                    v-if="unreadCount > 0"
+                                    class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] leading-[18px] text-center font-semibold bg-red-500 text-white"
+                                >
+                                    {{ unreadCount > 99 ? '99+' : unreadCount }}
+                                </span>
+                            </button>
+                            <div
+                                v-if="showNotificationPanel"
+                                class="absolute top-9 right-0 w-72 text-xs p-3 rounded border shadow-md z-20"
+                                :class="[themeClasses.cardBackground, themeClasses.border, themeClasses.textSecondary]"
+                            >
+                                <div v-if="unreadCount > 0">
+                                    <p class="font-semibold mb-1" :class="themeClasses.textPrimary">{{ unreadSender || (isAdmin() ? 'Patient' : (providerName || t('chat.healthcareProvider'))) }}</p>
+                                    <p class="break-words mb-3">{{ unreadLastText || t('chat.noMessages') }}</p>
+                                    <p v-if="unreadTimeText" class="text-[11px] mb-3 opacity-80">{{ unreadTimeText }}</p>
+                                    <button
+                                        type="button"
+                                        @click="openNotificationsChat"
+                                        class="px-3 py-1 rounded border text-xs"
+                                        :class="[themeClasses.border, themeClasses.inputBackground, themeClasses.textPrimary]"
+                                    >
+                                        {{ t('chat.openChat') }}
+                                    </button>
+                                </div>
+                                <div v-else>
+                                    <p class="mb-3">No Messages</p>
+                                    <button
+                                        v-if="isAdmin()"
+                                        type="button"
+                                        @click="openNotificationsChat"
+                                        class="px-3 py-1 rounded border text-xs"
+                                        :class="[themeClasses.border, themeClasses.inputBackground, themeClasses.textPrimary]"
+                                    >
+                                        {{ t('admin.patientMessagesTitle') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Language Switcher Button -->
                         <Menu as="div" class="relative">
                             <MenuButton
@@ -253,7 +304,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import { useLanguage } from '../composables/useLanguage'
@@ -275,6 +326,7 @@ import {
     HomeIcon,
     UsersIcon,
     Cog6ToothIcon,
+    BellIcon,
 } from '@heroicons/vue/24/outline'
 
 // Initialize router for navigation
@@ -292,7 +344,8 @@ const navigation = computed(() => {
     if (isAdmin()) {
         return [
             { name: t('nav.admin'), to: '/admin', icon: HomeIcon },
-            { name: t('nav.userManagement'), to: '/admin/users', icon: UsersIcon }
+            { name: t('nav.userManagement'), to: '/admin/users', icon: UsersIcon },
+            { name: t('admin.patientMessagesTitle'), to: '/admin/chats', icon: HomeIcon }
         ]
     }
 
@@ -310,6 +363,13 @@ const navigation = computed(() => {
 const sidebarOpen = ref(false)
 const isDesktopSidebarHidden = ref(false)
 const userData = ref(null)
+const unreadCount = ref(0)
+const unreadSender = ref('')
+const unreadLastText = ref('')
+const unreadTimestamp = ref('')
+const showNotificationPanel = ref(false)
+const notificationPanelRef = ref(null)
+let unreadPollTimer = null
 
 const userName = computed(() => userData.value?.name || 'User')
 
@@ -326,12 +386,188 @@ const currentLanguageName = computed(() => {
     return lang?.name || 'English'
 })
 
+const unreadTimeText = computed(() => {
+    if (!unreadTimestamp.value) return ''
+    const parsed = new Date(unreadTimestamp.value)
+    if (Number.isNaN(parsed.getTime())) return ''
+    return parsed.toLocaleString()
+})
+
 // Helper to check active route for styling
 const isActiveRoute = (path) => route.path === path
 
 const toggleDesktopSidebar = () => {
     isDesktopSidebarHidden.value = !isDesktopSidebarHidden.value
     emit('update:sidebarState', isDesktopSidebarHidden.value)
+}
+
+const toggleNotificationPanel = async () => {
+    if (showNotificationPanel.value) {
+        showNotificationPanel.value = false
+        return
+    }
+
+    showNotificationPanel.value = true
+    loadUnreadCount()
+}
+
+const openNotificationsChat = () => {
+    if (isAdmin()) {
+        showNotificationPanel.value = false
+        router.push('/admin/chats')
+        return
+    }
+
+    if (unreadCount.value <= 0) return
+
+    showNotificationPanel.value = false
+    router.push('/chat')
+}
+
+const handleGlobalClick = (event) => {
+    const panel = notificationPanelRef.value
+    if (!panel) return
+    if (!panel.contains(event.target)) {
+        showNotificationPanel.value = false
+    }
+}
+
+const loadUnreadCount = async () => {
+    try {
+        const endpoints = isAdmin()
+            ? ['/api/admin-chat/unread', '/api/admin/user-chat/unread', '/api/user-chat/unread']
+            : ['/api/user-chat/unread']
+
+        let loadedFromEndpoint = false
+
+        for (const endpoint of endpoints) {
+            const response = await fetch(`${API_URL}${endpoint}`, { credentials: 'include' })
+            if (!response.ok) {
+                if (response.status === 404) continue
+                break
+            }
+
+            const json = await response.json().catch(() => ({}))
+            const count = json?.count ?? json?.data?.count ?? json?.unreadCount ?? json?.data?.unreadCount ?? 0
+            unreadCount.value = Number.isFinite(Number(count)) ? Number(count) : 0
+
+            const lastMessage = json?.lastMessage || json?.data?.lastMessage || null
+            unreadLastText.value = lastMessage?.text || json?.lastMessageText || json?.data?.lastMessageText || ''
+            unreadSender.value = lastMessage?.senderName || lastMessage?.sender || json?.senderName || json?.data?.senderName || ''
+            unreadTimestamp.value = lastMessage?.createdAt || lastMessage?.time || json?.lastMessageCreatedAt || json?.data?.lastMessageCreatedAt || ''
+
+            loadedFromEndpoint = true
+
+            if (unreadCount.value > 0 && !unreadSender.value && !isAdmin()) {
+                unreadSender.value = providerName.value || t('chat.healthcareProvider')
+            }
+
+            if (!isAdmin() || unreadLastText.value || unreadSender.value || unreadCount.value > 0) {
+                return
+            }
+        }
+
+        if (isAdmin()) {
+            await loadAdminNotificationFallback()
+            if (unreadLastText.value || unreadSender.value || unreadCount.value > 0) {
+                return
+            }
+        }
+
+        if (!loadedFromEndpoint || !isAdmin()) {
+            unreadCount.value = 0
+            unreadSender.value = ''
+            unreadLastText.value = ''
+            unreadTimestamp.value = ''
+        }
+    } catch {
+        if (isAdmin()) {
+            await loadAdminNotificationFallback().catch(() => {
+                unreadCount.value = 0
+                unreadSender.value = ''
+                unreadLastText.value = ''
+                unreadTimestamp.value = ''
+            })
+            return
+        }
+        unreadCount.value = 0
+        unreadSender.value = ''
+        unreadLastText.value = ''
+        unreadTimestamp.value = ''
+    }
+}
+
+const loadAdminNotificationFallback = async () => {
+    const assignedRes = await fetch(`${API_URL}/api/admin/assigned-users?page=1&limit=50`, { credentials: 'include' })
+    if (!assignedRes.ok) {
+        unreadCount.value = 0
+        unreadSender.value = ''
+        unreadLastText.value = ''
+        unreadTimestamp.value = ''
+        return
+    }
+
+    const assignedJson = await assignedRes.json().catch(() => ({}))
+    const assignedUsers = assignedJson?.data?.users || assignedJson?.users || []
+
+    if (!Array.isArray(assignedUsers) || assignedUsers.length === 0) {
+        unreadCount.value = 0
+        unreadSender.value = ''
+        unreadLastText.value = ''
+        unreadTimestamp.value = ''
+        return
+    }
+
+    let latestMessage = null
+    let latestUserName = ''
+
+    for (const user of assignedUsers) {
+        const userId = user?.id || user?._id
+        if (!userId) continue
+
+        const historyEndpoints = [
+            `${API_URL}/api/admin-chat/history?userId=${encodeURIComponent(userId)}`,
+            `${API_URL}/api/admin/user-chat/history?userId=${encodeURIComponent(userId)}`,
+            `${API_URL}/api/user-chat/history?userId=${encodeURIComponent(userId)}`
+        ]
+
+        for (const historyUrl of historyEndpoints) {
+            const historyRes = await fetch(historyUrl, { credentials: 'include' })
+            if (!historyRes.ok) {
+                if (historyRes.status === 404) continue
+                break
+            }
+
+            const historyJson = await historyRes.json().catch(() => ({}))
+            const messages = historyJson?.messages || historyJson?.data?.messages || historyJson?.data || []
+            if (!Array.isArray(messages) || messages.length === 0) break
+
+            const userMessages = messages.filter(m => m && (m.isUser === true || String(m.senderId || '') === String(userId)))
+            if (userMessages.length === 0) break
+
+            const candidate = userMessages[userMessages.length - 1]
+            const createdAt = candidate?.createdAt ? new Date(candidate.createdAt).getTime() : 0
+            const latestAt = latestMessage?.createdAt ? new Date(latestMessage.createdAt).getTime() : 0
+
+            if (!latestMessage || createdAt >= latestAt) {
+                latestMessage = candidate
+                latestUserName = user?.name || user?.email || 'User'
+            }
+            break
+        }
+    }
+
+    if (latestMessage) {
+        unreadCount.value = Math.max(1, unreadCount.value || 1)
+        unreadSender.value = latestMessage?.senderName || latestMessage?.sender || latestUserName
+        unreadLastText.value = latestMessage?.text || ''
+        unreadTimestamp.value = latestMessage?.createdAt || latestMessage?.time || ''
+    } else {
+        unreadCount.value = 0
+        unreadSender.value = ''
+        unreadLastText.value = ''
+        unreadTimestamp.value = ''
+    }
 }
 
 const handleLogOut = async () => {
@@ -357,6 +593,9 @@ const loadUserData = async () => {
 
 onMounted(() => {
     loadUserData()
+    loadUnreadCount()
+    unreadPollTimer = window.setInterval(loadUnreadCount, 30000)
+    window.addEventListener('mousedown', handleGlobalClick)
     window.addEventListener('userUpdated', (e) => {
         // Only update top-right displayed user when the event payload matches the current logged-in user
         const updated = e?.detail || {}
@@ -365,5 +604,13 @@ onMounted(() => {
             userData.value = updated
         }
     })
+})
+
+onUnmounted(() => {
+    if (unreadPollTimer) {
+        clearInterval(unreadPollTimer)
+        unreadPollTimer = null
+    }
+    window.removeEventListener('mousedown', handleGlobalClick)
 })
 </script>

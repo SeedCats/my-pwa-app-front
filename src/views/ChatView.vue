@@ -27,7 +27,11 @@
                 </div>
 
                 <!-- Messages Container -->
-                <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4" :class="themeClasses.background">
+                <div ref="messagesContainer" class="flex-1 overflow-y-auto px-6 py-4 space-y-4" :class="themeClasses.background">
+                    <div v-if="isLoading" class="text-sm" :class="themeClasses.textSecondary">
+                        {{ t('common.loading') }}
+                    </div>
+
                     <div v-for="message in messages" :key="message.id" 
                         :class="['flex', message.isUser ? 'justify-end' : 'justify-start']">
                         <div :class="[
@@ -37,6 +41,9 @@
                                 : (isDarkMode ? 'bg-gray-700' : 'bg-gray-200'),
                             message.isUser ? '' : themeClasses.textPrimary
                         ]">
+                            <p v-if="message.fileName" class="text-xs mb-1 opacity-80">
+                                📎 {{ message.fileName }}
+                            </p>
                             <p class="text-sm">{{ message.text }}</p>
                             <p class="text-xs mt-1 opacity-70">{{ message.time }}</p>
                         </div>
@@ -53,7 +60,7 @@
                             {{ t('chat.noMessages') }}
                         </p>
                         <p class="text-sm" :class="themeClasses.textSecondary">
-                            {{ t('chat.startConversation') }}
+                            {{ noProviderAssigned ? t('chat.noProviderAssigned') : t('chat.startConversation') }}
                         </p>
                     </div>
                 </div>
@@ -61,11 +68,30 @@
                 <!-- Message Input -->
                 <div class="px-6 py-4 border-t" :class="[themeClasses.cardBackground, themeClasses.border]">
                     <form @submit.prevent="sendMessage" class="flex items-end gap-3">
+                        <div class="flex flex-col gap-1">
+                            <input
+                                ref="fileInputRef"
+                                type="file"
+                                class="hidden"
+                                @change="onFileSelected"
+                            />
+                            <button
+                                type="button"
+                                @click="triggerFilePicker"
+                                :disabled="noProviderAssigned || isSending"
+                                class="px-3 py-3 rounded-lg border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                :class="[themeClasses.border, themeClasses.inputBackground, themeClasses.textPrimary]"
+                                :title="t('chat.attachFile')"
+                            >
+                                📎
+                            </button>
+                        </div>
                         <textarea 
                             v-model="newMessage"
                             @keydown.enter.exact.prevent="sendMessage"
                             rows="1"
                             :placeholder="t('chat.typePlaceholder')"
+                            :disabled="noProviderAssigned || isSending"
                             class="flex-1 px-4 py-3 rounded-lg border resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                             :class="[
                                 themeClasses.inputBackground,
@@ -75,7 +101,7 @@
                         />
                         <button 
                             type="submit"
-                            :disabled="!newMessage.trim()"
+                            :disabled="(!newMessage.trim() && !selectedFile) || noProviderAssigned || isSending"
                             class="px-6 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             :class="isDarkMode 
                                 ? 'bg-blue-600 hover:bg-blue-700 text-white' 
@@ -86,8 +112,15 @@
                             </svg>
                         </button>
                     </form>
+                    <p v-if="selectedFile" class="text-xs mt-2" :class="themeClasses.textSecondary">
+                        {{ t('chat.attachedFile') }}: {{ selectedFile.name }}
+                        <button type="button" @click="clearSelectedFile" class="ml-2 underline">{{ t('chat.removeFile') }}</button>
+                    </p>
                     <p class="text-xs mt-2" :class="themeClasses.textSecondary">
                         {{ t('chat.sendHint') }}
+                    </p>
+                    <p v-if="errorMessage" class="text-xs mt-2 text-red-500">
+                        {{ errorMessage }}
                     </p>
                 </div>
             </main>
@@ -96,10 +129,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { useLanguage } from '../composables/useLanguage'
+import { fetchCurrentUserProfile, fetchUserChatHistory, sendUserChatMessage, sendUserChatMessageWithAttachment } from '../services/userChatService'
 
 const { isDarkMode, themeClasses } = useTheme()
 const { t } = useLanguage()
@@ -109,73 +143,101 @@ const updateSidebarState = (state) => sidebarHidden.value = state
 
 const newMessage = ref('')
 const messages = ref([])
+const messagesContainer = ref(null)
+const isLoading = ref(false)
+const isSending = ref(false)
+const errorMessage = ref('')
+const noProviderAssigned = ref(false)
+const currentUserId = ref(null)
+const fileInputRef = ref(null)
+const selectedFile = ref(null)
 
-const API_URL = import.meta.env.VITE_API_URL || ''
 const providerName = ref(null)
 
-// Load user data to get provider name
-onMounted(async () => {
-    try {
-        const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
-        if (res.ok) {
-            const json = await res.json()
-            const userData = json.data?.user || json.data || json.user || json
-            providerName.value = userData?.provider || userData?.providerName || userData?.assignedProvider
-        }
-    } catch (err) {
-        console.error('Error loading user data:', err)
-    }
-})
-
-const sendMessage = () => {
-    if (!newMessage.value.trim()) return
-
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, '0')
-    const day = String(now.getDate()).padStart(2, '0')
-    const hours = String(now.getHours()).padStart(2, '0')
-    const minutes = String(now.getMinutes()).padStart(2, '0')
-
-    const message = {
-        id: Date.now(),
-        text: newMessage.value,
-        time: `${year}/${month}/${day} ${hours}:${minutes}`,
-        isUser: true
-    }
-
-    messages.value.push(message)
-    newMessage.value = ''
-
-    // Auto-scroll to bottom
+const scrollToBottom = () => {
     nextTick(() => {
-        const container = document.querySelector('.overflow-y-auto')
-        if (container) {
-            container.scrollTop = container.scrollHeight
+        if (messagesContainer.value) {
+            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
         }
     })
-
-    // Simulate provider response (remove this in production)
-    setTimeout(() => {
-        const now = new Date()
-        const year = now.getFullYear()
-        const month = String(now.getMonth() + 1).padStart(2, '0')
-        const day = String(now.getDate()).padStart(2, '0')
-        const hours = String(now.getHours()).padStart(2, '0')
-        const minutes = String(now.getMinutes()).padStart(2, '0')
-
-        messages.value.push({
-            id: Date.now(),
-            text: t('chat.autoResponse'),
-            time: `${year}/${month}/${day} ${hours}:${minutes}`,
-            isUser: false
-        })
-        nextTick(() => {
-            const container = document.querySelector('.overflow-y-auto')
-            if (container) {
-                container.scrollTop = container.scrollHeight
-            }
-        })
-    }, 1000)
 }
+
+const loadProfile = async () => {
+    try {
+        const json = await fetchCurrentUserProfile()
+        const userData = json?.data?.user || json?.data || json?.user || json
+        currentUserId.value = userData?.id || userData?._id || null
+        providerName.value = userData?.provider || userData?.providerName || userData?.assignedProvider || null
+        noProviderAssigned.value = !userData?.providerId
+    } catch (err) {
+        console.error('Error loading user data:', err)
+        errorMessage.value = err.message || 'Failed to load user data'
+    }
+}
+
+const loadMessages = async () => {
+    isLoading.value = true
+    errorMessage.value = ''
+    try {
+        const response = await fetchUserChatHistory(currentUserId.value)
+        messages.value = response?.messages || []
+        noProviderAssigned.value = noProviderAssigned.value || (response?.messages?.length === 0 && response?.message?.toLowerCase?.().includes('no healthcare provider'))
+        scrollToBottom()
+    } catch (error) {
+        errorMessage.value = error.message || 'Failed to load messages'
+    } finally {
+        isLoading.value = false
+    }
+}
+
+const triggerFilePicker = () => {
+    fileInputRef.value?.click()
+}
+
+const onFileSelected = (event) => {
+    const file = event?.target?.files?.[0] || null
+    selectedFile.value = file
+}
+
+const clearSelectedFile = () => {
+    selectedFile.value = null
+    if (fileInputRef.value) {
+        fileInputRef.value.value = ''
+    }
+}
+
+const sendMessage = async () => {
+    if ((!newMessage.value.trim() && !selectedFile.value) || noProviderAssigned.value || isSending.value) return
+
+    isSending.value = true
+    errorMessage.value = ''
+    const text = newMessage.value.trim()
+    const file = selectedFile.value
+    newMessage.value = ''
+    clearSelectedFile()
+
+    try {
+        const response = file
+            ? await sendUserChatMessageWithAttachment(text, file, currentUserId.value)
+            : await sendUserChatMessage(text, currentUserId.value)
+
+        if (response?.message) {
+            messages.value.push(response.message)
+            scrollToBottom()
+        } else {
+            await loadMessages()
+        }
+    } catch (error) {
+        errorMessage.value = error.message || 'Failed to send message'
+        newMessage.value = text
+        selectedFile.value = file
+    } finally {
+        isSending.value = false
+    }
+}
+
+onMounted(async () => {
+    await loadProfile()
+    await loadMessages()
+})
 </script>

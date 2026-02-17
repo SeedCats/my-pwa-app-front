@@ -89,7 +89,13 @@
     "userSetting": "User Setting",
     "confirmServiceComplete": "Mark service as complete for {email}?",
     "serviceCompleted": "Service marked complete",
-    "serviceCompleteFailed": "Failed to mark service complete"
+    "serviceCompleteFailed": "Failed to mark service complete",
+    "patientMessagesTitle": "Patient Messages",
+    "patientMessagesDesc": "Review messages from your assigned patients",
+    "selectPatient": "Select a patient",
+    "selectPatientHint": "Choose a patient to view conversation history",
+    "noPatientMessages": "No messages found for this patient",
+    "refresh": "Refresh"
   },
   "home": {
     "title": "Home",
@@ -423,8 +429,12 @@
     "healthcareProvider": "Healthcare Provider",
     "offline": "Offline",
     "noMessages": "No messages yet",
+    "noProviderAssigned": "No healthcare provider assigned yet.",
     "startConversation": "Start a conversation with your healthcare provider",
     "typePlaceholder": "Type a message...",
+    "attachFile": "Attach file",
+    "attachedFile": "Attached file",
+    "removeFile": "Remove",
     "sendHint": "Press Enter to send, Shift+Enter for new line",
     "autoResponse": "Thank you for your message. Your healthcare provider will respond soon."
   }

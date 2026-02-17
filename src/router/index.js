@@ -78,6 +78,12 @@ const router = createRouter({
       name: 'UserManagement',
       component: () => import('../views/adminView/UserManagementView.vue'),
       meta: { requiresAuth: true, requiresRole: 'admin' }
+    },
+    {
+      path: '/admin/chats',
+      name: 'AdminPatientChat',
+      component: () => import('../views/adminView/AdminPatientChatView.vue'),
+      meta: { requiresAuth: true, requiresRole: 'admin' }
     }
   ]
 })

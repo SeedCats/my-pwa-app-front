@@ -89,7 +89,13 @@
     "userSetting": "使用者設定",
     "confirmServiceComplete": "要將 {email} 的服務標記為完成嗎？",
     "serviceCompleted": "服務已標記為完成",
-    "serviceCompleteFailed": "標記服務完成失敗"
+    "serviceCompleteFailed": "標記服務完成失敗",
+    "patientMessagesTitle": "病患訊息",
+    "patientMessagesDesc": "檢視您所指派病患的訊息",
+    "selectPatient": "選擇病患",
+    "selectPatientHint": "請先選擇病患以查看對話紀錄",
+    "noPatientMessages": "此病患目前沒有訊息",
+    "refresh": "重新整理"
   },
   "home": {
     "title": "首頁",
@@ -438,8 +444,12 @@
     "healthcareProvider": "醫護人員",
     "offline": "離線",
     "noMessages": "尚無訊息",
+    "noProviderAssigned": "尚未指派醫護人員。",
     "startConversation": "開始與您的醫護人員對話",
     "typePlaceholder": "輸入訊息...",
+    "attachFile": "附加檔案",
+    "attachedFile": "已附加檔案",
+    "removeFile": "移除",
     "sendHint": "按 Enter 發送，Shift+Enter 換行",
     "autoResponse": "感謝您的訊息。您的醫護人員將儘快回覆。"
   }
