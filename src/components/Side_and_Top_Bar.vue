@@ -457,12 +457,39 @@ const toggleNotificationPanel = async () => {
 
     showNotificationPanel.value = true
     hasViewedNotifications.value = true // Mark as viewed when opening panel
-    loadUnreadCount()
+    await loadUnreadCount()
 }
 
-const openNotificationsChat = () => {
+// Global flag to track if we just cleared notifications and prevent immediate re-fetching that would show them again
+const justClearedNotifications = ref(false)
+
+const openNotificationsChat = async () => {
     if (isAdmin()) {
         showNotificationPanel.value = false
+        // Optimistically clear count and message details
+        unreadCount.value = 0
+        unreadLastText.value = ''
+        unreadSender.value = ''
+        unreadTimestamp.value = ''
+        hasViewedNotifications.value = true
+        justClearedNotifications.value = true
+
+        // Mark all unread messages as read on the backend by fetching history for each unread user
+        try {
+            const usersRes = await fetch(`${API_URL}/api/admin-chat/users`, { credentials: 'include' })
+            if (usersRes.ok) {
+                const usersJson = await usersRes.json().catch(() => ({}))
+                const chatUsers = usersJson?.users || []
+                const unreadUsers = chatUsers.filter(u => (u.unreadCount || 0) > 0)
+                await Promise.all(unreadUsers.map(u => {
+                    const userId = u.userId || u.id || u._id
+                    if (!userId) return Promise.resolve()
+                    return fetch(`${API_URL}/api/admin-chat/history?userId=${encodeURIComponent(userId)}`, { credentials: 'include' }).catch(() => {})
+                }))
+            }
+        } catch { /* ignore, navigation still proceeds */ }
+
+        setTimeout(() => { justClearedNotifications.value = false }, 35000) // Prevent updates for 35s (> poll interval)
         router.push('/admin/chats')
         return
     }
@@ -470,6 +497,13 @@ const openNotificationsChat = () => {
     // Allow navigation even if unreadCount is 0, if user clicks the button manually
     
     showNotificationPanel.value = false
+    unreadCount.value = 0
+    unreadLastText.value = ''
+    unreadSender.value = ''
+    unreadTimestamp.value = ''
+    hasViewedNotifications.value = true
+    justClearedNotifications.value = true
+    setTimeout(() => { justClearedNotifications.value = false }, 5000) // Prevent updates for 5s
     router.push('/chat')
 }
 
@@ -482,6 +516,9 @@ const handleGlobalClick = (event) => {
 }
 
 const loadUnreadCount = async () => {
+    // Skip loading if we just cleared notifications (to allow backend time to update read status)
+    if (justClearedNotifications.value) return
+
     try {
         const endpoints = isAdmin()
             ? ['/api/admin-chat/unread', '/api/admin/user-chat/unread', '/api/user-chat/unread']

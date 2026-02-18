@@ -16,13 +16,21 @@
 
         <div v-else class="space-y-2">
           <button v-for="user in users" :key="user.id" type="button" @click="selectUser(user)"
-            class="w-full text-left p-3 rounded border transition" :class="[
+            class="w-full text-left p-3 rounded border transition relative" :class="[
               selectedUser?.id === user.id
                 ? (isDarkMode ? 'border-blue-500 bg-blue-900/20' : 'border-blue-300 bg-blue-50')
                 : `${themeClasses.border} ${themeClasses.inputBackground}`
             ]">
-            <p class="text-sm font-medium" :class="themeClasses.textPrimary">{{ user.name }}</p>
-            <p class="text-xs truncate" :class="themeClasses.textSecondary">{{ user.email }}</p>
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm font-medium" :class="themeClasses.textPrimary">{{ user.name }}</p>
+                <p class="text-xs truncate" :class="themeClasses.textSecondary">{{ user.email }}</p>
+                <p v-if="user.lastMessage" class="text-xs truncate mt-1 text-gray-400">{{ user.lastMessage }}</p>
+              </div>
+              <span v-if="user.unreadCount > 0" class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full ml-2">
+                {{ user.unreadCount }}
+              </span>
+            </div>
           </button>
         </div>
       </div>
@@ -123,7 +131,7 @@
 import { ref, onMounted, nextTick } from 'vue'
 import { useTheme } from '../../composables/useTheme'
 import { useLanguage } from '../../composables/useLanguage'
-import { fetchAdminChatHistory, fetchAssignedUsers, fetchCurrentUserProfile, sendAdminChatMessage } from '../../services/userChatService'
+import { fetchAdminChatHistory, fetchAdminChatUsers, fetchCurrentUserProfile, sendAdminChatMessage } from '../../services/userChatService'
 
 const { themeClasses, isDarkMode } = useTheme()
 const { t } = useLanguage()
@@ -163,18 +171,21 @@ const loadAssignedUsers = async () => {
   usersLoading.value = true
   errorMessage.value = ''
   try {
-    const response = await fetchAssignedUsers(1, 100)
+    const response = await fetchAdminChatUsers()
     users.value = (response?.users || []).map((user) => ({
-      id: user.id || user._id,
+      id: user.userId || user.id || user._id,
       name: user.name || user.email || 'User',
-      email: user.email || ''
+      email: user.email || '',
+      unreadCount: user.unreadCount || 0,
+      lastMessage: user.lastMessage,
+      lastMessageTime: user.lastMessageTime
     }))
 
     if (!selectedUser.value && users.value.length > 0) {
-      await selectUser(users.value[0])
+      // selectUser(users.value[0]) // Don't auto-select, let them choose? Or auto-select first is fine.
     }
   } catch (error) {
-    errorMessage.value = error.message || 'Failed to load assigned users'
+    errorMessage.value = error.message || 'Failed to load chat users'
   } finally {
     usersLoading.value = false
   }
@@ -182,6 +193,8 @@ const loadAssignedUsers = async () => {
 
 const selectUser = async (user) => {
   selectedUser.value = user
+  // Reset unread count locally for UI feedback
+  user.unreadCount = 0
   messagesLoading.value = true
   errorMessage.value = ''
   try {
