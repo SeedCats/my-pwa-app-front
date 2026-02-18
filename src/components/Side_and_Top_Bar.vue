@@ -213,7 +213,12 @@
                                 </div>
                                 
                                 <div v-if="unreadCount > 0" class="space-y-3">
-                                    <div class="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                    <button
+                                        type="button"
+                                        @click="openNotificationsChat"
+                                        class="w-full flex items-start gap-3 p-2 rounded-lg transition-colors text-left"
+                                        :class="isDarkMode ? 'hover:bg-gray-700/70' : 'hover:bg-gray-50'"
+                                    >
                                         <div class="flex-shrink-0">
                                             <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                                                 <span class="text-blue-600 dark:text-blue-300 font-bold text-xs">
@@ -232,16 +237,8 @@
                                                 {{ unreadTimeText }}
                                             </p>
                                         </div>
-                                    </div>
-                                    
-                                    <button
-                                        type="button"
-                                        @click="openNotificationsChat"
-                                        class="w-full flex justify-center items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-sm"
-                                    >
-                                        <span>{{ t('chat.openChat') }}</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-                                            <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 015.25 2h9.5A2.25 2.25 0 0117 4.25v10.5A2.25 2.25 0 0114.75 17h-9.5A2.25 2.25 0 013 14.75V4.25zM19 5.5v10.5a.75.75 0 01-1.5 0V5.5a.75.75 0 011.5 0z" clip-rule="evenodd" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0 mt-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
                                         </svg>
                                     </button>
                                 </div>
@@ -519,16 +516,25 @@ const loadUnreadCount = async () => {
     // Skip loading if we just cleared notifications (to allow backend time to update read status)
     if (justClearedNotifications.value) return
 
+    // Capture initial count BEFORE the try block so it's accessible in catch
+    const initialCount = unreadCount.value
+
     try {
         const endpoints = isAdmin()
             ? ['/api/admin-chat/unread', '/api/admin/user-chat/unread', '/api/user-chat/unread']
             : ['/api/user-chat/unread']
 
         let loadedFromEndpoint = false
-        const initialCount = unreadCount.value  // Capture initial count before modifications
 
         for (const endpoint of endpoints) {
-            const response = await fetch(`${API_URL}${endpoint}`, { credentials: 'include' })
+            let response
+            try {
+                response = await fetch(`${API_URL}${endpoint}`, { credentials: 'include' })
+            } catch {
+                // Network error (ERR_INTERNET_DISCONNECTED etc.) - skip this endpoint silently
+                continue
+            }
+
             if (!response.ok) {
                 if (response.status === 404) continue
                 break
@@ -538,10 +544,6 @@ const loadUnreadCount = async () => {
             const count = json?.count ?? json?.data?.count ?? json?.unreadCount ?? json?.data?.unreadCount ?? 0
             const newCount = Number.isFinite(Number(count)) ? Number(count) : 0
             
-            // Only update unreadCount if we actually found something for non-admins, 
-            // or continue accumulating logic. 
-            // For admin: if endpoint returns 0, we shouldn't necessarily trust it if we rely on fallback.
-            // But let's stick to updating it.
             unreadCount.value = newCount
 
             // If we have MORE notifications than before (compared to initial count), reset the viewed flag
@@ -582,9 +584,6 @@ const loadUnreadCount = async () => {
         }
 
         if (!loadedFromEndpoint && !isAdmin()) {
-            // Only clear unreadCount if non-admin AND failed to load from endpoint
-            // If we are admin, we rely on the fallback logic above or catching errors.
-            // If checking unread failed for non-admin, we reset.
             unreadCount.value = 0
             unreadSender.value = ''
             unreadLastText.value = ''
@@ -599,7 +598,7 @@ const loadUnreadCount = async () => {
                 unreadTimestamp.value = ''
             })
             // If fallback increased count over captured initial, reset flag
-             if (unreadCount.value > initialCount) {
+            if (unreadCount.value > initialCount) {
                 if (!showNotificationPanel.value) {
                     hasViewedNotifications.value = false
                 }
@@ -614,7 +613,17 @@ const loadUnreadCount = async () => {
 }
 
 const loadAdminNotificationFallback = async () => {
-    const assignedRes = await fetch(`${API_URL}/api/admin/assigned-users?page=1&limit=50`, { credentials: 'include' })
+    let assignedRes
+    try {
+        assignedRes = await fetch(`${API_URL}/api/admin/assigned-users?page=1&limit=50`, { credentials: 'include' })
+    } catch {
+        // Network error - silently reset and return
+        unreadCount.value = 0
+        unreadSender.value = ''
+        unreadLastText.value = ''
+        unreadTimestamp.value = ''
+        return
+    }
     if (!assignedRes.ok) {
         unreadCount.value = 0
         unreadSender.value = ''
@@ -648,7 +657,12 @@ const loadAdminNotificationFallback = async () => {
         ]
 
         for (const historyUrl of historyEndpoints) {
-            const historyRes = await fetch(historyUrl, { credentials: 'include' })
+            let historyRes
+            try {
+                historyRes = await fetch(historyUrl, { credentials: 'include' })
+            } catch {
+                continue // network error, try next endpoint
+            }
             if (!historyRes.ok) {
                 if (historyRes.status === 404) continue
                 break

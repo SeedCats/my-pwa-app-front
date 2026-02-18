@@ -2,7 +2,9 @@
   "common": {
     "loading": "Loading...",
     "delete": "Delete",
-    "close": "Close"
+    "close": "Close",
+    "search": "Search",
+    "noResults": "No results found"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -90,11 +92,11 @@
     "confirmServiceComplete": "Mark service as complete for {email}?",
     "serviceCompleted": "Service marked complete",
     "serviceCompleteFailed": "Failed to mark service complete",
-    "patientMessagesTitle": "Patient Messages",
+    "patientMessagesTitle": "Messages",
     "patientMessagesDesc": "Review messages from your assigned patients",
-    "selectPatient": "Select a patient",
-    "selectPatientHint": "Choose a patient to view conversation history",
-    "noPatientMessages": "No messages found for this patient",
+    "selectPatient": "Select a user",
+    "selectPatientHint": "Choose a user to view conversation history",
+    "noPatientMessages": "No messages found for this user",
     "refresh": "Refresh"
   },
   "home": {

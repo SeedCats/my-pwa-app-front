@@ -2,7 +2,9 @@
   "common": {
     "loading": "載入中...",
     "delete": "刪除",
-    "close": "關閉"
+    "close": "關閉",
+    "search": "搜尋",
+    "noResults": "未找到結果"
   },
   "auth": {
     "welcomeBack": "歡迎回來",
@@ -90,11 +92,11 @@
     "confirmServiceComplete": "要將 {email} 的服務標記為完成嗎？",
     "serviceCompleted": "服務已標記為完成",
     "serviceCompleteFailed": "標記服務完成失敗",
-    "patientMessagesTitle": "病患訊息",
-    "patientMessagesDesc": "檢視您所指派病患的訊息",
-    "selectPatient": "選擇病患",
-    "selectPatientHint": "請先選擇病患以查看對話紀錄",
-    "noPatientMessages": "此病患目前沒有訊息",
+    "patientMessagesTitle": "訊息",
+    "patientMessagesDesc": "檢視您所指派用戶的訊息",
+    "selectPatient": "選擇用戶",
+    "selectPatientHint": "請先選擇用戶以查看對話紀錄",
+    "noPatientMessages": "此用戶目前沒有訊息",
     "refresh": "重新整理"
   },
   "home": {
