@@ -8,76 +8,45 @@ const API_URL = import.meta.env.VITE_API_URL || ''
 const handleStreamingResponse = async (response, onChunk) => {
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
-    let fullResponse = ''
-    const toolCalls = []
-    const sources = []
-    let buffer = '' // Buffer for incomplete lines
+    let fullResponse = '', buffer = ''
+    const toolCalls = [], sources = []
 
     while (true) {
         const { done, value } = await reader.read()
         if (done) break
 
-        const chunk = decoder.decode(value, { stream: true })
-        buffer += chunk
+        buffer += decoder.decode(value, { stream: true })
         const lines = buffer.split('\n')
-        
-        // Keep the last line in buffer if it doesn't end with newline
         buffer = lines.pop() || ''
 
         for (const line of lines) {
-            if (line.startsWith('data: ')) {
-                try {
-                    const jsonStr = line.slice(6).trim()
-                    if (!jsonStr) continue // Skip empty data lines
-                    
-                    const data = JSON.parse(jsonStr)
-                    
-                    if (data.type === 'tool-call') {
-                        toolCalls.push({ toolName: data.toolName, args: data.args })
-                        if (onChunk) onChunk({ type: 'tool-call', toolName: data.toolName, args: data.args })
-                    } else if (data.type === 'text-delta') {
-                        fullResponse += data.text
-                        if (onChunk) onChunk({ type: 'text-delta', text: data.text })
-                    } else if (data.type === 'source') {
-                        sources.push({ url: data.url, title: data.title || data.url })
-                        if (onChunk) onChunk({ type: 'source', url: data.url, title: data.title })
-                    } else if (data.type === 'done') {
-                        // Handle final metadata from 'done' event - prefer message from done if fullResponse is empty
-                        if (data.message && !fullResponse) {
-                            fullResponse = data.message
-                        }
-                        if (data.sources && Array.isArray(data.sources)) {
-                            data.sources.forEach(src => {
-                                if (!sources.find(s => s.url === src.url)) {
-                                    sources.push({ url: src.url, title: src.title || src.url })
-                                }
-                            })
-                        }
-                        if (data.toolCalls && Array.isArray(data.toolCalls)) {
-                            data.toolCalls.forEach(tc => {
-                                if (!toolCalls.find(t => t.toolName === tc.toolName)) {
-                                    toolCalls.push(tc)
-                                }
-                            })
-                        }
-                    }
-                } catch (e) {
-                    // Skip logging for very long lines that are likely truncated
-                    if (line.length < 1000) {
-                        console.warn('Failed to parse SSE data:', line.substring(0, 200), e)
-                    }
+            if (!line.startsWith('data: ')) continue
+            try {
+                const jsonStr = line.slice(6).trim()
+                if (!jsonStr) continue
+                const data = JSON.parse(jsonStr)
+
+                if (data.type === 'tool-call') {
+                    toolCalls.push({ toolName: data.toolName, args: data.args })
+                    onChunk?.({ type: 'tool-call', toolName: data.toolName, args: data.args })
+                } else if (data.type === 'text-delta') {
+                    fullResponse += data.text
+                    onChunk?.({ type: 'text-delta', text: data.text })
+                } else if (data.type === 'source') {
+                    sources.push({ url: data.url, title: data.title || data.url })
+                    onChunk?.({ type: 'source', url: data.url, title: data.title })
+                } else if (data.type === 'done') {
+                    if (data.message && !fullResponse) fullResponse = data.message
+                    data.sources?.forEach(src => { if (!sources.find(s => s.url === src.url)) sources.push({ url: src.url, title: src.title || src.url }) })
+                    data.toolCalls?.forEach(tc => { if (!toolCalls.find(t => t.toolName === tc.toolName)) toolCalls.push(tc) })
                 }
+            } catch (e) {
+                if (line.length < 1000) console.warn('Failed to parse SSE data:', line.substring(0, 200), e)
             }
         }
     }
 
-    return { 
-        success: true, 
-        message: fullResponse || 'No response from Grok', 
-        toolCalls, 
-        sources,
-        hasTools: toolCalls.length > 0 
-    }
+    return { success: true, message: fullResponse || 'No response from Grok', toolCalls, sources, hasTools: toolCalls.length > 0 }
 }
 
 // Helper function to process response (streaming or non-streaming)
@@ -87,101 +56,61 @@ const processGrokResponse = async (response, onChunk) => {
         throw new Error(errorData.message || 'Failed to get response from Grok')
     }
 
-    const contentType = response.headers.get('content-type')
-    if (contentType && contentType.includes('text/event-stream')) {
-        return await handleStreamingResponse(response, onChunk)
-    } else {
-        const data = await response.json()
-        return { 
-            success: true, 
-            message: data.data?.message || data.message || '', 
-            toolCalls: data.data?.toolCalls || data.toolCalls || [], 
-            sources: data.data?.sources || data.sources || [],
-            hasTools: (data.data?.toolCalls || data.toolCalls || []).length > 0 
-        }
+    if (response.headers.get('content-type')?.includes('text/event-stream'))
+        return handleStreamingResponse(response, onChunk)
+
+    const data = await response.json()
+    const toolCalls = data.data?.toolCalls || data.toolCalls || []
+    return {
+        success: true,
+        message: data.data?.message || data.message || '',
+        toolCalls,
+        sources: data.data?.sources || data.sources || [],
+        hasTools: toolCalls.length > 0
     }
 }
 
-export const sendMessageToGrok = async (message, conversationHistory = [], onChunk, options = {}) => {
-    try {
-        const response = await fetchWithAuth(`${API_URL}/api/grok/chat`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'text/event-stream, application/json'
-            },
-            body: JSON.stringify({ 
-                message,
-                conversationHistory: conversationHistory.map(msg => ({ role: msg.role, content: msg.content })),
-                options 
-            })
-        })
+const GROK_FETCH_OPTS = {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream, application/json' }
+}
 
-        return await processGrokResponse(response, onChunk)
-    } catch (error) {
-        console.error('Grok API error:', error)
-        throw new Error(error.message || 'Failed to get response from Grok')
-    }
+export const sendMessageToGrok = async (message, conversationHistory = [], onChunk, options = {}) => {
+    const response = await fetchWithAuth(`${API_URL}/api/grok/chat`, {
+        ...GROK_FETCH_OPTS,
+        body: JSON.stringify({ message, conversationHistory: conversationHistory.map(({ role, content }) => ({ role, content })), options })
+    })
+    return processGrokResponse(response, onChunk)
 }
 
 // Send a message with an attached file
 export const sendMessageToGrokWithFile = async (file, message, conversationHistory = [], onChunk, options = {}) => {
-    try {
-        let fileData = null
-        
-        // Read and encode file content if provided
-        if (file) {
-            const fileContent = await readFileContent(file)
-            fileData = {
-                name: file.name,
-                content: btoa(fileContent) // base64 encode
-            }
-        }
+    const fileData = file ? {
+        name: file.name,
+        content: btoa(await readFileContent(file))
+    } : null
 
-        const response = await fetchWithAuth(`${API_URL}/api/grok/chat`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'text/event-stream, application/json'
-            },
-            body: JSON.stringify({
-                message,
-                conversationHistory: conversationHistory.map(msg => ({ role: msg.role, content: msg.content })),
-                options,
-                file: fileData
-            })
-        })
-
-        return await processGrokResponse(response, onChunk)
-    } catch (error) {
-        console.error('Grok API error:', error)
-        throw new Error(error.message || 'Failed to get response from Grok')
-    }
+    const response = await fetchWithAuth(`${API_URL}/api/grok/chat`, {
+        ...GROK_FETCH_OPTS,
+        body: JSON.stringify({ message, conversationHistory: conversationHistory.map(({ role, content }) => ({ role, content })), options, file: fileData })
+    })
+    return processGrokResponse(response, onChunk)
 }
 
 // Helper function to read file content
 const readFileContent = async (file) => {
     const MAX_CHARS = 200000
-    
     try {
-        let content = ''
-        
-        if (typeof file.text === 'function') {
-            content = await file.text()
-        } else {
-            content = await new Promise((resolve, reject) => {
+        const content = typeof file.text === 'function'
+            ? await file.text()
+            : await new Promise((resolve, reject) => {
                 const reader = new FileReader()
                 reader.onload = () => resolve(reader.result)
                 reader.onerror = reject
                 reader.readAsText(file)
             })
-        }
-
-        return content.length > MAX_CHARS 
-            ? content.slice(0, MAX_CHARS) + '\n\n...[truncated]'
-            : content
+        return content.length > MAX_CHARS ? content.slice(0, MAX_CHARS) + '\n\n...[truncated]' : content
     } catch (e) {
         console.warn('Failed to read file content:', e)
         return '[File could not be read]'
@@ -199,8 +128,6 @@ export const updateAichatTitle = async (id, title) => apiRequest(`/api/ai/chat/$
 
 export const updateAichatLastMessage = async (id, lastMessage = null) => {
     if (!id) return { success: false, message: 'Missing chat id' }
-    if (!lastMessage) return { success: false, message: 'Nothing to update' }
-
     const msgObj = normalizeMessage(lastMessage)
     if (!msgObj) return { success: false, message: 'Nothing to update' }
 
@@ -215,21 +142,12 @@ export const updateAichatLastMessage = async (id, lastMessage = null) => {
         if (!res.ok) {
             const errBody = await parseErrorResponse(res)
             const result = { success: false, status: res.status, message: errBody.message, body: errBody.raw }
-
-            // Retry with sanitized content on 400 errors
-            if (res.status === 400 && msgObj.content) {
-                const retryResult = await retryWithSanitizedContent(id, msgObj)
-                if (retryResult) return retryResult
-                result.retry = retryResult
-            }
-
+            if (res.status === 400 && msgObj.content) result.retry = await retryWithSanitizedContent(id, msgObj)
             return result
         }
 
-        const data = await res.json()
-        return { success: true, data }
+        return { success: true, data: await res.json() }
     } catch (error) {
-        console.error('Update AI chat lastMessage error:', error)
         return { success: false, message: error.message || 'Failed to update chat lastMessage' }
     }
 }
@@ -238,46 +156,27 @@ export const updateAichatLastMessage = async (id, lastMessage = null) => {
 const normalizeMessage = (lastMessage) => {
     if (typeof lastMessage === 'string') {
         const content = lastMessage.trim()
-        return content ? { 
-            role: 'assistant', 
-            content, 
-            timestamp: new Date().toISOString() 
-        } : null
+        return content ? { role: 'assistant', content, timestamp: new Date().toISOString() } : null
     }
-    
-    if (typeof lastMessage === 'object') {
+    if (typeof lastMessage === 'object' && lastMessage) {
         const content = (lastMessage.content || lastMessage.text || '').toString().trim()
         if (!content) return null
-        
         return {
             role: lastMessage.role || 'assistant',
             content,
-            timestamp: lastMessage.timestamp instanceof Date 
-                ? lastMessage.timestamp.toISOString() 
+            timestamp: lastMessage.timestamp instanceof Date
+                ? lastMessage.timestamp.toISOString()
                 : new Date(lastMessage.timestamp || Date.now()).toISOString()
         }
     }
-    
     return null
 }
 
 // Helper function to parse error response
 const parseErrorResponse = async (res) => {
     let raw
-    try {
-        raw = await res.json()
-    } catch (e) {
-        try {
-            raw = await res.text()
-        } catch (e2) {
-            raw = res.statusText
-        }
-    }
-    
-    const message = (raw && raw.message) 
-        ? raw.message 
-        : (typeof raw === 'string' ? raw : (res.statusText || 'Failed to update chat lastMessage'))
-    
+    try { raw = await res.json() } catch { try { raw = await res.text() } catch { raw = res.statusText } }
+    const message = raw?.message || (typeof raw === 'string' ? raw : res.statusText || 'Failed to update chat lastMessage')
     return { message, raw }
 }
 
@@ -286,23 +185,15 @@ const retryWithSanitizedContent = async (id, msgObj) => {
     try {
         const sanitize = (s) => s.toString().replace(/[\u0000-\u001F\u007F]/g, '').trim()
         const short = sanitize(msgObj.content).slice(0, 1000)
-        
         if (!short || short === msgObj.content) return null
-        
+
         const retryRes = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
-            method: 'PUT',
-            credentials: 'include',
+            method: 'PUT', credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ messages: [{ ...msgObj, content: short }], append: true })
         })
-        
-        if (retryRes.ok) {
-            const data = await retryRes.json()
-            return { success: true, data, retried: true }
-        }
-        
-        const rb = await parseErrorResponse(retryRes)
-        return { status: retryRes.status, body: rb.raw }
+        if (retryRes.ok) return { success: true, data: await retryRes.json(), retried: true }
+        return { status: retryRes.status, body: (await parseErrorResponse(retryRes)).raw }
     } catch (err) {
         console.warn('Retry updateAichatLastMessage failed:', err)
         return null

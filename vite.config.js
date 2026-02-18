@@ -12,7 +12,13 @@ export default defineConfig({
       devOptions: { enabled: true },  // Enables PWA in development mode for testing
       workbox: {
         clientsClaim: true,
-        skipWaiting: true
+        skipWaiting: true,
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/'),
+            handler: 'NetworkOnly',
+          }
+        ]
       },
       manifest: {
         icons: [

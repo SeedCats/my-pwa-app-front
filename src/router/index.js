@@ -81,48 +81,21 @@ const router = createRouter({
     },
     {
       path: '/admin/chats',
-      name: 'AdminPatientChat',
-      component: () => import('../views/adminView/AdminPatientChatView.vue'),
+      name: 'AdminChat',
+      component: () => import('../views/adminView/AdminChatView.vue'),
       meta: { requiresAuth: true, requiresRole: 'admin' }
     }
   ]
 })
 
-// Navigation guard middleware (uses cached auth check)
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const isAuthenticated = await checkAuth()
+  if (isAuthenticated) prefetchHealthDataForOffline().catch(() => {})
 
-  if (isAuthenticated) {
-    prefetchHealthDataForOffline().catch(() => {})
-  }
-  
-  // Route requires authentication
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    // Redirect to login page
-    next({ name: 'Login' })
-  }
-  // Route requires a specific role
-  else if (to.meta.requiresRole) {
-    if (!hasRole(to.meta.requiresRole)) {
-      // Not authorized: redirect to home
-      next({ name: 'home' })
-    } else {
-      next()
-    }
-  }
-  // Route is for guests only (login/register) but user is authenticated
-  else if (to.meta.requiresGuest && isAuthenticated) {
-    // Redirect based on role: admins go to Admin Dashboard, others go to home
-    if (hasRole('admin')) {
-      next({ name: 'AdminDashboard' })
-    } else {
-      next({ name: 'home' })
-    }
-  }
-  // Allow navigation
-  else {
-    next()
-  }
+  if (to.meta.requiresAuth && !isAuthenticated) next({ name: 'Login' })
+  else if (to.meta.requiresRole && !hasRole(to.meta.requiresRole)) next({ name: 'home' })
+  else if (to.meta.requiresGuest && isAuthenticated) next({ name: hasRole('admin') ? 'AdminDashboard' : 'home' })
+  else next()
 })
 
 export default router

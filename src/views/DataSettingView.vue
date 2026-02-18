@@ -320,7 +320,6 @@ import { saveBMIData, getLatestBMIRecord, updateBMIRecord, deleteBMIRecord, dele
 import { uploadHeartRateCSV, uploadAllCSV, deleteAllHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
 import { uploadStressCSV, deleteAllStressRecords, getStressDates } from '../services/stressService'
 import { invalidateBmiCache, invalidateHeartRateCache, invalidateStressCache, useUserStore } from '../stores/userStore'
-import { apiRequest } from '../services/apiClient'
 
 const route = useRoute()
 const router = useRouter()
@@ -331,25 +330,13 @@ const { t } = useI18n()
 
 // Navigate back to the referrer if provided; otherwise fall back to history or Admin dashboard
 const goBackToReferrer = () => {
-    const from = route.query.from || null
-    if (from) {
-        // route.query.from may be a string path
-        try {
-            router.push(from)
-            return
-        } catch (e) {
-            // ignore and fallback
-        }
-    }
-    if (window.history.length > 1) {
-        router.back()
-    } else {
-        router.push({ name: 'AdminDashboard' })
-    }
+    const from = route.query.from
+    if (from) { try { router.push(from); return } catch {} }
+    if (window.history.length > 1) router.back()
+    else router.push({ name: 'AdminDashboard' })
 }
 
 // State
-const sidebarHidden = ref(false)
 const bmiForm = ref({ age: '', height: '', weight: '' })
 const existingBMIRecord = ref(null)
 const isLoading = ref(false)
@@ -366,26 +353,21 @@ const hasHeartRateData = ref(false)
 const hasStressData = ref(false)
 const isDeletingBMI = ref(false)
 const deleteBMIStatus = ref(null)
-// New states
 const isStressOnlyUpload = ref(false)
 const isHeartOnlyUpload = ref(false)
-// Processing state for client-side CSV formatting
 const isProcessing = ref(false)
 const fileProcessStatus = ref(null)
 
-// Keep upload type checkboxes mutually exclusive
 watch(isHeartOnlyUpload, (val) => { if (val) isStressOnlyUpload.value = false })
 watch(isStressOnlyUpload, (val) => { if (val) isHeartOnlyUpload.value = false })
-
 
 // Computed
 const isUpdateMode = computed(() => !!(existingBMIRecord.value?._id || existingBMIRecord.value?.id))
 
 const calculatedBMI = computed(() => {
-    const { height, weight } = bmiForm.value
-    if (!height || !weight) return null
-    const h = parseFloat(height) / 100, w = parseFloat(weight)
-    return (h > 0 && w > 0) ? (w / (h * h)).toFixed(1) : null
+    const h = parseFloat(bmiForm.value.height) / 100
+    const w = parseFloat(bmiForm.value.weight)
+    return h > 0 && w > 0 ? (w / (h * h)).toFixed(1) : null
 })
 
 const bmiCategory = computed(() => {
@@ -398,51 +380,38 @@ const bmiCategory = computed(() => {
 })
 
 const bmiCategoryKey = computed(() => {
-    const raw = (bmiCategory.value || '').toString().toLowerCase()
-    if (raw.includes('under') || raw.includes('過輕')) return 'underweight'
-    if (raw.includes('normal') || raw.includes('正常')) return 'normal'
-    if (raw.includes('over') || raw.includes('過重')) return 'overweight'
-    if (raw.includes('obese') || raw.includes('肥胖')) return 'obese'
+    const raw = bmiCategory.value.toLowerCase()
+    if (raw.includes('under')) return 'underweight'
+    if (raw.includes('normal')) return 'normal'
+    if (raw.includes('over')) return 'overweight'
+    if (raw.includes('obese')) return 'obese'
     return ''
 })
 
 const bmiCategoryColor = computed(() => {
     const bmi = parseFloat(calculatedBMI.value)
     if (!bmi) return ''
-    const colors = {
-        underweight: ['text-blue-400', 'text-blue-600'],
-        normal: ['text-green-400', 'text-green-600'],
-        overweight: ['text-yellow-400', 'text-yellow-600'],
-        obese: ['text-red-400', 'text-red-600']
-    }
     const key = bmi < 18.5 ? 'underweight' : bmi < 25 ? 'normal' : bmi < 30 ? 'overweight' : 'obese'
+    const colors = { underweight: ['text-blue-400', 'text-blue-600'], normal: ['text-green-400', 'text-green-600'], overweight: ['text-yellow-400', 'text-yellow-600'], obese: ['text-red-400', 'text-red-600'] }
     return isDarkMode.value ? colors[key][0] : colors[key][1]
 })
 
-const updateSidebarState = (state) => sidebarHidden.value = state
+const updateSidebarState = () => {}
 const viewedUserId = computed(() => route.query.userId || null)
 const currentUserId = computed(() => userState.user?.id || null)
-const isViewingOtherUser = computed(() => {
-    return viewedUserId.value && currentUserId.value && String(viewedUserId.value) !== String(currentUserId.value)
-})
+const isViewingOtherUser = computed(() =>
+    viewedUserId.value && currentUserId.value && String(viewedUserId.value) !== String(currentUserId.value)
+)
+const adminParams = computed(() => isViewingOtherUser.value ? { userId: viewedUserId.value } : {})
 
 const loadExistingBMIData = async () => {
     isLoadingData.value = true
     try {
-        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
-        const { success, data } = await getLatestBMIRecord(params)
-        if (success && data) {
-            existingBMIRecord.value = data
-            bmiForm.value = {
-                height: data.height?.toString() || '',
-                weight: data.weight?.toString() || '',
-                age: data.age?.toString() || ''
-            }
-        } else {
-            existingBMIRecord.value = null
-        }
-    } catch (error) {
-        // No existing BMI data
+        const { success, data } = await getLatestBMIRecord(adminParams.value)
+        existingBMIRecord.value = success && data ? data : null
+        if (success && data)
+            bmiForm.value = { height: data.height?.toString() || '', weight: data.weight?.toString() || '', age: data.age?.toString() || '' }
+    } catch {
         existingBMIRecord.value = null
     } finally {
         isLoadingData.value = false
@@ -450,211 +419,120 @@ const loadExistingBMIData = async () => {
 }
 
 // Reload data when viewed user changes
-watch(() => route.query.userId, () => {
-    loadExistingBMIData()
-    checkHeartRateData()
-    checkStressData()
-})
+watch(() => route.query.userId, () => { loadExistingBMIData(); checkHeartRateData(); checkStressData() })
+
+const clearStatusAfterDelay = (statusRef) => setTimeout(() => statusRef.value = null, 3000)
 
 const submitBMIData = async () => {
     if (!bmiForm.value.height || !bmiForm.value.weight) {
         submitStatus.value = { type: 'error', message: t('dataSettings.fillHeightWeight') }
         return
     }
-
     isLoading.value = true
     submitStatus.value = null
-
-    const ageValue = bmiForm.value.age ? parseInt(bmiForm.value.age, 10) : null
-
     const bmiData = {
         weight: parseFloat(bmiForm.value.weight),
         height: parseFloat(bmiForm.value.height),
         bmi: parseFloat(calculatedBMI.value),
         category: bmiCategory.value,
-        age: ageValue
+        age: bmiForm.value.age ? parseInt(bmiForm.value.age, 10) : null
     }
-
     try {
         const recordId = existingBMIRecord.value?._id || existingBMIRecord.value?.id
-        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
-        let response
-
-        if (isUpdateMode.value && recordId) {
-            response = await updateBMIRecord(recordId, bmiData, params)
-        } else {
-            response = await saveBMIData(bmiData, params)
-        }
-
-        if (response && response.success) {
-            if (response.data) {
-                existingBMIRecord.value = { ...response.data, _id: response.data._id || response.data.id }
-            }
-            submitStatus.value = {
-                type: 'success',
-                message: isUpdateMode.value ? t('dataSettings.updatedSuccessfully') : t('dataSettings.savedSuccessfully')
-            }
-            invalidateBmiCache()  // Invalidate cache so HomeView fetches fresh data
+        const response = recordId
+            ? await updateBMIRecord(recordId, bmiData, adminParams.value)
+            : await saveBMIData(bmiData, adminParams.value)
+        if (response?.success) {
+            if (response.data) existingBMIRecord.value = { ...response.data, _id: response.data._id || response.data.id }
+            submitStatus.value = { type: 'success', message: isUpdateMode.value ? t('dataSettings.updatedSuccessfully') : t('dataSettings.savedSuccessfully') }
+            invalidateBmiCache()
             window.dispatchEvent(new CustomEvent('bmiDataUpdated'))
         } else {
-            submitStatus.value = { type: 'error', message: (response && response.message) || t('dataSettings.saveFailed') }
+            submitStatus.value = { type: 'error', message: response?.message || t('dataSettings.saveFailed') }
         }
     } catch (error) {
-        console.error('BMI submission error:', error)
         submitStatus.value = { type: 'error', message: error.message || t('dataSettings.saveFailed') }
     } finally {
         isLoading.value = false
-        if (submitStatus.value?.type === 'success') {
-            setTimeout(() => submitStatus.value = null, 3000)
-        }
+        if (submitStatus.value?.type === 'success') clearStatusAfterDelay(submitStatus)
     }
 }
 
 // Delete BMI data
 const deleteBMIData = async () => {
-    if (!confirm(t('dataSettings.deleteBMIConfirm'))) {
-        return
-    }
-
+    if (!confirm(t('dataSettings.deleteBMIConfirm'))) return
     isDeletingBMI.value = true
     deleteBMIStatus.value = null
-
     try {
-        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
         const recordId = existingBMIRecord.value?._id || existingBMIRecord.value?.id
-        let response
-
-        // If there's a specific record displayed, delete that record by ID
-        if (recordId) {
-            response = await deleteBMIRecord(recordId, params)
-        } else {
-            // Otherwise delete all BMI records
-            response = await deleteAllBMIRecords(params)
-        }
-
-        if (response && response.success) {
-            deleteBMIStatus.value = {
-                type: 'success',
-                message: t('dataSettings.bmiDeleted')
-            }
-            // Clear the form and reset state
+        const response = recordId
+            ? await deleteBMIRecord(recordId, adminParams.value)
+            : await deleteAllBMIRecords(adminParams.value)
+        if (response?.success) {
+            deleteBMIStatus.value = { type: 'success', message: t('dataSettings.bmiDeleted') }
             bmiForm.value = { age: '', height: '', weight: '' }
             existingBMIRecord.value = null
             invalidateBmiCache()
             window.dispatchEvent(new CustomEvent('bmiDataUpdated'))
         } else {
-            deleteBMIStatus.value = { type: 'error', message: (response && response.message) || t('dataSettings.deleteFailed') }
+            deleteBMIStatus.value = { type: 'error', message: response?.message || t('dataSettings.deleteFailed') }
         }
     } catch (error) {
-        console.error('BMI delete error:', error)
         deleteBMIStatus.value = { type: 'error', message: error.message || t('dataSettings.deleteFailed') }
     } finally {
         isDeletingBMI.value = false
-        if (deleteBMIStatus.value?.type === 'success') {
-            setTimeout(() => deleteBMIStatus.value = null, 3000)
-        }
+        if (deleteBMIStatus.value?.type === 'success') clearStatusAfterDelay(deleteBMIStatus)
     }
 }
 
 // Check if heart rate data exists
 const checkHeartRateData = async () => {
     try {
-        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
-        const response = await getHeartRateDates(params)
-
-        // Check if there are dates available (backend returns data.dates array)
-        if (
-            response &&
-            response.success &&
-            response.data &&
-            Array.isArray(response.data.dates) &&
-            response.data.dates.length > 0
-        ) {
-            hasHeartRateData.value = true
-        } else {
-            hasHeartRateData.value = false
-        }
-    } catch (error) {
-        hasHeartRateData.value = false
-    }
+        const res = await getHeartRateDates(adminParams.value)
+        hasHeartRateData.value = !!(res?.success && Array.isArray(res.data?.dates) && res.data.dates.length)
+    } catch { hasHeartRateData.value = false }
 }
 
 // Check if stress data exists
 const checkStressData = async () => {
     try {
-        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
-        const response = await getStressDates(params)
-        if (
-            response &&
-            response.success &&
-            response.data &&
-            Array.isArray(response.data.dates) &&
-            response.data.dates.length > 0
-        ) {
-            hasStressData.value = true
-        } else {
-            hasStressData.value = false
-        }
-    } catch (error) {
-        hasStressData.value = false
-    }
+        const res = await getStressDates(adminParams.value)
+        hasStressData.value = !!(res?.success && Array.isArray(res.data?.dates) && res.data.dates.length)
+    } catch { hasStressData.value = false }
 }
 
 // Delete all heart rate data
 const deleteAllHeartRateData = async () => {
-    if (!confirm(t('dataSettings.deleteAllConfirm'))) {
-        return
-    }
-
+    if (!confirm(t('dataSettings.deleteAllConfirm'))) return
     isDeleting.value = true
     deleteStatus.value = null
-
     try {
-        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
-        const response = await deleteAllHeartRateRecords(params)
-
-        if (response && response.success) {
-            deleteStatus.value = {
-                type: 'success',
-                message: response.message || t('dataSettings.allHeartRateDeleted')
-            }
+        const response = await deleteAllHeartRateRecords(adminParams.value)
+        if (response?.success) {
+            deleteStatus.value = { type: 'success', message: response.message || t('dataSettings.allHeartRateDeleted') }
             hasHeartRateData.value = false
             invalidateHeartRateCache()
             window.dispatchEvent(new CustomEvent('heartRateDataUpdated'))
         } else {
-            deleteStatus.value = { type: 'error', message: (response && response.message) || t('dataSettings.deleteFailed') }
+            deleteStatus.value = { type: 'error', message: response?.message || t('dataSettings.deleteFailed') }
         }
     } catch (error) {
-        console.error('Heart rate delete error:', error)
         deleteStatus.value = { type: 'error', message: error.message || t('dataSettings.deleteFailed') }
     } finally {
         isDeleting.value = false
-        if (deleteStatus.value?.type === 'success') {
-            setTimeout(() => deleteStatus.value = null, 3000)
-        }
+        if (deleteStatus.value?.type === 'success') clearStatusAfterDelay(deleteStatus)
     }
 }
 
-
-
 // Delete all stress data
 const deleteAllStressData = async () => {
-    if (!confirm(t('dataSettings.deleteAllStressConfirm'))) {
-        return
-    }
-
+    if (!confirm(t('dataSettings.deleteAllStressConfirm'))) return
     isDeleting.value = true
     deleteStatus.value = null
-
     try {
-        const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
-        const response = await deleteAllStressRecords(params)
-
-        if (response.success) {
-            deleteStatus.value = {
-                type: 'success',
-                message: response.message || t('dataSettings.allStressDeleted')
-            }
+        const response = await deleteAllStressRecords(adminParams.value)
+        if (response?.success) {
+            deleteStatus.value = { type: 'success', message: response.message || t('dataSettings.allStressDeleted') }
             hasStressData.value = false
             invalidateStressCache()
             window.dispatchEvent(new CustomEvent('stressDataUpdated'))
@@ -662,46 +540,27 @@ const deleteAllStressData = async () => {
             deleteStatus.value = { type: 'error', message: t('dataSettings.deleteFailed') }
         }
     } catch (error) {
-        console.error('Stress delete error:', error)
         deleteStatus.value = { type: 'error', message: t('dataSettings.deleteFailed') }
     } finally {
         isDeleting.value = false
-        if (deleteStatus.value?.type === 'success') {
-            setTimeout(() => deleteStatus.value = null, 3000)
-        }
+        if (deleteStatus.value?.type === 'success') clearStatusAfterDelay(deleteStatus)
     }
 }
 
-onMounted(() => {
-    loadExistingBMIData()
-    checkHeartRateData()
-    checkStressData()
-})
+onMounted(() => { loadExistingBMIData(); checkHeartRateData(); checkStressData() })
 
 // File Upload Handlers
 const triggerFileInput = () => fileInput.value.click()
 
 const validateAndSetFile = (file, errorMsg) => {
-    // Check for CSV by extension or MIME type (some systems use different MIME types)
     const isCSV = file?.name?.toLowerCase().endsWith('.csv') ||
-        file?.type === 'text/csv' ||
-        file?.type === 'application/vnd.ms-excel' ||
-        file?.type === 'text/plain'
-
-    if (isCSV) {
-        selectedFile.value = file
-        uploadStatus.value = null
-    } else if (file) {
-        uploadStatus.value = { type: 'error', message: errorMsg }
-    }
+        ['text/csv', 'application/vnd.ms-excel', 'text/plain'].includes(file?.type)
+    if (isCSV) { selectedFile.value = file; uploadStatus.value = null }
+    else if (file) { uploadStatus.value = { type: 'error', message: errorMsg } }
 }
 
 const handleFileSelect = (e) => validateAndSetFile(e.target.files[0], t('dataSettings.invalidCsvSelect'))
-
-const handleFileDrop = (e) => {
-    isDragging.value = false
-    validateAndSetFile(e.dataTransfer.files[0], t('dataSettings.invalidCsvDrop'))
-}
+const handleFileDrop = (e) => { isDragging.value = false; validateAndSetFile(e.dataTransfer.files[0], t('dataSettings.invalidCsvDrop')) }
 
 const clearFile = () => {
     selectedFile.value = null
@@ -711,10 +570,7 @@ const clearFile = () => {
 }
 
 // Helper to split CSV line while respecting quoted commas
-const splitCsvLine = (line) => {
-    const regex = /,(?=(?:(?:[^"]*"){2})*[^\"]*$)/
-    return line.split(regex)
-}
+const splitCsvLine = (line) => line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
 
 // Process CSV text into required "Value,Date" format
 function processCsvText(text) {
@@ -745,13 +601,11 @@ function processCsvText(text) {
     return out.join('\n')
 }
 
-const uploadProcessedCsv = async (csvText, filename = 'heart_rate_stress_combined.csv') => {
-    const processedFile = new File([csvText], filename, { type: 'text/csv' })
-    const params = isViewingOtherUser.value ? { userId: viewedUserId.value } : {}
-
-    if (isHeartOnlyUpload.value) return await uploadHeartRateCSV(processedFile, params)
-    if (isStressOnlyUpload.value) return await uploadStressCSV(processedFile, params)
-    return await uploadAllCSV(processedFile, params)
+const uploadProcessedCsv = (csvText, filename = 'heart_rate_stress_combined.csv') => {
+    const file = new File([csvText], filename, { type: 'text/csv' })
+    if (isHeartOnlyUpload.value) return uploadHeartRateCSV(file, adminParams.value)
+    if (isStressOnlyUpload.value) return uploadStressCSV(file, adminParams.value)
+    return uploadAllCSV(file, adminParams.value)
 }
 
 const submitFileUpload = async () => {
@@ -766,16 +620,11 @@ const submitFileUpload = async () => {
     fileProcessStatus.value = { type: 'info', message: t('dataSettings.processingCSV') }
 
     try {
-        // Read file text and process
-        const text = await selectedFile.value.text()
         let processedCsv
         try {
-            processedCsv = processCsvText(text)
-            fileProcessStatus.value = { type: 'success', message: t('dataSettings.processingSuccess') || 'CSV processed' }
-            // Show uploading message after processing
+            processedCsv = processCsvText(await selectedFile.value.text())
             fileProcessStatus.value = { type: 'info', message: t('dataSettings.uploading') || 'Uploading...' }
         } catch (error) {
-            console.error('CSV processing error:', error)
             fileProcessStatus.value = { type: 'error', message: error.message || t('dataSettings.processingFailed') }
             throw error
         }
@@ -813,7 +662,6 @@ const submitFileUpload = async () => {
             uploadStatus.value = { type: 'error', message: (response && response.message) || t('dataSettings.uploadFailed') }
         }
     } catch (error) {
-        console.error('File upload error:', error)
         uploadStatus.value = { type: 'error', message: error.message || t('dataSettings.uploadFailedTry') }
     } finally {
         isUploading.value = false

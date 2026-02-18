@@ -3,7 +3,7 @@
     <main>
       <div class="px-3 sm:px-4 md:px-6 lg:px-8 pt-4 pb-8">
         <!-- Header -->
-        <div class="mb-8 pt-16">
+        <div class="mb-8 pt-4">
           <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('formatSettings.title') }}</h1>
           <p class="mt-2 text-sm" :class="themeClasses.textSecondary">{{ $t('formatSettings.subtitle') }}</p>
         </div>

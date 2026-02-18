@@ -421,9 +421,7 @@ const userName = computed(() => userData.value?.name || 'User')
 // Provider name - check multiple possible field names
 const providerName = computed(() => {
     const user = userData.value
-    if (!user) return null
-    // Check multiple possible field names for provider
-    return user.provider || user.providerName || user.assignedProvider || user.healthcare_provider || null
+    return user?.provider || user?.providerName || user?.assignedProvider || user?.healthcare_provider || null
 })
 
 const currentLanguageName = computed(() => {
@@ -434,8 +432,7 @@ const currentLanguageName = computed(() => {
 const unreadTimeText = computed(() => {
     if (!unreadTimestamp.value) return ''
     const parsed = new Date(unreadTimestamp.value)
-    if (Number.isNaN(parsed.getTime())) return ''
-    return parsed.toLocaleString()
+    return Number.isNaN(parsed.getTime()) ? '' : parsed.toLocaleString()
 })
 
 // Helper to check active route for styling
@@ -447,37 +444,30 @@ const toggleDesktopSidebar = () => {
 }
 
 const toggleNotificationPanel = async () => {
-    if (showNotificationPanel.value) {
-        showNotificationPanel.value = false
-        return
-    }
-
+    if (showNotificationPanel.value) { showNotificationPanel.value = false; return }
     showNotificationPanel.value = true
-    hasViewedNotifications.value = true // Mark as viewed when opening panel
+    hasViewedNotifications.value = true
     await loadUnreadCount()
 }
 
 // Global flag to track if we just cleared notifications and prevent immediate re-fetching that would show them again
 const justClearedNotifications = ref(false)
 
+const clearUnread = (suppressMs = 0) => {
+    unreadCount.value = 0; unreadLastText.value = ''; unreadSender.value = ''; unreadTimestamp.value = ''
+    hasViewedNotifications.value = true
+    showNotificationPanel.value = false
+    if (suppressMs > 0) { justClearedNotifications.value = true; setTimeout(() => { justClearedNotifications.value = false }, suppressMs) }
+}
+
 const openNotificationsChat = async () => {
     if (isAdmin()) {
-        showNotificationPanel.value = false
-        // Optimistically clear count and message details
-        unreadCount.value = 0
-        unreadLastText.value = ''
-        unreadSender.value = ''
-        unreadTimestamp.value = ''
-        hasViewedNotifications.value = true
-        justClearedNotifications.value = true
-
-        // Mark all unread messages as read on the backend by fetching history for each unread user
+        clearUnread(35000)
         try {
             const usersRes = await fetch(`${API_URL}/api/admin-chat/users`, { credentials: 'include' })
             if (usersRes.ok) {
                 const usersJson = await usersRes.json().catch(() => ({}))
-                const chatUsers = usersJson?.users || []
-                const unreadUsers = chatUsers.filter(u => (u.unreadCount || 0) > 0)
+                const unreadUsers = (usersJson?.users || []).filter(u => (u.unreadCount || 0) > 0)
                 await Promise.all(unreadUsers.map(u => {
                     const userId = u.userId || u.id || u._id
                     if (!userId) return Promise.resolve()
@@ -485,22 +475,10 @@ const openNotificationsChat = async () => {
                 }))
             }
         } catch { /* ignore, navigation still proceeds */ }
-
-        setTimeout(() => { justClearedNotifications.value = false }, 35000) // Prevent updates for 35s (> poll interval)
         router.push('/admin/chats')
         return
     }
-
-    // Allow navigation even if unreadCount is 0, if user clicks the button manually
-    
-    showNotificationPanel.value = false
-    unreadCount.value = 0
-    unreadLastText.value = ''
-    unreadSender.value = ''
-    unreadTimestamp.value = ''
-    hasViewedNotifications.value = true
-    justClearedNotifications.value = true
-    setTimeout(() => { justClearedNotifications.value = false }, 5000) // Prevent updates for 5s
+    clearUnread(5000)
     router.push('/chat')
 }
 
@@ -583,32 +561,14 @@ const loadUnreadCount = async () => {
             }
         }
 
-        if (!loadedFromEndpoint && !isAdmin()) {
-            unreadCount.value = 0
-            unreadSender.value = ''
-            unreadLastText.value = ''
-            unreadTimestamp.value = ''
-        }
+        if (!loadedFromEndpoint && !isAdmin()) clearUnread()
     } catch {
         if (isAdmin()) {
-            await loadAdminNotificationFallback().catch(() => {
-                unreadCount.value = 0
-                unreadSender.value = ''
-                unreadLastText.value = ''
-                unreadTimestamp.value = ''
-            })
-            // If fallback increased count over captured initial, reset flag
-            if (unreadCount.value > initialCount) {
-                if (!showNotificationPanel.value) {
-                    hasViewedNotifications.value = false
-                }
-            }
+            await loadAdminNotificationFallback().catch(() => clearUnread())
+            if (unreadCount.value > initialCount && !showNotificationPanel.value) hasViewedNotifications.value = false
             return
         }
-        unreadCount.value = 0
-        unreadSender.value = ''
-        unreadLastText.value = ''
-        unreadTimestamp.value = ''
+        clearUnread()
     }
 }
 
@@ -617,31 +577,13 @@ const loadAdminNotificationFallback = async () => {
     try {
         assignedRes = await fetch(`${API_URL}/api/admin/assigned-users?page=1&limit=50`, { credentials: 'include' })
     } catch {
-        // Network error - silently reset and return
-        unreadCount.value = 0
-        unreadSender.value = ''
-        unreadLastText.value = ''
-        unreadTimestamp.value = ''
-        return
+        clearUnread(); return
     }
-    if (!assignedRes.ok) {
-        unreadCount.value = 0
-        unreadSender.value = ''
-        unreadLastText.value = ''
-        unreadTimestamp.value = ''
-        return
-    }
+    if (!assignedRes.ok) { clearUnread(); return }
 
     const assignedJson = await assignedRes.json().catch(() => ({}))
     const assignedUsers = assignedJson?.data?.users || assignedJson?.users || []
-
-    if (!Array.isArray(assignedUsers) || assignedUsers.length === 0) {
-        unreadCount.value = 0
-        unreadSender.value = ''
-        unreadLastText.value = ''
-        unreadTimestamp.value = ''
-        return
-    }
+    if (!Array.isArray(assignedUsers) || assignedUsers.length === 0) { clearUnread(); return }
 
     let latestMessage = null
     let latestUserName = ''
@@ -693,10 +635,7 @@ const loadAdminNotificationFallback = async () => {
         unreadLastText.value = latestMessage?.text || ''
         unreadTimestamp.value = latestMessage?.createdAt || latestMessage?.time || ''
     } else {
-        unreadCount.value = 0
-        unreadSender.value = ''
-        unreadLastText.value = ''
-        unreadTimestamp.value = ''
+        clearUnread()
     }
 }
 
@@ -715,10 +654,7 @@ const loadUserData = async () => {
             const json = await res.json()
             userData.value = json.data?.user || json.data || json.user || json
         }
-    } catch (err) { 
-        console.error('Error loading user data:', err)
-        userData.value = null 
-    }
+    } catch { userData.value = null }
 }
 
 onMounted(() => {
@@ -727,20 +663,15 @@ onMounted(() => {
     unreadPollTimer = window.setInterval(loadUnreadCount, 30000)
     window.addEventListener('mousedown', handleGlobalClick)
     window.addEventListener('userUpdated', (e) => {
-        // Only update top-right displayed user when the event payload matches the current logged-in user
         const updated = e?.detail || {}
         const currentId = userStore.user?.id || userStore.user?._id || userData.value?.id || userData.value?._id
-        if (updated && currentId && (String(updated.id) === String(currentId) || String(updated._id) === String(currentId))) {
+        if (updated && currentId && (String(updated.id) === String(currentId) || String(updated._id) === String(currentId)))
             userData.value = updated
-        }
     })
 })
 
 onUnmounted(() => {
-    if (unreadPollTimer) {
-        clearInterval(unreadPollTimer)
-        unreadPollTimer = null
-    }
+    if (unreadPollTimer) { clearInterval(unreadPollTimer); unreadPollTimer = null }
     window.removeEventListener('mousedown', handleGlobalClick)
 })
 </script>

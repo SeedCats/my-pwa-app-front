@@ -4,7 +4,7 @@
 
       <!-- ── Left panel: patient list ─────────────────────────────── -->
       <aside
-        class="flex flex-col w-80 border-r shrink-0 transition-all duration-300"
+        class="flex flex-col w-60 border-r shrink-0 transition-all duration-300"
         :class="[themeClasses.cardBackground, themeClasses.border]"
       >
         <!-- Header -->
@@ -449,12 +449,12 @@ const selectUser = async (user) => {
   try {
     const response = await fetchAdminChatHistory(user.id, adminId.value)
     messages.value = response?.messages || []
-    scrollToBottom()
   } catch (error) {
     messages.value = []
     errorMessage.value = error.message || 'Failed to load patient messages'
   } finally {
     messagesLoading.value = false
+    scrollToBottom()
   }
 }
 

@@ -2,154 +2,57 @@ import { fetchWithAuth } from '../utils/fetchWithAuth'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
-// Try several possible endpoints and return parsed JSON if found
-export const getUserById = async (id) => {
+const parseResponse = async (res) => {
+  const ct = res.headers.get('content-type') || ''
+  if (ct.includes('application/json')) return res.json().catch(() => null)
+  return { data: await res.text().catch(() => null) }
+}
+
+// Try several endpoints in order, returning the first non-404 response
+const tryEndpoints = async (id, paths, fetchOpts) => {
+  for (const path of paths) {
+    const res = await fetchWithAuth(`${API_URL}${path(id)}`, { credentials: 'include', ...fetchOpts })
+    if (res.status === 404) continue
+    return parseResponse(res)
+  }
+  return { success: false, status: 404, message: 'Not found' }
+}
+
+const USER_PATHS = [
+  (id) => `/api/admin/users/${id}`,
+  (id) => `/api/admin/user/${id}`,
+  (id) => `/api/users/${id}`,
+  (id) => `/api/user/${id}`
+]
+
+export const getUserById = (id) => {
   if (!id) return null
-
-  const endpoints = [
-    (id) => `/api/admin/users/${id}`,
-    (id) => `/api/admin/user/${id}`,
-    (id) => `/api/users/${id}`,
-    (id) => `/api/user/${id}`
-  ]
-
-  for (const ep of endpoints) {
-    const url = `${API_URL}${ep(id)}`
-    try {
-      const res = await fetchWithAuth(url, { credentials: 'include' })
-
-      // If not found, try next endpoint
-      if (res.status === 404) continue
-
-      const ct = res.headers.get('content-type') || ''
-      if (ct.includes('application/json')) {
-        // Return parsed JSON (may include different shapes)
-        const json = await res.json().catch(() => null)
-        return json
-      }
-
-      // Non-JSON but successful response - return as text
-      const text = await res.text().catch(() => null)
-      return { data: text }
-    } catch (err) {
-      // Pass through 401 handling (fetchWithAuth will redirect). For other errors, rethrow
-      throw err
-    }
-  }
-
-  return { success: false, status: 404, message: 'User not found' }
+  return tryEndpoints(id, USER_PATHS, {})
 }
 
-// Update a user's public fields (tries multiple possible endpoints)
-export const updateUserById = async (id, body) => {
+export const updateUserById = (id, body) => {
   if (!id) throw new Error('Missing user id')
-
-  const endpoints = [
-    (id) => `/api/admin/user/${id}`,
-    (id) => `/api/admin/users/${id}`,
-    (id) => `/api/users/${id}`,
-    (id) => `/api/user/${id}`
-  ]
-
-  for (const ep of endpoints) {
-    const url = `${API_URL}${ep(id)}`
-    try {
-      const res = await fetchWithAuth(url, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(body)
-      })
-
-      if (res.status === 404) continue
-
-      const ct = res.headers.get('content-type') || ''
-      if (ct.includes('application/json')) {
-        const json = await res.json().catch(() => null)
-        return json
-      }
-
-      const text = await res.text().catch(() => null)
-      return { data: text }
-    } catch (err) {
-      throw err
-    }
-  }
-
-  return { success: false, status: 404, message: 'User not found' }
+  return tryEndpoints(id, USER_PATHS, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
 }
 
-// Delete a user (tries multiple possible endpoints)
-export const deleteUserById = async (id) => {
+export const deleteUserById = (id) => {
   if (!id) throw new Error('Missing user id')
-
-  const endpoints = [
-    (id) => `/api/admin/user/${id}`,
-    (id) => `/api/admin/users/${id}`,
-    (id) => `/api/users/${id}`,
-    (id) => `/api/user/${id}`
-  ]
-
-  for (const ep of endpoints) {
-    const url = `${API_URL}${ep(id)}`
-    try {
-      const res = await fetchWithAuth(url, {
-        method: 'DELETE',
-        credentials: 'include'
-      })
-
-      if (res.status === 404) continue
-
-      const ct = res.headers.get('content-type') || ''
-      if (ct.includes('application/json')) {
-        const json = await res.json().catch(() => null)
-        return json
-      }
-
-      const text = await res.text().catch(() => null)
-      return { data: text }
-    } catch (err) {
-      throw err
-    }
-  }
-
-  return { success: false, status: 404, message: 'User not found' }
+  return tryEndpoints(id, USER_PATHS, { method: 'DELETE' })
 }
 
-// Update a user's password (admin only)
-export const updateUserPasswordById = async (id, newPassword) => {
+export const updateUserPasswordById = (id, newPassword) => {
   if (!id) throw new Error('Missing user id')
   if (!newPassword) throw new Error('Missing new password')
-
-  const endpoints = [
+  return tryEndpoints(id, [
     (id) => `/api/admin/user/${id}/password`,
     (id) => `/api/admin/users/${id}/password`
-  ]
-
-  for (const ep of endpoints) {
-    const url = `${API_URL}${ep(id)}`
-    try {
-      const res = await fetchWithAuth(url, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ newPassword })
-      })
-
-      if (res.status === 404) continue
-
-      const ct = res.headers.get('content-type') || ''
-      if (ct.includes('application/json')) {
-        const json = await res.json().catch(() => null)
-        return json
-      }
-
-      const text = await res.text().catch(() => null)
-      return { data: text }
-    } catch (err) {
-      throw err
-    }
-  }
-
-  return { success: false, status: 404, message: 'Endpoint not found' }
+  ], {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ newPassword })
+  })
 }

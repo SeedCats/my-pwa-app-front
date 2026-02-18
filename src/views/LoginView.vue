@@ -138,24 +138,10 @@ const API_URL = import.meta.env.VITE_API_URL || ''
 onMounted(async () => {
   // Clear all localStorage except login-related items
   const keysToKeep = [REMEMBER_EMAIL_KEY, 'theme', 'darkMode']
-  const currentStorage = {}
-  
-  // Save items we want to keep
-  keysToKeep.forEach(key => {
-    const value = localStorage.getItem(key)
-    if (value !== null) {
-      currentStorage[key] = value
-    }
-  })
-  
-  // Clear all localStorage
+  const saved = Object.fromEntries(keysToKeep.flatMap(k => { const v = localStorage.getItem(k); return v !== null ? [[k, v]] : [] }))
   localStorage.clear()
-  
-  // Restore kept items
-  Object.keys(currentStorage).forEach(key => {
-    localStorage.setItem(key, currentStorage[key])
-  })
-  
+  Object.entries(saved).forEach(([k, v]) => localStorage.setItem(k, v))
+
   // Load remembered email if exists
   const rememberedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY)
   if (rememberedEmail) {
@@ -202,27 +188,16 @@ async function handleLogin() {
     }
 
     if (response.ok && data.success) {
-      // Handle "Remember Me" - save email to localStorage
-      if (loginForm.value.remember) {
-        localStorage.setItem(REMEMBER_EMAIL_KEY, loginForm.value.email)
-      } else {
-        localStorage.removeItem(REMEMBER_EMAIL_KEY)
-      }
-      
+      if (loginForm.value.remember) localStorage.setItem(REMEMBER_EMAIL_KEY, loginForm.value.email)
+      else localStorage.removeItem(REMEMBER_EMAIL_KEY)
       success.value = data.message || t('auth.loginSuccess')
-      // Refresh auth state then redirect based on role
       await checkAuth(true)
       const state = useUserStore()
-      if (state.user && state.user.role === 'admin') {
-        router.push({ name: 'AdminDashboard' })
-      } else {
-        router.push({ name: 'home' })
-      }
+      router.push({ name: state.user?.role === 'admin' ? 'AdminDashboard' : 'home' })
     } else {
       error.value = data.message || t('auth.loginFailed')
     }
   } catch (err) {
-    console.error('Login error:', err)
     error.value = err.name === 'TypeError' && err.message.includes('fetch')
       ? t('auth.serverConnectionError')
       : t('auth.networkError')

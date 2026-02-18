@@ -161,10 +161,7 @@ export const fetchAssignedUsers = async (page = 1, limit = 50) => {
 
 export const fetchAdminChatUsers = async () => {
     const response = await apiRequest('/api/admin-chat/users')
-    return {
-        ...response,
-        users: response.users || []
-    }
+    return { ...response, users: response.users || [] }
 }
 
 export const fetchAdminChatHistory = async (userId, providerId = null) => {

@@ -257,15 +257,12 @@ const success = ref('')
 const showProviderForm = ref(false)
 const registerForm = ref({ name: '', email: '', password: '', confirmPassword: '', acceptTerms: false, isProvider: false, providerName: '', providerEmail: '', providerSubject: '', providerMessage: '' })
 
+const resetProviderFields = () => Object.assign(registerForm.value, { providerName: '', providerEmail: '', providerSubject: '', providerMessage: '' })
+
 const toggleProvider = () => {
   showProviderForm.value = !showProviderForm.value
   registerForm.value.isProvider = showProviderForm.value
-  if (!showProviderForm.value) {
-    registerForm.value.providerName = ''
-    registerForm.value.providerEmail = ''
-    registerForm.value.providerSubject = ''
-    registerForm.value.providerMessage = ''
-  }
+  if (!showProviderForm.value) resetProviderFields()
 }
 
 async function handleRegister() {
@@ -301,18 +298,13 @@ async function handleRegister() {
 
       if (response.ok && data.success) {
         success.value = data.message || t('auth.providerRequestSuccess')
-        // reset and exit provider mode
-        registerForm.value.providerName = ''
-        registerForm.value.providerEmail = ''
-        registerForm.value.providerSubject = ''
-        registerForm.value.providerMessage = ''
+        resetProviderFields()
         showProviderForm.value = false
         registerForm.value.isProvider = false
       } else {
         error.value = data.message || t('auth.providerRequestFailed')
       }
     } catch (err) {
-      console.error('Provider request error:', err)
       error.value = err.name === 'TypeError' && err.message.includes('fetch')
         ? t('auth.serverConnectionError')
         : t('auth.networkError')
@@ -356,7 +348,6 @@ async function handleRegister() {
       error.value = data.message || t('auth.registrationFailed')
     }
   } catch (err) {
-    console.error('Registration error:', err)
     error.value = err.name === 'TypeError' && err.message.includes('fetch')
       ? t('auth.serverConnectionError')
       : t('auth.networkError')
