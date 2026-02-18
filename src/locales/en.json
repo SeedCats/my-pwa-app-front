@@ -185,7 +185,8 @@
         "good": "Good",
         "fair": "Fair",
         "poor": "Poor",
-        "critical": "Critical"
+        "critical": "Critical",
+        "noData": "No Data Available"
       },
       "summary": {
         "excellent": "Excellent overall health based on current BMI, heart rate and stress.",
@@ -429,6 +430,7 @@
     "healthcareProvider": "Healthcare Provider",
     "offline": "Offline",
     "noMessages": "No messages yet",
+    "openChat": "Open Chat",
     "noProviderAssigned": "No healthcare provider assigned yet.",
     "startConversation": "Start a conversation with your healthcare provider",
     "typePlaceholder": "Type a message...",

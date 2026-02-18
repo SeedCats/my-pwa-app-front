@@ -169,45 +169,92 @@
                             <button
                                 type="button"
                                 @click.stop="toggleNotificationPanel"
-                                class="relative -m-1.5 flex items-center p-1.5 rounded-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
-                                :class="[isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200']"
+                                class="relative -m-1.5 flex items-center p-1.5 rounded-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 group"
+                                :class="[
+                                    isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200',
+                                    unreadCount > 0 && !hasViewedNotifications ? 'bg-opacity-10' : ''
+                                ]"
                                 :aria-label="'Notifications'"
                                 :title="'Notifications'"
                             >
-                                <BellIcon class="w-5 h-5" :class="themeClasses.textPrimary" aria-hidden="true" />
-                                <span
-                                    v-if="unreadCount > 0"
-                                    class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] leading-[18px] text-center font-semibold bg-red-500 text-white"
-                                >
-                                    {{ unreadCount > 99 ? '99+' : unreadCount }}
-                                </span>
+                                <div class="relative">
+                                    <BellIcon
+                                        class="w-6 h-6 transition-colors duration-200"
+                                        :class="[
+                                            themeClasses.textPrimary,
+                                            unreadCount > 0 && !hasViewedNotifications ? 'animate-bell-shake text-blue-500' : ''
+                                        ]"
+                                        aria-hidden="true"
+                                    />
+                                    <span
+                                        v-if="unreadCount > 0 && !hasViewedNotifications"
+                                        class="absolute top-0 right-0 flex h-3 w-3"
+                                    >
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                    </span>
+                                </div>
                             </button>
                             <div
                                 v-if="showNotificationPanel"
-                                class="absolute top-9 right-0 w-72 text-xs p-3 rounded border shadow-md z-20"
-                                :class="[themeClasses.cardBackground, themeClasses.border, themeClasses.textSecondary]"
+                                class="absolute top-10 right-0 w-80 text-sm p-4 rounded-xl border shadow-xl z-20 backdrop-blur-sm"
+                                :class="[
+                                    themeClasses.cardBackground, 
+                                    themeClasses.border, 
+                                    themeClasses.textSecondary,
+                                    isDarkMode ? 'bg-gray-800/95' : 'bg-white/95'
+                                ]"
                             >
-                                <div v-if="unreadCount > 0">
-                                    <p class="font-semibold mb-1" :class="themeClasses.textPrimary">{{ unreadSender || (isAdmin() ? 'Patient' : (providerName || t('chat.healthcareProvider'))) }}</p>
-                                    <p class="break-words mb-3">{{ unreadLastText || t('chat.noMessages') }}</p>
-                                    <p v-if="unreadTimeText" class="text-[11px] mb-3 opacity-80">{{ unreadTimeText }}</p>
+                                <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100 dark:border-gray-700">
+                                    <span class="font-bold text-base" :class="themeClasses.textPrimary">Notifications</span>
+                                    <span v-if="unreadCount > 0" class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+                                        {{ unreadCount }} New
+                                    </span>
+                                </div>
+                                
+                                <div v-if="unreadCount > 0" class="space-y-3">
+                                    <div class="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                                <span class="text-blue-600 dark:text-blue-300 font-bold text-xs">
+                                                    {{ (unreadSender || 'S').charAt(0).toUpperCase() }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-sm truncate" :class="themeClasses.textPrimary">
+                                                {{ unreadSender || (isAdmin() ? 'Patient' : (providerName || t('chat.healthcareProvider'))) }}
+                                            </p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">
+                                                {{ unreadLastText || t('chat.noMessages') }}
+                                            </p>
+                                            <p v-if="unreadTimeText" class="text-[10px] text-gray-400 mt-1">
+                                                {{ unreadTimeText }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
                                     <button
                                         type="button"
                                         @click="openNotificationsChat"
-                                        class="px-3 py-1 rounded border text-xs"
-                                        :class="[themeClasses.border, themeClasses.inputBackground, themeClasses.textPrimary]"
+                                        class="w-full flex justify-center items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-sm"
                                     >
-                                        {{ t('chat.openChat') }}
+                                        <span>{{ t('chat.openChat') }}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                                            <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 015.25 2h9.5A2.25 2.25 0 0117 4.25v10.5A2.25 2.25 0 0114.75 17h-9.5A2.25 2.25 0 013 14.75V4.25zM19 5.5v10.5a.75.75 0 01-1.5 0V5.5a.75.75 0 011.5 0z" clip-rule="evenodd" />
+                                        </svg>
                                     </button>
                                 </div>
-                                <div v-else>
-                                    <p class="mb-3">No Messages</p>
+                                <div v-else class="py-6 text-center">
+                                    <div class="mx-auto w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-2">
+                                        <BellIcon class="w-6 h-6 text-gray-400" />
+                                    </div>
+                                    <p class="text-sm text-gray-500">No new messages</p>
                                     <button
                                         v-if="isAdmin()"
                                         type="button"
                                         @click="openNotificationsChat"
-                                        class="px-3 py-1 rounded border text-xs"
-                                        :class="[themeClasses.border, themeClasses.inputBackground, themeClasses.textPrimary]"
+                                        class="mt-3 text-blue-600 hover:text-blue-500 text-xs font-medium"
                                     >
                                         {{ t('admin.patientMessagesTitle') }}
                                     </button>
@@ -369,6 +416,7 @@ const unreadLastText = ref('')
 const unreadTimestamp = ref('')
 const showNotificationPanel = ref(false)
 const notificationPanelRef = ref(null)
+const hasViewedNotifications = ref(false)
 let unreadPollTimer = null
 
 const userName = computed(() => userData.value?.name || 'User')
@@ -408,6 +456,7 @@ const toggleNotificationPanel = async () => {
     }
 
     showNotificationPanel.value = true
+    hasViewedNotifications.value = true // Mark as viewed when opening panel
     loadUnreadCount()
 }
 
@@ -418,8 +467,8 @@ const openNotificationsChat = () => {
         return
     }
 
-    if (unreadCount.value <= 0) return
-
+    // Allow navigation even if unreadCount is 0, if user clicks the button manually
+    
     showNotificationPanel.value = false
     router.push('/chat')
 }
@@ -439,6 +488,7 @@ const loadUnreadCount = async () => {
             : ['/api/user-chat/unread']
 
         let loadedFromEndpoint = false
+        const initialCount = unreadCount.value  // Capture initial count before modifications
 
         for (const endpoint of endpoints) {
             const response = await fetch(`${API_URL}${endpoint}`, { credentials: 'include' })
@@ -449,7 +499,21 @@ const loadUnreadCount = async () => {
 
             const json = await response.json().catch(() => ({}))
             const count = json?.count ?? json?.data?.count ?? json?.unreadCount ?? json?.data?.unreadCount ?? 0
-            unreadCount.value = Number.isFinite(Number(count)) ? Number(count) : 0
+            const newCount = Number.isFinite(Number(count)) ? Number(count) : 0
+            
+            // Only update unreadCount if we actually found something for non-admins, 
+            // or continue accumulating logic. 
+            // For admin: if endpoint returns 0, we shouldn't necessarily trust it if we rely on fallback.
+            // But let's stick to updating it.
+            unreadCount.value = newCount
+
+            // If we have MORE notifications than before (compared to initial count), reset the viewed flag
+            if (newCount > initialCount) {
+                // Only reset if panel is CLOSED. If open, user is viewing it.
+                if (!showNotificationPanel.value) {
+                     hasViewedNotifications.value = false
+                }
+            }
 
             const lastMessage = json?.lastMessage || json?.data?.lastMessage || null
             unreadLastText.value = lastMessage?.text || json?.lastMessageText || json?.data?.lastMessageText || ''
@@ -469,12 +533,21 @@ const loadUnreadCount = async () => {
 
         if (isAdmin()) {
             await loadAdminNotificationFallback()
+            // After fallback, check if count specifically increased from what we started with
+            if (unreadCount.value > initialCount) {
+                if (!showNotificationPanel.value) {
+                    hasViewedNotifications.value = false
+                }
+            }
             if (unreadLastText.value || unreadSender.value || unreadCount.value > 0) {
                 return
             }
         }
 
-        if (!loadedFromEndpoint || !isAdmin()) {
+        if (!loadedFromEndpoint && !isAdmin()) {
+            // Only clear unreadCount if non-admin AND failed to load from endpoint
+            // If we are admin, we rely on the fallback logic above or catching errors.
+            // If checking unread failed for non-admin, we reset.
             unreadCount.value = 0
             unreadSender.value = ''
             unreadLastText.value = ''
@@ -488,6 +561,12 @@ const loadUnreadCount = async () => {
                 unreadLastText.value = ''
                 unreadTimestamp.value = ''
             })
+            // If fallback increased count over captured initial, reset flag
+             if (unreadCount.value > initialCount) {
+                if (!showNotificationPanel.value) {
+                    hasViewedNotifications.value = false
+                }
+            }
             return
         }
         unreadCount.value = 0

@@ -186,7 +186,8 @@
         "good": "良好",
         "fair": "一般",
         "poor": "請注意",
-        "critical": "危急"
+        "critical": "危急",
+        "noData": "無資料"
       },
       "summary": {
         "excellent": "依目前 BMI、心率與壓力判斷，整體狀態良好。",
@@ -444,6 +445,7 @@
     "healthcareProvider": "醫護人員",
     "offline": "離線",
     "noMessages": "尚無訊息",
+    "openChat": "開啟聊天",
     "noProviderAssigned": "尚未指派醫護人員。",
     "startConversation": "開始與您的醫護人員對話",
     "typePlaceholder": "輸入訊息...",

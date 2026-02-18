@@ -1,10 +1,5 @@
 <template>
   <div class="min-h-full" :class="themeClasses.background">
-    <Sidebar @update:sidebarState="updateSidebarState" />
-    <div :class="[
-      'transition-all duration-300 ease-in-out pt-16',
-      sidebarHidden ? 'lg:ml-0' : 'lg:ml-72'
-    ]">
       <main class="px-3 sm:px-4 md:px-6 lg:px-6 pb-4">
 
         <!-- Banner shown to admins when viewing another user's home -->
@@ -671,7 +666,6 @@
           </router-link>
         </div>
       </main>
-    </div>
   </div>
 </template>
 

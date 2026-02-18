@@ -1,12 +1,7 @@
 <template>
   <div class="min-h-screen" :class="themeClasses.background">
-    <Sidebar @update:sidebarState="updateSidebarState" />
-    <div :class="[
-      'transition-all duration-300 ease-in-out pt-16',
-      sidebarHidden ? 'lg:ml-0' : 'lg:ml-72'
-    ]">
       <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-6">
-        <div class="p-6">
+        <div class="py-6">
           <h1 class="text-2xl font-bold mb-4" :class="themeClasses.textPrimary">{{ $t('admin.userManagementTitle') }}</h1>
 
           <div class="mb-4 flex items-center">
@@ -153,16 +148,14 @@
 
         </div>
       </main>
-    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import Sidebar from '../../components/Side_and_Top_Bar.vue'
-import { useTheme } from '../../composables/useTheme'
 import { useLanguage } from '../../composables/useLanguage'
+import { useTheme } from '../../composables/useTheme'
 import { fetchWithAuth } from '../../utils/fetchWithAuth'
 const { t } = useLanguage()
 const API_URL = import.meta.env.VITE_API_URL || ''
@@ -342,9 +335,6 @@ const formatDate = (d) => {
     return ''
   }
 }
-
-const sidebarHidden = ref(false)
-const updateSidebarState = (state) => sidebarHidden.value = state
 
 const { themeClasses, isDarkMode } = useTheme()
 
