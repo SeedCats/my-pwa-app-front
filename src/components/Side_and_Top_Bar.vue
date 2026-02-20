@@ -535,19 +535,6 @@ const loadUnreadCount = async () => {
             }
         }
 
-        if (isAdmin()) {
-            await loadAdminNotificationFallback()
-            // After fallback, check if count specifically increased from what we started with
-            if (unreadCount.value > initialCount) {
-                if (!showNotificationPanel.value) {
-                    hasViewedNotifications.value = false
-                }
-            }
-            if (unreadLastText.value || unreadSender.value || unreadCount.value > 0) {
-                return
-            }
-        }
-
         if (!loadedFromEndpoint && !isAdmin()) {
             unreadCount.value = 0
             unreadLastText.value = ''
@@ -555,16 +542,6 @@ const loadUnreadCount = async () => {
             unreadTimestamp.value = ''
         }
     } catch {
-        if (isAdmin()) {
-            await loadAdminNotificationFallback().catch(() => {
-                unreadCount.value = 0
-                unreadLastText.value = ''
-                unreadSender.value = ''
-                unreadTimestamp.value = ''
-            })
-            if (unreadCount.value > initialCount && !showNotificationPanel.value) hasViewedNotifications.value = false
-            return
-        }
         unreadCount.value = 0
         unreadLastText.value = ''
         unreadSender.value = ''

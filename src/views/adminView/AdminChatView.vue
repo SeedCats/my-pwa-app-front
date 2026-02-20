@@ -311,11 +311,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useTheme } from '../../composables/useTheme'
 import { useLanguage } from '../../composables/useLanguage'
 import { fetchAdminChatHistory, fetchAdminChatUsers, fetchCurrentUserProfile, sendAdminChatMessage } from '../../services/userChatService'
 
+const route = useRoute()
 const { themeClasses, isDarkMode } = useTheme()
 const { t } = useLanguage()
 
@@ -430,7 +432,25 @@ const loadAssignedUsers = async () => {
       lastMessageTime: user.lastMessageTime
     }))
 
-    if (!selectedUser.value && users.value.length > 0) {
+    // Check if there's a userId in the query params to auto-select
+    const queryUserId = route.query.userId
+    if (queryUserId) {
+      let userToSelect = users.value.find(u => String(u.id) === String(queryUserId))
+      
+      // If user is not in the assigned users list, create a temporary user object
+      if (!userToSelect) {
+        userToSelect = {
+          id: queryUserId,
+          name: 'User', // We don't have the name, but we can still open the chat
+          email: '',
+          unreadCount: 0
+        }
+        // Add to the top of the list so it's visible
+        users.value.unshift(userToSelect)
+      }
+      
+      await selectUser(userToSelect)
+    } else if (!selectedUser.value && users.value.length > 0) {
       // selectUser(users.value[0]) // Don't auto-select, let them choose? Or auto-select first is fine.
     }
   } catch (error) {
@@ -507,6 +527,26 @@ const sendMessage = async () => {
 onMounted(async () => {
   await loadProfile()
   await loadAssignedUsers()
+})
+
+watch(() => route.query.userId, async (newUserId) => {
+  if (newUserId) {
+    let userToSelect = users.value.find(u => String(u.id) === String(newUserId))
+    
+    if (!userToSelect) {
+      userToSelect = {
+        id: newUserId,
+        name: 'User',
+        email: '',
+        unreadCount: 0
+      }
+      users.value.unshift(userToSelect)
+    }
+    
+    if (!selectedUser.value || String(selectedUser.value.id) !== String(newUserId)) {
+      await selectUser(userToSelect)
+    }
+  }
 })
 </script>
 

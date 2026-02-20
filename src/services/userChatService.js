@@ -26,6 +26,8 @@ const normalizeMessage = (message, currentUserId = null) => {
       hour: '2-digit',
       minute: '2-digit'
     }) : ''),
+    userRead: message?.userRead,
+    adminRead: message?.adminRead,
     isUser: typeof message?.isUser === 'boolean'
       ? message.isUser
       : (normalizedUserId ? senderId === normalizedUserId : false)

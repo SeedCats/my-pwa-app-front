@@ -158,6 +158,7 @@ const loadMessages = async () => {
     try {
         const response = await fetchUserChatHistory(currentUserId.value)
         messages.value = response?.messages || []
+        
         noProviderAssigned.value = noProviderAssigned.value || (response?.messages?.length === 0 && response?.message?.toLowerCase?.().includes('no healthcare provider'))
         scrollToBottom()
         

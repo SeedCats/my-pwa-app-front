@@ -36,7 +36,15 @@
                     <td :class="['px-6 py-4 whitespace-nowrap text-sm', themeClasses.textSecondary]">{{ u.id }}</td>
                     <td :class="['px-6 py-4 whitespace-nowrap text-sm', themeClasses.textSecondary]">{{ formatDate(u.createdAt) }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                      <button @click="openOperations(u)" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 mx-auto">{{ $t('admin.operation') }}</button>
+                      <div class="flex items-center justify-center gap-2">
+                        <button @click="goToChat(u)" class="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 flex items-center gap-1">
+                          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                          </svg>
+                          {{ $t('nav.chat') }}
+                        </button>
+                        <button @click="openOperations(u)" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">{{ $t('admin.operation') }}</button>
+                      </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                       <span :class="['inline-block px-2 py-1 rounded text-xs font-semibold', u.serviceStatusKey === 'completed' ? (isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800') : (isDarkMode ? 'bg-yellow-700 text-white' : 'bg-yellow-100 text-yellow-800')]">
@@ -109,15 +117,6 @@
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5v14" />
                         </svg>
                         {{ $t('admin.userSetting') }}
-                      </button>
-                    </div>
-
-                    <div class="flex gap-3">
-                      <button @click="goToChat(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 rounded text-sm bg-purple-600 text-white hover:bg-purple-700">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                        </svg>
-                        {{ $t('nav.chat') }}
                       </button>
                     </div>
 
@@ -297,6 +296,12 @@ const goToUserSetting = (user) => {
   closeOperations()
   // Navigate to the User Setting page and pass the user's id and email via query
   router.push({ name: 'UserSetting', query: { userId: user.id, userEmail: user.email } })
+}
+
+const goToChat = (user) => {
+  if (!user) return
+  closeOperations()
+  router.push({ path: '/admin/chats', query: { userId: user.id } })
 }
 
 const setOnGoingService = async (user) => {
