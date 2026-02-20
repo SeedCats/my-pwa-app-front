@@ -113,6 +113,15 @@
                     </div>
 
                     <div class="flex gap-3">
+                      <button @click="goToChat(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 rounded text-sm bg-purple-600 text-white hover:bg-purple-700">
+                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                        {{ $t('nav.chat') }}
+                      </button>
+                    </div>
+
+                    <div class="flex gap-3">
                       <button @click="setOnGoingService(selectedUser)" class="flex-1 flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700">
                         <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                           <path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 5a1 1 0 112 0v4l3 2a1 1 0 11-1 1l-3-2V5z" clip-rule="evenodd" />
