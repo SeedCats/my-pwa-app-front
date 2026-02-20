@@ -449,6 +449,9 @@ const selectUser = async (user) => {
   try {
     const response = await fetchAdminChatHistory(user.id, adminId.value)
     messages.value = response?.messages || []
+    
+    // Dispatch event to update unread count in top bar
+    window.dispatchEvent(new CustomEvent('messagesRead'))
   } catch (error) {
     messages.value = []
     errorMessage.value = error.message || 'Failed to load patient messages'

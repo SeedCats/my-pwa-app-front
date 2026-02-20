@@ -160,6 +160,9 @@ const loadMessages = async () => {
         messages.value = response?.messages || []
         noProviderAssigned.value = noProviderAssigned.value || (response?.messages?.length === 0 && response?.message?.toLowerCase?.().includes('no healthcare provider'))
         scrollToBottom()
+        
+        // Dispatch event to update unread count in top bar
+        window.dispatchEvent(new CustomEvent('messagesRead'))
     } catch (error) {
         errorMessage.value = error.message || 'Failed to load messages'
     } finally {

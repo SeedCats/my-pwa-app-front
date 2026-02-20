@@ -454,7 +454,6 @@ const toggleNotificationPanel = async () => {
 const justClearedNotifications = ref(false)
 
 const clearUnread = (suppressMs = 0) => {
-    unreadCount.value = 0; unreadLastText.value = ''; unreadSender.value = ''; unreadTimestamp.value = ''
     hasViewedNotifications.value = true
     showNotificationPanel.value = false
     if (suppressMs > 0) { justClearedNotifications.value = true; setTimeout(() => { justClearedNotifications.value = false }, suppressMs) }
@@ -462,23 +461,11 @@ const clearUnread = (suppressMs = 0) => {
 
 const openNotificationsChat = async () => {
     if (isAdmin()) {
-        clearUnread(35000)
-        try {
-            const usersRes = await fetch(`${API_URL}/api/admin-chat/users`, { credentials: 'include' })
-            if (usersRes.ok) {
-                const usersJson = await usersRes.json().catch(() => ({}))
-                const unreadUsers = (usersJson?.users || []).filter(u => (u.unreadCount || 0) > 0)
-                await Promise.all(unreadUsers.map(u => {
-                    const userId = u.userId || u.id || u._id
-                    if (!userId) return Promise.resolve()
-                    return fetch(`${API_URL}/api/admin-chat/history?userId=${encodeURIComponent(userId)}`, { credentials: 'include' }).catch(() => {})
-                }))
-            }
-        } catch { /* ignore, navigation still proceeds */ }
+        showNotificationPanel.value = false
         router.push('/admin/chats')
         return
     }
-    clearUnread(5000)
+    showNotificationPanel.value = false
     router.push('/chat')
 }
 
@@ -561,14 +548,27 @@ const loadUnreadCount = async () => {
             }
         }
 
-        if (!loadedFromEndpoint && !isAdmin()) clearUnread()
+        if (!loadedFromEndpoint && !isAdmin()) {
+            unreadCount.value = 0
+            unreadLastText.value = ''
+            unreadSender.value = ''
+            unreadTimestamp.value = ''
+        }
     } catch {
         if (isAdmin()) {
-            await loadAdminNotificationFallback().catch(() => clearUnread())
+            await loadAdminNotificationFallback().catch(() => {
+                unreadCount.value = 0
+                unreadLastText.value = ''
+                unreadSender.value = ''
+                unreadTimestamp.value = ''
+            })
             if (unreadCount.value > initialCount && !showNotificationPanel.value) hasViewedNotifications.value = false
             return
         }
-        clearUnread()
+        unreadCount.value = 0
+        unreadLastText.value = ''
+        unreadSender.value = ''
+        unreadTimestamp.value = ''
     }
 }
 
@@ -577,13 +577,13 @@ const loadAdminNotificationFallback = async () => {
     try {
         assignedRes = await fetch(`${API_URL}/api/admin/assigned-users?page=1&limit=50`, { credentials: 'include' })
     } catch {
-        clearUnread(); return
+        unreadCount.value = 0; unreadLastText.value = ''; unreadSender.value = ''; unreadTimestamp.value = ''; return
     }
-    if (!assignedRes.ok) { clearUnread(); return }
+    if (!assignedRes.ok) { unreadCount.value = 0; unreadLastText.value = ''; unreadSender.value = ''; unreadTimestamp.value = ''; return }
 
     const assignedJson = await assignedRes.json().catch(() => ({}))
     const assignedUsers = assignedJson?.data?.users || assignedJson?.users || []
-    if (!Array.isArray(assignedUsers) || assignedUsers.length === 0) { clearUnread(); return }
+    if (!Array.isArray(assignedUsers) || assignedUsers.length === 0) { unreadCount.value = 0; unreadLastText.value = ''; unreadSender.value = ''; unreadTimestamp.value = ''; return }
 
     let latestMessage = null
     let latestUserName = ''
@@ -635,7 +635,10 @@ const loadAdminNotificationFallback = async () => {
         unreadLastText.value = latestMessage?.text || ''
         unreadTimestamp.value = latestMessage?.createdAt || latestMessage?.time || ''
     } else {
-        clearUnread()
+        unreadCount.value = 0
+        unreadLastText.value = ''
+        unreadSender.value = ''
+        unreadTimestamp.value = ''
     }
 }
 
@@ -662,6 +665,7 @@ onMounted(() => {
     loadUnreadCount()
     unreadPollTimer = window.setInterval(loadUnreadCount, 30000)
     window.addEventListener('mousedown', handleGlobalClick)
+    window.addEventListener('messagesRead', loadUnreadCount)
     window.addEventListener('userUpdated', (e) => {
         const updated = e?.detail || {}
         const currentId = userStore.user?.id || userStore.user?._id || userData.value?.id || userData.value?._id
@@ -673,5 +677,6 @@ onMounted(() => {
 onUnmounted(() => {
     if (unreadPollTimer) { clearInterval(unreadPollTimer); unreadPollTimer = null }
     window.removeEventListener('mousedown', handleGlobalClick)
+    window.removeEventListener('messagesRead', loadUnreadCount)
 })
 </script>
