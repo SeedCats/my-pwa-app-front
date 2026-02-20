@@ -1608,7 +1608,7 @@ const loadViewedUser = async () => {
     // Fetch user's service status from the new API
     if (viewedUser.value && id) {
       try {
-        const resStatus = await fetchWithAuth(`${API_URL}/api/data/status?userId=${id}`, { credentials: 'include' })
+        const resStatus = await fetchWithAuth(`${API_URL}/api/admin/users/${id}/status`, { credentials: 'include' })
         if (resStatus.ok) {
           const j = await resStatus.json().catch(() => null)
           const s = j?.data?.status || 'On-going'

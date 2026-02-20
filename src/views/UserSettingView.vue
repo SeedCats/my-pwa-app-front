@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen" :class="themeClasses.background">
-    <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-8 pt-4">
+    <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-8">
 
       <!-- Admin banner when editing another user's settings -->
       <div v-if="isViewingOtherUser" class="mb-4 p-3 rounded-md text-sm"

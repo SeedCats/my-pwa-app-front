@@ -181,7 +181,7 @@ const loadUsers = async () => {
     // Fetch each user's status in parallel using the new API endpoint
     await Promise.all(users.value.map(async (u, idx) => {
       try {
-        const resStatus = await fetchWithAuth(`${API_URL}/api/data/status?userId=${u.id}`, { credentials: 'include' })
+        const resStatus = await fetchWithAuth(`${API_URL}/api/admin/users/${u.id}/status`, { credentials: 'include' })
         if (resStatus.ok) {
           const jsonStatus = await resStatus.json().catch(() => null)
           const statusText = jsonStatus?.data?.status || 'On-going'
@@ -255,8 +255,8 @@ const completeService = async (user) => {
   error.value = ''
   info.value = ''
   try {
-    const res = await fetchWithAuth(`${API_URL}/api/data/status/complete?userId=${user.id}`, {
-      method: 'POST',
+    const res = await fetchWithAuth(`${API_URL}/api/admin/users/${user.id}/status/completed`, {
+      method: 'PUT',
       credentials: 'include'
     })
     if (!res.ok) throw new Error(t('admin.serviceCompleteFailed'))
@@ -296,17 +296,10 @@ const setOnGoingService = async (user) => {
   error.value = ''
   info.value = ''
   try {
-    // Try a dedicated endpoint first, then fallback to a generic status update
-    let res = await fetchWithAuth(`${API_URL}/api/data/status/ongoing?userId=${user.id}`, { method: 'POST', credentials: 'include' })
-    if (!res.ok) {
-      // fallback: POST /api/data/status with JSON body { status: 'On-going' }
-      res = await fetchWithAuth(`${API_URL}/api/data/status?userId=${user.id}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'On-going' })
-      })
-    }
+    const res = await fetchWithAuth(`${API_URL}/api/admin/users/${user.id}/status/ongoing`, { 
+      method: 'PUT', 
+      credentials: 'include' 
+    })
 
     if (!res.ok) throw new Error(t('admin.serviceSetOnGoingFailed'))
 

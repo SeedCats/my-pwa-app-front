@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen" :class="themeClasses.background">
-    <main>
-      <div class="px-3 sm:px-4 md:px-6 lg:px-8 pt-4 pb-8">
+    <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-8">
         <!-- Header -->
         <div class="mb-8 pt-4">
           <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('formatSettings.title') }}</h1>
@@ -104,7 +103,6 @@
             </div>
           </div>
         </div>
-      </div>
     </main>
   </div>
 </template>
