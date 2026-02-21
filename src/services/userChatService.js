@@ -137,14 +137,19 @@ export const sendUserChatMessageWithAttachment = async (text, file, currentUserI
 }
 
 export const fetchUserUnreadSummary = async () => {
-  const response = await apiRequest('/api/user-chat/unread')
-  const count = Number(response?.count ?? response?.data?.count ?? response?.unreadCount ?? 0) || 0
-  const preview = response?.lastMessage || response?.data?.lastMessage || null
+  try {
+    const response = await apiRequest('/api/user-chat/unread')
+    const count = Number(response?.count ?? response?.data?.count ?? response?.unreadCount ?? 0) || 0
+    const preview = response?.lastMessage || response?.data?.lastMessage || null
 
-  return {
-    ...response,
-    count,
-    preview
+    return {
+      ...response,
+      count,
+      preview
+    }
+  } catch (error) {
+    console.warn('Failed to fetch user unread summary:', error.message)
+    return { count: 0, preview: null }
   }
 }
 

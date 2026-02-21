@@ -26,12 +26,15 @@
             <!-- Provider Selection -->
             <div>
               <label class="block text-sm font-medium mb-1" :class="themeClasses.textSecondary">{{ $t('booking.provider') }}</label>
-              <select v-model="form.provider" required class="w-full p-2 rounded border focus:ring-2 focus:ring-blue-500 outline-none" :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]">
+              <select v-model="form.provider" required :disabled="providers.length === 1" class="w-full p-2 rounded border focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-70" :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]">
                 <option value="" disabled>{{ $t('booking.selectProvider') }}</option>
                 <option v-for="provider in providers" :key="provider.id" :value="provider.id">
                   {{ provider.name }}
                 </option>
               </select>
+              <p v-if="providers.length === 1" class="text-xs mt-1" :class="themeClasses.textSecondary">
+                {{ $t('booking.designatedProvider') || 'Your designated healthcare provider' }}
+              </p>
             </div>
 
             <!-- Date and Time -->
@@ -58,6 +61,7 @@
             </button>
             
             <p v-if="successMessage" class="text-green-500 text-sm mt-2 text-center">{{ successMessage }}</p>
+            <p v-if="errorMessage" class="text-red-500 text-sm mt-2 text-center">{{ errorMessage }}</p>
           </form>
         </div>
 
@@ -65,19 +69,22 @@
         <div class="p-6 rounded-lg shadow-md border" :class="[themeClasses.cardBackground, themeClasses.border]">
           <h2 class="text-xl font-semibold mb-6" :class="themeClasses.textPrimary">{{ $t('booking.upcoming') }}</h2>
           
-          <div v-if="bookings.length === 0" class="text-center py-8" :class="themeClasses.textSecondary">
+          <div v-if="isLoading" class="text-center py-8" :class="themeClasses.textSecondary">
+            {{ $t('common.loading') || 'Loading...' }}
+          </div>
+          <div v-else-if="bookings.length === 0" class="text-center py-8" :class="themeClasses.textSecondary">
             {{ $t('booking.noUpcoming') }}
           </div>
           
           <div v-else class="space-y-4">
-            <div v-for="booking in bookings" :key="booking.id" class="p-4 rounded-md border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4" :class="[themeClasses.background, themeClasses.border]">
+            <div v-for="booking in bookings" :key="booking._id || booking.id" class="p-4 rounded-md border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4" :class="[themeClasses.background, themeClasses.border]">
               <div>
                 <h3 class="font-semibold" :class="themeClasses.textPrimary">{{ $t(`booking.${booking.service}`) }}</h3>
                 <p class="text-sm" :class="themeClasses.textSecondary">
                   {{ booking.date }} at {{ booking.time }}
                 </p>
                 <p class="text-sm" :class="themeClasses.textSecondary">
-                  {{ $t('booking.provider') }}: {{ getProviderName(booking.providerId) }}
+                  {{ $t('booking.provider') }}: {{ getProviderName(booking.providerID || booking.providerId) }}
                 </p>
               </div>
               <span :class="getStatusClass(booking.status)" class="px-3 py-1 rounded-full text-xs font-medium">
@@ -92,28 +99,32 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from 'vue-i18n'
+import { fetchBookings, createBooking } from '../services/bookingService'
+import { fetchCurrentUserProfile } from '../services/userChatService'
 
 const { themeClasses } = useTheme()
 const { t } = useI18n()
 
 const isSubmitting = ref(false)
 const successMessage = ref('')
+const errorMessage = ref('')
+const isLoading = ref(true)
 
-// Mock providers
+const currentUser = ref(null)
+const providerName = ref('')
+const providerId = ref('')
+
+// Mock providers (fallback if no designated provider)
 const providers = ref([
   { id: 'p1', name: 'Dr. Smith' },
   { id: 'p2', name: 'Dr. Johnson' },
   { id: 'p3', name: 'Dr. Williams' }
 ])
 
-// Mock bookings
-const bookings = ref([
-  { id: 1, service: 'generalCheckup', providerId: 'p1', date: '2026-03-01', time: '10:00', status: 'confirmed' },
-  { id: 2, service: 'dental', providerId: 'p2', date: '2026-03-15', time: '14:30', status: 'pending' }
-])
+const bookings = ref([])
 
 const form = ref({
   service: '',
@@ -129,6 +140,7 @@ const minDate = computed(() => {
 })
 
 const getProviderName = (id) => {
+  if (id === providerId.value) return providerName.value
   const provider = providers.value.find(p => p.id === id)
   return provider ? provider.name : 'Unknown'
 }
@@ -142,37 +154,84 @@ const getStatusClass = (status) => {
   }
 }
 
-const submitBooking = () => {
+const loadData = async () => {
+  isLoading.value = true
+  try {
+    // Load user profile to get designated provider
+    const profileRes = await fetchCurrentUserProfile()
+    const userData = profileRes?.data?.user || profileRes?.data || profileRes?.user || profileRes
+    currentUser.value = userData
+    
+    if (userData?.providerId) {
+      providerId.value = userData.providerId
+      providerName.value = userData.provider || userData.providerName || userData.assignedProvider || 'Designated Provider'
+      
+      // Set form provider to designated provider
+      form.value.provider = providerId.value
+      
+      // Update providers list to only show designated provider
+      providers.value = [{ id: providerId.value, name: providerName.value }]
+    }
+
+    // Load bookings
+    const bookingsRes = await fetchBookings()
+    if (bookingsRes?.success) {
+      bookings.value = bookingsRes.bookings || []
+    }
+  } catch (error) {
+    console.error('Error loading booking data:', error)
+    errorMessage.value = 'Failed to load data. Please try again.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadData()
+})
+
+const submitBooking = async () => {
   isSubmitting.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
   
-  // Simulate API call
-  setTimeout(() => {
-    const newBooking = {
-      id: Date.now(),
+  try {
+    const bookingData = {
       service: form.value.service,
-      providerId: form.value.provider,
+      providerID: form.value.provider,
+      providerName: getProviderName(form.value.provider),
       date: form.value.date,
       time: form.value.time,
-      status: 'pending'
+      notes: form.value.notes
     }
     
-    bookings.value.unshift(newBooking)
+    const res = await createBooking(bookingData)
     
-    // Reset form
-    form.value = {
-      service: '',
-      provider: '',
-      date: '',
-      time: '',
-      notes: ''
+    if (res?.success) {
+      bookings.value.unshift(res.booking)
+      
+      // Reset form
+      form.value = {
+        service: '',
+        provider: providerId.value || '',
+        date: '',
+        time: '',
+        notes: ''
+      }
+      
+      successMessage.value = t('booking.success') || 'Appointment created successfully'
+      
+      setTimeout(() => {
+        successMessage.value = ''
+      }, 3000)
+    } else {
+      errorMessage.value = res?.message || 'Failed to create appointment'
     }
-    
+  } catch (error) {
+    console.error('Error creating booking:', error)
+    errorMessage.value = error.message || 'Failed to create appointment'
+  } finally {
     isSubmitting.value = false
-    successMessage.value = t('booking.success')
-    
-    setTimeout(() => {
-      successMessage.value = ''
-    }, 3000)
-  }, 1000)
+  }
 }
 </script>

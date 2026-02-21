@@ -22,15 +22,20 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-if="bookings.length === 0">
+                <tr v-if="isLoading">
+                  <td colspan="5" class="p-8 text-center" :class="themeClasses.textSecondary">
+                    {{ $t('common.loading') || 'Loading...' }}
+                  </td>
+                </tr>
+                <tr v-else-if="bookings.length === 0">
                   <td colspan="5" class="p-8 text-center" :class="themeClasses.textSecondary">
                     {{ $t('common.noResults') }}
                   </td>
                 </tr>
-                <tr v-for="booking in bookings" :key="booking.id" class="border-b last:border-0 hover:bg-opacity-50" :class="[themeClasses.border, themeClasses.hoverBackground]">
+                <tr v-for="booking in bookings" :key="booking._id || booking.id" class="border-b last:border-0 hover:bg-opacity-50" :class="[themeClasses.border, themeClasses.hoverBackground]">
                   <td class="p-4">
-                    <div class="font-medium" :class="themeClasses.textPrimary">{{ booking.patientName }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">{{ booking.patientEmail }}</div>
+                    <div class="font-medium" :class="themeClasses.textPrimary">{{ booking.name || booking.patientName }}</div>
+                    <div class="text-sm" :class="themeClasses.textSecondary">{{ booking.email || booking.patientEmail }}</div>
                   </td>
                   <td class="p-4" :class="themeClasses.textPrimary">
                     {{ $t(`booking.${booking.service}`) }}
@@ -47,14 +52,14 @@
                   <td class="p-4 text-right space-x-2">
                     <button 
                       v-if="booking.status === 'pending'"
-                      @click="updateStatus(booking.id, 'confirmed')"
+                      @click="updateStatus(booking._id || booking.id, 'confirmed')"
                       class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors"
                     >
                       {{ $t('booking.approve') }}
                     </button>
                     <button 
                       v-if="booking.status === 'pending'"
-                      @click="updateStatus(booking.id, 'cancelled')"
+                      @click="updateStatus(booking._id || booking.id, 'cancelled')"
                       class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors"
                     >
                       {{ $t('booking.reject') }}
@@ -71,43 +76,39 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useTheme } from '../../composables/useTheme'
 import { useI18n } from 'vue-i18n'
+import { fetchBookings, updateBooking } from '../../services/bookingService'
 
 const { themeClasses } = useTheme()
 const { t } = useI18n()
 
-// Mock data for admin bookings
-const bookings = ref([
-  { 
-    id: 1, 
-    patientName: 'John Doe', 
-    patientEmail: 'john@example.com',
-    service: 'generalCheckup', 
-    date: '2026-03-01', 
-    time: '10:00', 
-    status: 'confirmed' 
-  },
-  { 
-    id: 2, 
-    patientName: 'Jane Smith', 
-    patientEmail: 'jane@example.com',
-    service: 'dental', 
-    date: '2026-03-15', 
-    time: '14:30', 
-    status: 'pending' 
-  },
-  { 
-    id: 3, 
-    patientName: 'Alice Johnson', 
-    patientEmail: 'alice@example.com',
-    service: 'cardiology', 
-    date: '2026-03-20', 
-    time: '09:15', 
-    status: 'pending' 
+const bookings = ref([])
+const isLoading = ref(true)
+const errorMessage = ref('')
+
+const loadBookings = async () => {
+  isLoading.value = true
+  errorMessage.value = ''
+  try {
+    const res = await fetchBookings()
+    if (res?.success) {
+      bookings.value = res.bookings || []
+    } else {
+      errorMessage.value = res?.message || 'Failed to load bookings'
+    }
+  } catch (error) {
+    console.error('Error loading bookings:', error)
+    errorMessage.value = error.message || 'Failed to load bookings'
+  } finally {
+    isLoading.value = false
   }
-])
+}
+
+onMounted(() => {
+  loadBookings()
+})
 
 const getStatusClass = (status) => {
   switch (status) {
@@ -118,12 +119,20 @@ const getStatusClass = (status) => {
   }
 }
 
-const updateStatus = (id, newStatus) => {
-  const booking = bookings.value.find(b => b.id === id)
-  if (booking) {
-    booking.status = newStatus
-    // In a real app, you would show a toast notification here
-    // alert(newStatus === 'confirmed' ? t('booking.approvedSuccess') : t('booking.rejectedSuccess'))
+const updateStatus = async (id, newStatus) => {
+  try {
+    const res = await updateBooking(id, { status: newStatus })
+    if (res?.success) {
+      const booking = bookings.value.find(b => b._id === id || b.id === id)
+      if (booking) {
+        booking.status = newStatus
+      }
+    } else {
+      alert(res?.message || 'Failed to update status')
+    }
+  } catch (error) {
+    console.error('Error updating status:', error)
+    alert(error.message || 'Failed to update status')
   }
 }
 </script>

@@ -462,6 +462,7 @@
     "time": "Time",
     "provider": "Healthcare Provider",
     "selectProvider": "Select a provider",
+    "designatedProvider": "Your designated healthcare provider",
     "notes": "Additional Notes",
     "submit": "Book Appointment",
     "upcoming": "Upcoming Appointments",

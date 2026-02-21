@@ -502,8 +502,9 @@ const loadUnreadCount = async () => {
             let response
             try {
                 response = await fetch(`${API_URL}${endpoint}`, { credentials: 'include' })
-            } catch {
+            } catch (err) {
                 // Network error (ERR_INTERNET_DISCONNECTED etc.) - skip this endpoint silently
+                console.warn(`Failed to fetch unread count from ${endpoint}:`, err.message)
                 continue
             }
 

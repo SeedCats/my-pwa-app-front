@@ -477,6 +477,7 @@
     "time": "時間",
     "provider": "醫護人員",
     "selectProvider": "選擇醫護人員",
+    "designatedProvider": "您指定的醫護人員",
     "notes": "備註",
     "submit": "提交預約",
     "upcoming": "即將到來的預約",
