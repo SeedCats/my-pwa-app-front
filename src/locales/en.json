@@ -4,7 +4,9 @@
     "delete": "Delete",
     "close": "Close",
     "search": "Search",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "cancel": "Cancel",
+    "apply": "Apply"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -350,7 +352,11 @@
     "enterPasswordToConfirmDeletion": "Enter your password to confirm deletion",
     "confirmDelete": "Confirm Deletion",
     "deleting": "Deleting...",
-    "adminCannotDeleteSelf": "Admins cannot delete their own account. Please contact another administrator or system owner."
+    "adminCannotDeleteSelf": "Admins cannot delete their own account. Please contact another administrator or system owner.",
+    "profileIcon": "Profile Icon",
+    "profileIconDesc": "Upload a picture to personalize your profile.",
+    "removeIcon": "Remove Icon",
+    "cropImage": "Crop Image"
   },
   "aiSupport": {
     "title": "AI Support Chat",

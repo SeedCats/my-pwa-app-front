@@ -307,6 +307,12 @@
                                 class="-m-1.5 flex items-center p-1.5 rounded-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
                                 :class="[isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200']">
                                 <span class="flex items-center">
+                                    <img v-if="userData?.icon" :src="userData.icon" alt="User Icon" class="w-8 h-8 rounded-full object-cover mr-2 border" :class="themeClasses.border" />
+                                    <div v-else class="w-8 h-8 rounded-full flex items-center justify-center mr-2 border bg-gray-100 dark:bg-gray-800" :class="themeClasses.border">
+                                        <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                        </svg>
+                                    </div>
                                     <span class="text-sm font-semibold leading-6 hidden sm:block"
                                         :class="themeClasses.textPrimary">{{ userName }}</span>
                                     <span class="text-xs font-semibold leading-6 sm:hidden truncate max-w-20"

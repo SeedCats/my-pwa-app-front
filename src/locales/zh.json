@@ -4,7 +4,9 @@
     "delete": "刪除",
     "close": "關閉",
     "search": "搜尋",
-    "noResults": "未找到結果"
+    "noResults": "未找到結果",
+    "cancel": "取消",
+    "apply": "套用"
   },
   "auth": {
     "welcomeBack": "歡迎回來",
@@ -362,7 +364,11 @@
     "deleteAccountDesc": "帳戶刪除後，其所有資源和資料將被永久刪除。",
     "deleteAccountButton": "刪除帳戶",
     "deleting": "刪除中...",
-    "adminCannotDeleteSelf": "管理員無法刪除自己的帳戶。請聯絡其他管理員或系統擁有者。"
+    "adminCannotDeleteSelf": "管理員無法刪除自己的帳戶。請聯絡其他管理員或系統擁有者。",
+    "profileIcon": "個人頭像",
+    "profileIconDesc": "上傳並裁剪您的個人頭像",
+    "removeIcon": "移除頭像",
+    "cropImage": "裁剪圖片"
   },
   "aiSupport": {
     "title": "AI 支援聊天",

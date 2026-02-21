@@ -46,6 +46,33 @@
           </div>
 
           <form @submit.prevent="updateProfile" class="p-6 space-y-6">
+            <!-- Profile Icon -->
+            <div class="flex items-center gap-6 mb-6">
+              <div class="relative group cursor-pointer" @click="triggerIconUpload">
+                <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0 scale-90" enter-to-class="opacity-100 scale-100" mode="out-in">
+                  <img v-if="profileForm.icon" :key="profileForm.icon" :src="profileForm.icon" class="w-24 h-24 rounded-full object-cover border-2 shadow-sm transition-all duration-200 group-hover:brightness-75" :class="themeClasses.border" />
+                  <div v-else class="w-24 h-24 rounded-full flex items-center justify-center border-2 border-dashed transition-colors duration-200" :class="[themeClasses.border, themeClasses.textSecondary, 'group-hover:border-indigo-500 group-hover:text-indigo-500']">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  </div>
+                </transition>
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-black/30">
+                  <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </div>
+                <button type="button" class="absolute bottom-0 right-0 bg-indigo-600 text-white p-1.5 rounded-full shadow-md transition-transform duration-200 group-hover:scale-110 group-active:scale-95">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                </button>
+                <input type="file" ref="iconInput" class="hidden" accept="image/*" @change="onIconSelected" />
+              </div>
+              <div>
+                <h3 class="text-sm font-medium" :class="themeClasses.textPrimary">{{ $t('userSettings.profileIcon') || 'Profile Icon' }}</h3>
+                <p class="text-xs mt-1" :class="themeClasses.textSecondary">{{ $t('userSettings.profileIconDesc') || 'Upload a picture to personalize your profile.' }}</p>
+                <button v-if="profileForm.icon" type="button" @click="removeIcon" class="mt-3 inline-flex items-center px-3 py-1.5 border border-red-200 text-xs font-medium rounded-md text-red-600 bg-red-50 hover:bg-red-100 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/50">
+                  <svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  {{ $t('userSettings.removeIcon') || 'Remove Icon' }}
+                </button>
+              </div>
+            </div>
+
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <!-- Name -->
               <div>
@@ -216,6 +243,45 @@
         </div>
       </div>
     </main>
+
+    <!-- Cropper Modal -->
+    <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition ease-in duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
+      <div v-if="showCropper" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col transform transition-all" style="height: 80vh; max-height: 800px;">
+          <div class="p-4 border-b dark:border-gray-700 flex justify-between items-center shrink-0">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('userSettings.cropImage') || 'Crop Image' }}</h3>
+            <button @click="cancelCrop" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          <div class="flex-1 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 relative overflow-hidden">
+            <div class="relative w-full h-full flex items-center justify-center"
+                 @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseleave="endDrag"
+                 @touchstart="startDrag" @touchmove="onDrag" @touchend="endDrag"
+                 @wheel.prevent="onZoom">
+              <img ref="cropImageRef" :src="cropImageUrl" class="max-w-none absolute cursor-move transition-transform duration-75" 
+                   :style="{ left: '50%', top: '50%', transform: `translate(-50%, -50%) translate(${cropX}px, ${cropY}px) scale(${cropZoom})` }" draggable="false" />
+              <div class="absolute inset-0 pointer-events-none" style="box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); border-radius: 50%; width: 300px; height: 300px; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 2px solid white;"></div>
+            </div>
+          </div>
+          <div class="p-4 border-t dark:border-gray-700 flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-2">
+              <button @click="cropZoom = Math.max(0.1, cropZoom - 0.1)" class="p-1.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
+              </button>
+              <input type="range" min="0.1" max="3" step="0.05" v-model.number="cropZoom" class="w-24 accent-indigo-600" />
+              <button @click="cropZoom = Math.min(3, cropZoom + 0.1)" class="p-1.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              </button>
+            </div>
+            <div class="flex gap-2">
+              <button @click="cancelCrop" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors">{{ $t('common.cancel') || 'Cancel' }}</button>
+              <button @click="applyCrop" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">{{ $t('common.apply') || 'Apply' }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -233,9 +299,23 @@ const { isDarkMode, themeClasses } = useTheme()
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 // State
-const profileForm = ref({ name: '', email: '' })
+const profileForm = ref({ name: '', email: '', icon: '' })
 const targetUserId = ref(null)
 const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
+
+// Cropper State
+const iconInput = ref(null)
+const showCropper = ref(false)
+const cropImageUrl = ref('')
+const cropImageRef = ref(null)
+const cropX = ref(0)
+const cropY = ref(0)
+const cropZoom = ref(1)
+let isDragging = false
+let startDragX = 0
+let startDragY = 0
+let startCropX = 0
+let startCropY = 0
 
 // For admin viewing another user: keep the loaded user separate from the editable form
 const viewedUserData = ref(null)
@@ -296,7 +376,7 @@ const loadUserData = async () => {
 
     if (user) {
       // populate profile form
-      profileForm.value = { name: user.name || '', email: user.email || '' }
+      profileForm.value = { name: user.name || '', email: user.email || '', icon: user.icon || '' }
       // If no explicit targetUserId set above, set it to the current user's id
       if (!targetUserId.value && user.id) targetUserId.value = user.id
 
@@ -335,7 +415,7 @@ const updateProfile = async () => {
         const updatedUser = data?.data?.user || data?.user || data
         if (updatedUser) {
           viewedUserData.value = updatedUser
-          profileForm.value = { name: updatedUser.name || '', email: updatedUser.email || '' }
+          profileForm.value = { name: updatedUser.name || '', email: updatedUser.email || '', icon: updatedUser.icon || '' }
         }
         successMessage.value = data.message || 'Profile updated successfully!'
       } else {
@@ -368,6 +448,84 @@ const updateProfile = async () => {
   } finally {
     profileLoading.value = false
   }
+}
+
+// Cropper Methods
+const triggerIconUpload = () => {
+  iconInput.value?.click()
+}
+
+const onIconSelected = (event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+  
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    cropImageUrl.value = e.target.result
+    cropX.value = 0
+    cropY.value = 0
+    cropZoom.value = 1
+    showCropper.value = true
+  }
+  reader.readAsDataURL(file)
+  
+  if (iconInput.value) iconInput.value.value = ''
+}
+
+const startDrag = (e) => {
+  isDragging = true
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY
+  startDragX = clientX
+  startDragY = clientY
+  startCropX = cropX.value
+  startCropY = cropY.value
+}
+
+const onDrag = (e) => {
+  if (!isDragging) return
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY
+  cropX.value = startCropX + (clientX - startDragX)
+  cropY.value = startCropY + (clientY - startDragY)
+}
+
+const endDrag = () => {
+  isDragging = false
+}
+
+const onZoom = (e) => {
+  const delta = e.deltaY > 0 ? -0.1 : 0.1
+  cropZoom.value = Math.max(0.1, Math.min(3, cropZoom.value + delta))
+}
+
+const cancelCrop = () => {
+  showCropper.value = false
+  cropImageUrl.value = ''
+}
+
+const applyCrop = () => {
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  const size = 300
+  canvas.width = size
+  canvas.height = size
+  
+  const img = cropImageRef.value
+  if (!img) return
+  
+  ctx.clearRect(0, 0, size, size)
+  ctx.translate(size / 2, size / 2)
+  ctx.translate(cropX.value, cropY.value)
+  ctx.scale(cropZoom.value, cropZoom.value)
+  ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2)
+  
+  profileForm.value.icon = canvas.toDataURL('image/jpeg', 0.9)
+  showCropper.value = false
+}
+
+const removeIcon = () => {
+  profileForm.value.icon = ''
 }
 
 const updatePassword = async () => {
