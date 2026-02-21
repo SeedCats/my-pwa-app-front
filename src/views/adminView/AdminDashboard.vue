@@ -16,6 +16,11 @@
               <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('admin.patientMessagesDesc') }}</p>
             </router-link>
 
+            <router-link to="/admin/bookings" :class="['p-4 rounded-md border hover:shadow', themeClasses.cardBackground, themeClasses.border]">
+              <h2 class="font-semibold" :class="themeClasses.textPrimary">{{ $t('booking.adminTitle') }}</h2>
+              <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('booking.adminDesc') }}</p>
+            </router-link>
+
             <!-- Add more admin cards here in the future -->
           </div>
         </div>

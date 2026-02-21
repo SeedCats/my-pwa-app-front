@@ -395,7 +395,8 @@ const navigation = computed(() => {
         return [
             { name: t('nav.admin'), to: '/admin', icon: HomeIcon },
             { name: t('nav.userManagement'), to: '/admin/users', icon: UsersIcon },
-            { name: t('admin.patientMessagesTitle'), to: '/admin/chats', icon: HomeIcon }
+            { name: t('admin.patientMessagesTitle'), to: '/admin/chats', icon: HomeIcon },
+            { name: t('booking.adminTitle'), to: '/admin/bookings', icon: HomeIcon }
         ]
     }
 
