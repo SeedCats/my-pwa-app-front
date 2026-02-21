@@ -5,7 +5,8 @@
             <div class="px-6 py-4 border-b" :class="[themeClasses.cardBackground, themeClasses.border]">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center"
+                        <img v-if="receiverIcon" :src="receiverIcon" alt="Provider Icon" class="w-10 h-10 rounded-full object-cover" />
+                        <div v-else class="w-10 h-10 rounded-full flex items-center justify-center"
                             :class="isDarkMode ? 'bg-blue-600' : 'bg-blue-500'">
                             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -30,31 +31,49 @@
 
                 <div v-for="message in messages" :key="message.id"
                     :class="['flex', message.isUser ? 'justify-end' : 'justify-start']">
-                    <div :class="[
-                        'max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-lg',
-                        message.isUser
-                            ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
-                            : (isDarkMode ? 'bg-gray-700' : 'bg-gray-200'),
-                        message.isUser ? '' : themeClasses.textPrimary
-                    ]">
-                        <p v-if="message.text" class="text-sm">{{ message.text }}</p>
-                        <div v-if="message.fileName" class="mt-2 mb-1">
-                            <button @click="downloadFile(message.id, message.fileName)" 
-                                class="flex items-center gap-2 w-full text-left px-3 py-2 rounded-md transition-colors border"
-                                :class="message.isUser 
-                                    ? (isDarkMode ? 'bg-blue-700/50 border-blue-500 hover:bg-blue-700' : 'bg-blue-600 border-blue-400 hover:bg-blue-700') 
-                                    : (isDarkMode ? 'bg-gray-600 border-gray-500 hover:bg-gray-500' : 'bg-white border-gray-300 hover:bg-gray-50')">
-                                <div class="p-1.5 rounded-lg shrink-0" :class="message.isUser ? 'bg-white/20' : (isDarkMode ? 'bg-gray-500' : 'bg-blue-50')">
-                                    <svg class="w-4 h-4" :class="message.isUser ? 'text-white' : 'text-blue-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                    </svg>
-                                </div>
-                                <span class="text-sm font-medium truncate flex-1" :class="message.isUser ? 'text-white' : themeClasses.textPrimary">
-                                    {{ message.fileName }}
-                                </span>
-                            </button>
+                    <div class="flex items-end gap-2" :class="message.isUser ? 'flex-row-reverse' : 'flex-row'">
+                        <!-- Avatar dot -->
+                        <template v-if="message.isUser">
+                            <img v-if="senderIcon" :src="senderIcon" alt="User Icon" class="w-6 h-6 rounded-full shrink-0 mb-0.5 object-cover" />
+                            <div v-else class="w-6 h-6 rounded-full shrink-0 mb-0.5 flex items-center justify-center text-[10px] font-bold text-white"
+                                :class="isDarkMode ? 'bg-blue-600' : 'bg-blue-500'">
+                                U
+                            </div>
+                        </template>
+                        <template v-else>
+                            <img v-if="receiverIcon" :src="receiverIcon" alt="Provider Icon" class="w-6 h-6 rounded-full shrink-0 mb-0.5 object-cover" />
+                            <div v-else class="w-6 h-6 rounded-full shrink-0 mb-0.5 flex items-center justify-center text-[10px] font-bold text-white"
+                                :class="isDarkMode ? 'bg-blue-600' : 'bg-blue-500'">
+                                A
+                            </div>
+                        </template>
+
+                        <div :class="[
+                            'max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-lg',
+                            message.isUser
+                                ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
+                                : (isDarkMode ? 'bg-gray-700' : 'bg-gray-200'),
+                            message.isUser ? '' : themeClasses.textPrimary
+                        ]">
+                            <p v-if="message.text" class="text-sm">{{ message.text }}</p>
+                            <div v-if="message.fileName" class="mt-2 mb-1">
+                                <button @click="downloadFile(message.id, message.fileName)" 
+                                    class="flex items-center gap-2 w-full text-left px-3 py-2 rounded-md transition-colors border"
+                                    :class="message.isUser 
+                                        ? (isDarkMode ? 'bg-blue-700/50 border-blue-500 hover:bg-blue-700' : 'bg-blue-600 border-blue-400 hover:bg-blue-700') 
+                                        : (isDarkMode ? 'bg-gray-600 border-gray-500 hover:bg-gray-500' : 'bg-white border-gray-300 hover:bg-gray-50')">
+                                    <div class="p-1.5 rounded-lg shrink-0" :class="message.isUser ? 'bg-white/20' : (isDarkMode ? 'bg-gray-500' : 'bg-blue-50')">
+                                        <svg class="w-4 h-4" :class="message.isUser ? 'text-white' : 'text-blue-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm font-medium truncate flex-1" :class="message.isUser ? 'text-white' : themeClasses.textPrimary">
+                                        {{ message.fileName }}
+                                    </span>
+                                </button>
+                            </div>
+                            <p class="text-xs mt-1 opacity-70">{{ message.time }}</p>
                         </div>
-                        <p class="text-xs mt-1 opacity-70">{{ message.time }}</p>
                     </div>
                 </div>
 
@@ -89,29 +108,36 @@
                     </button>
                 </div>
 
-                <form @submit.prevent="sendMessage" class="flex items-end gap-3">
-                    <div class="flex flex-col gap-1">
-                        <input ref="fileInputRef" type="file" class="hidden" @change="onFileSelected" />
-                        <button type="button" @click="triggerFilePicker" :disabled="noProviderAssigned || isSending"
-                            class="px-3 py-3 rounded-lg border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            :class="[themeClasses.border, themeClasses.inputBackground, themeClasses.textPrimary]"
-                            :title="t('chat.attachFile')">
-                            📎
-                        </button>
-                    </div>
+                <form @submit.prevent="sendMessage" class="flex items-end gap-2">
+                    <!-- File attach -->
+                    <input ref="fileInputRef" type="file" class="hidden" @change="onFileSelected" />
+                    <button type="button" @click="triggerFilePicker" :disabled="noProviderAssigned || isSending"
+                        class="p-2.5 rounded-xl border transition-all duration-150 disabled:opacity-40 hover:scale-105 active:scale-95"
+                        :class="[themeClasses.border, themeClasses.inputBackground, themeClasses.textSecondary]"
+                        :title="t('chat.attachFile')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                    </button>
+
+                    <!-- Text input -->
                     <textarea v-model="newMessage" @keydown.enter.exact.prevent="sendMessage" rows="1"
                         :placeholder="t('chat.typePlaceholder')" :disabled="noProviderAssigned || isSending"
-                        class="flex-1 px-4 py-3 rounded-lg border resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="flex-1 px-4 py-2.5 rounded-xl border resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition disabled:opacity-50"
                         :class="[
                             themeClasses.inputBackground,
                             themeClasses.textPrimary,
                             themeClasses.border
-                        ]" />
+                        ]"
+                        style="max-height:120px;min-height:42px;" />
+
+                    <!-- Send -->
                     <button type="submit"
                         :disabled="(!newMessage.trim() && !selectedFile) || noProviderAssigned || isSending"
-                        class="px-6 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[64px]"
+                        class="p-2.5 rounded-xl font-medium transition-all duration-150 disabled:opacity-40 hover:scale-105 active:scale-95"
                         :class="isDarkMode
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            ? 'bg-blue-600 hover:bg-blue-500 text-white'
                             : 'bg-blue-500 hover:bg-blue-600 text-white'">
                         <svg v-if="!isSending" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -155,6 +181,8 @@ const fileInputRef = ref(null)
 const selectedFile = ref(null)
 
 const providerName = ref(null)
+const receiverIcon = ref(null)
+const senderIcon = ref(null)
 
 const scrollToBottom = () => {
     nextTick(() => {
@@ -170,6 +198,7 @@ const loadProfile = async () => {
         const userData = json?.data?.user || json?.data || json?.user || json
         currentUserId.value = userData?.id || userData?._id || null
         providerName.value = userData?.provider || userData?.providerName || userData?.assignedProvider || null
+        senderIcon.value = userData?.icon || null
         noProviderAssigned.value = !userData?.providerId
     } catch (err) {
         console.error('Error loading user data:', err)
@@ -183,6 +212,7 @@ const loadMessages = async () => {
     try {
         const response = await fetchUserChatHistory(currentUserId.value)
         messages.value = response?.messages || []
+        receiverIcon.value = response?.receiverIcon || null
         
         noProviderAssigned.value = noProviderAssigned.value || (response?.messages?.length === 0 && response?.message?.toLowerCase?.().includes('no healthcare provider'))
         scrollToBottom()

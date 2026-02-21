@@ -91,7 +91,8 @@
               >
                 <!-- Avatar -->
                 <div class="relative shrink-0">
-                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white"
+                  <img v-if="user.icon" :src="user.icon" alt="User Icon" class="w-10 h-10 rounded-full object-cover" />
+                  <div v-else class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white"
                        :style="{ background: stringToColor(user.name) }">
                     {{ initials(user.name) }}
                   </div>
@@ -142,7 +143,8 @@
              :class="[themeClasses.cardBackground, themeClasses.border]">
           <div v-if="selectedUser" class="flex items-center gap-3 flex-1 min-w-0">
             <div class="relative shrink-0">
-              <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white"
+              <img v-if="selectedUser.icon || receiverIcon" :src="selectedUser.icon || receiverIcon" alt="User Icon" class="w-10 h-10 rounded-full object-cover" />
+              <div v-else class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white"
                    :style="{ background: stringToColor(selectedUser.name) }">
                 {{ initials(selectedUser.name) }}
               </div>
@@ -222,10 +224,20 @@
               <div class="flex items-end gap-2 max-w-[72%]"
                    :class="message.isUser ? 'flex-row' : 'flex-row-reverse'">
                 <!-- Avatar dot -->
-                <div class="w-6 h-6 rounded-full shrink-0 mb-0.5 flex items-center justify-center text-[10px] font-bold text-white"
-                     :style="{ background: message.isUser ? stringToColor(selectedUser?.name || 'P') : '#3b82f6' }">
-                  {{ message.isUser ? initials(selectedUser?.name || 'P') : 'A' }}
-                </div>
+                <template v-if="message.isUser">
+                  <img v-if="selectedUser?.icon || receiverIcon" :src="selectedUser?.icon || receiverIcon" alt="User Icon" class="w-6 h-6 rounded-full shrink-0 mb-0.5 object-cover" />
+                  <div v-else class="w-6 h-6 rounded-full shrink-0 mb-0.5 flex items-center justify-center text-[10px] font-bold text-white"
+                       :style="{ background: stringToColor(selectedUser?.name || 'P') }">
+                    {{ initials(selectedUser?.name || 'P') }}
+                  </div>
+                </template>
+                <template v-else>
+                  <img v-if="adminIcon" :src="adminIcon" alt="Admin Icon" class="w-6 h-6 rounded-full shrink-0 mb-0.5 object-cover" />
+                  <div v-else class="w-6 h-6 rounded-full shrink-0 mb-0.5 flex items-center justify-center text-[10px] font-bold text-white"
+                       style="background: #3b82f6">
+                    A
+                  </div>
+                </template>
 
                 <div
                   class="px-4 py-2.5 rounded-2xl text-sm shadow-sm"
@@ -358,6 +370,8 @@ const newMessage = ref('')
 const isSending = ref(false)
 const selectedFile = ref(null)
 const fileInputRef = ref(null)
+const receiverIcon = ref(null)
+const adminIcon = ref(null)
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -437,6 +451,9 @@ const loadProfile = async () => {
     const profile = await fetchCurrentUserProfile()
     const userData = profile?.data?.user || profile?.data || profile?.user || profile
     adminId.value = userData?.id || userData?._id || null
+    if (userData?.icon) {
+      adminIcon.value = userData.icon
+    }
   } catch (error) {
     errorMessage.value = error.message || 'Failed to load admin profile'
   }
@@ -451,6 +468,7 @@ const loadAssignedUsers = async () => {
       id: user.userId || user.id || user._id,
       name: user.name || user.email || 'User',
       email: user.email || '',
+      icon: user.icon || null,
       unreadCount: user.unreadCount || 0,
       lastMessage: user.lastMessage,
       lastMessageTime: user.lastMessageTime
@@ -501,11 +519,16 @@ const selectUser = async (user) => {
   try {
     const response = await fetchAdminChatHistory(user.id, adminId.value)
     messages.value = response?.messages || []
+    receiverIcon.value = response?.receiverIcon || null
+    if (response?.icon) {
+      adminIcon.value = response.icon
+    }
     
     // Dispatch event to update unread count in top bar
     window.dispatchEvent(new CustomEvent('messagesRead'))
   } catch (error) {
     messages.value = []
+    receiverIcon.value = null
     errorMessage.value = error.message || 'Failed to load patient messages'
   } finally {
     messagesLoading.value = false
