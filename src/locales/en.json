@@ -99,7 +99,8 @@
     "selectPatient": "Select a user",
     "selectPatientHint": "Choose a user to view conversation history",
     "noPatientMessages": "No messages found for this user",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "deleteChatHistory": "Delete Chat History"
   },
   "home": {
     "title": "Home",

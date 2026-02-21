@@ -11,10 +11,19 @@ const normalizeMessage = (message, currentUserId = null) => {
   const senderId = message?.senderId?.toString?.() || String(message?.senderId || '')
   const normalizedUserId = currentUserId ? String(currentUserId) : null
 
+  let rawFileName = message?.fileName || message?.originalname || message?.originalName || message?.filename || message?.name || message?.attachmentName || message?.file?.originalname || message?.file?.originalName || message?.file?.filename || message?.file?.name || null
+  if (rawFileName) {
+    try {
+      rawFileName = decodeURIComponent(escape(rawFileName))
+    } catch (e) {
+      // Ignore if it's already properly decoded or not URI encoded
+    }
+  }
+
   return {
     id: message?.id || message?._id || `${senderId}-${message?.createdAt || Date.now()}`,
     text: message?.text || '',
-    fileName: message?.fileName || message?.attachmentName || message?.file?.name || null,
+    fileName: rawFileName,
     fileUrl: message?.fileUrl || message?.attachmentUrl || message?.file?.url || null,
     senderId: message?.senderId,
     receiverId: message?.receiverId,
@@ -97,7 +106,11 @@ export const sendUserChatMessageWithAttachment = async (text, file, currentUserI
 
   const formData = new FormData()
   formData.append('text', (text || '').trim())
-  formData.append('file', file)
+  
+  // Encode filename to handle Chinese characters properly
+  const encodedFileName = encodeURIComponent(file.name)
+  const newFile = new File([file], encodedFileName, { type: file.type })
+  formData.append('file', newFile)
 
   try {
     const response = await apiRequest('/api/user-chat/send', {
@@ -194,7 +207,12 @@ export const sendAdminChatMessage = async (userId, text, providerId = null, file
       const formData = new FormData()
       formData.append('userId', String(userId))
       formData.append('text', payloadText)
-      formData.append('file', file)
+      
+      // Encode filename to handle Chinese characters properly
+      const encodedFileName = encodeURIComponent(file.name)
+      const newFile = new File([file], encodedFileName, { type: file.type })
+      formData.append('file', newFile)
+      
       return formData
     })()
     : { userId, text: payloadText }
@@ -234,4 +252,48 @@ export const deleteAdminChatHistory = async (userId) => {
   return apiRequest(`/api/admin-chat/history/${userId}`, {
     method: 'DELETE'
   })
+}
+
+export const downloadUserChatFile = async (messageId, fileName) => {
+  if (!messageId) throw new Error('Missing messageId')
+  const response = await apiRequest(`/api/user-chat/file/${messageId}`, { expectStream: true })
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  
+  let decodedFileName = fileName || 'download'
+  try {
+    decodedFileName = decodeURIComponent(escape(decodedFileName))
+  } catch (e) {
+    // Ignore
+  }
+  a.download = decodedFileName
+  
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  window.URL.revokeObjectURL(url)
+}
+
+export const downloadAdminChatFile = async (messageId, fileName) => {
+  if (!messageId) throw new Error('Missing messageId')
+  const response = await apiRequest(`/api/admin-chat/file/${messageId}`, { expectStream: true })
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  
+  let decodedFileName = fileName || 'download'
+  try {
+    decodedFileName = decodeURIComponent(escape(decodedFileName))
+  } catch (e) {
+    // Ignore
+  }
+  a.download = decodedFileName
+  
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  window.URL.revokeObjectURL(url)
 }

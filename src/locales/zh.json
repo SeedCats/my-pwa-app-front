@@ -99,7 +99,8 @@
     "selectPatient": "選擇用戶",
     "selectPatientHint": "請先選擇用戶以查看對話紀錄",
     "noPatientMessages": "此用戶目前沒有訊息",
-    "refresh": "重新整理"
+    "refresh": "重新整理",
+    "deleteChatHistory": "刪除對話紀錄"
   },
   "home": {
     "title": "首頁",

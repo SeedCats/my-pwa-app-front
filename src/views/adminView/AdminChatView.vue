@@ -235,14 +235,23 @@
                       : (isDarkMode ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-blue-500 text-white rounded-br-sm')
                   ]"
                 >
-                  <p v-if="message.fileName" class="text-xs mb-1 opacity-75 flex items-center gap-1">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                    </svg>
-                    {{ message.fileName }}
-                  </p>
-                  <p>{{ message.text }}</p>
+                  <p v-if="message.text">{{ message.text }}</p>
+                  <div v-if="message.fileName" class="mt-2 mb-1">
+                    <button @click="downloadFile(message.id, message.fileName)" 
+                        class="flex items-center gap-2 w-full text-left px-3 py-2 rounded-md transition-colors border"
+                        :class="message.isUser 
+                            ? (isDarkMode ? 'bg-gray-600 border-gray-500 hover:bg-gray-500' : 'bg-gray-50 border-gray-200 hover:bg-gray-100') 
+                            : (isDarkMode ? 'bg-blue-700/50 border-blue-500 hover:bg-blue-700' : 'bg-blue-600 border-blue-400 hover:bg-blue-700')">
+                      <div class="p-1.5 rounded-lg shrink-0" :class="message.isUser ? (isDarkMode ? 'bg-gray-500' : 'bg-white') : 'bg-white/20'">
+                        <svg class="w-4 h-4" :class="message.isUser ? 'text-blue-500' : 'text-white'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                      </div>
+                      <span class="text-sm font-medium truncate flex-1" :class="message.isUser ? themeClasses.textPrimary : 'text-white'">
+                        {{ message.fileName }}
+                      </span>
+                    </button>
+                  </div>
                   <p class="text-[10px] mt-1 opacity-60" :class="message.isUser ? 'text-left' : 'text-right'">{{ formatMsgTime(message.time) }}</p>
                 </div>
               </div>
@@ -330,7 +339,7 @@ import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTheme } from '../../composables/useTheme'
 import { useLanguage } from '../../composables/useLanguage'
-import { fetchAdminChatHistory, fetchAdminChatUsers, fetchCurrentUserProfile, sendAdminChatMessage, deleteAdminChatHistory } from '../../services/userChatService'
+import { fetchAdminChatHistory, fetchAdminChatUsers, fetchCurrentUserProfile, sendAdminChatMessage, deleteAdminChatHistory, downloadAdminChatFile } from '../../services/userChatService'
 
 const route = useRoute()
 const { themeClasses, isDarkMode } = useTheme()
@@ -539,6 +548,15 @@ const clearSelectedFile = () => {
   selectedFile.value = null
   if (fileInputRef.value) {
     fileInputRef.value.value = ''
+  }
+}
+
+const downloadFile = async (messageId, fileName) => {
+  try {
+    await downloadAdminChatFile(messageId, fileName)
+  } catch (error) {
+    console.error('Error downloading file:', error)
+    errorMessage.value = error.message || 'Failed to download file'
   }
 }
 

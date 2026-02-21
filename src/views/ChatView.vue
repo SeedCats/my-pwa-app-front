@@ -37,10 +37,23 @@
                             : (isDarkMode ? 'bg-gray-700' : 'bg-gray-200'),
                         message.isUser ? '' : themeClasses.textPrimary
                     ]">
-                        <p v-if="message.fileName" class="text-xs mb-1 opacity-80">
-                            📎 {{ message.fileName }}
-                        </p>
-                        <p class="text-sm">{{ message.text }}</p>
+                        <p v-if="message.text" class="text-sm">{{ message.text }}</p>
+                        <div v-if="message.fileName" class="mt-2 mb-1">
+                            <button @click="downloadFile(message.id, message.fileName)" 
+                                class="flex items-center gap-2 w-full text-left px-3 py-2 rounded-md transition-colors border"
+                                :class="message.isUser 
+                                    ? (isDarkMode ? 'bg-blue-700/50 border-blue-500 hover:bg-blue-700' : 'bg-blue-600 border-blue-400 hover:bg-blue-700') 
+                                    : (isDarkMode ? 'bg-gray-600 border-gray-500 hover:bg-gray-500' : 'bg-white border-gray-300 hover:bg-gray-50')">
+                                <div class="p-1.5 rounded-lg shrink-0" :class="message.isUser ? 'bg-white/20' : (isDarkMode ? 'bg-gray-500' : 'bg-blue-50')">
+                                    <svg class="w-4 h-4" :class="message.isUser ? 'text-white' : 'text-blue-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                </div>
+                                <span class="text-sm font-medium truncate flex-1" :class="message.isUser ? 'text-white' : themeClasses.textPrimary">
+                                    {{ message.fileName }}
+                                </span>
+                            </button>
+                        </div>
                         <p class="text-xs mt-1 opacity-70">{{ message.time }}</p>
                     </div>
                 </div>
@@ -63,6 +76,19 @@
 
             <!-- Message Input -->
             <div class="px-6 py-4 border-t" :class="[themeClasses.cardBackground, themeClasses.border]">
+                <!-- File preview -->
+                <div v-if="selectedFile"
+                     class="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg text-sm border"
+                     :class="[isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-700']">
+                    <svg class="w-4 h-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    <span class="truncate flex-1 font-medium">{{ selectedFile.name }}</span>
+                    <button type="button" @click="clearSelectedFile" class="p-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-500 hover:text-red-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+
                 <form @submit.prevent="sendMessage" class="flex items-end gap-3">
                     <div class="flex flex-col gap-1">
                         <input ref="fileInputRef" type="file" class="hidden" @change="onFileSelected" />
@@ -83,21 +109,20 @@
                         ]" />
                     <button type="submit"
                         :disabled="(!newMessage.trim() && !selectedFile) || noProviderAssigned || isSending"
-                        class="px-6 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="px-6 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[64px]"
                         :class="isDarkMode
                             ? 'bg-blue-600 hover:bg-blue-700 text-white'
                             : 'bg-blue-500 hover:bg-blue-600 text-white'">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg v-if="!isSending" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
+                        <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
                     </button>
                 </form>
-                <p v-if="selectedFile" class="text-xs mt-2" :class="themeClasses.textSecondary">
-                    {{ t('chat.attachedFile') }}: {{ selectedFile.name }}
-                    <button type="button" @click="clearSelectedFile" class="ml-2 underline">{{ t('chat.removeFile')
-                        }}</button>
-                </p>
                 <p class="text-xs mt-2" :class="themeClasses.textSecondary">
                     {{ t('chat.sendHint') }}
                 </p>
@@ -113,7 +138,7 @@
 import { ref, onMounted, nextTick } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useLanguage } from '../composables/useLanguage'
-import { fetchCurrentUserProfile, fetchUserChatHistory, sendUserChatMessage, sendUserChatMessageWithAttachment } from '../services/userChatService'
+import { fetchCurrentUserProfile, fetchUserChatHistory, sendUserChatMessage, sendUserChatMessageWithAttachment, downloadUserChatFile } from '../services/userChatService'
 
 const { isDarkMode, themeClasses } = useTheme()
 const { t } = useLanguage()
@@ -184,6 +209,15 @@ const clearSelectedFile = () => {
     selectedFile.value = null
     if (fileInputRef.value) {
         fileInputRef.value.value = ''
+    }
+}
+
+const downloadFile = async (messageId, fileName) => {
+    try {
+        await downloadUserChatFile(messageId, fileName)
+    } catch (error) {
+        console.error('Error downloading file:', error)
+        errorMessage.value = error.message || 'Failed to download file'
     }
 }
 
