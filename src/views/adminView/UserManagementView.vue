@@ -301,7 +301,7 @@ const goToUserSetting = (user) => {
 const goToChat = (user) => {
   if (!user) return
   closeOperations()
-  router.push({ path: '/admin/chats', query: { userId: user.id } })
+  router.push({ path: '/admin/chats', query: { userId: user.id, userName: user.name, userEmail: user.email } })
 }
 
 const setOnGoingService = async (user) => {

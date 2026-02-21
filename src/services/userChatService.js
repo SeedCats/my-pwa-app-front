@@ -228,3 +228,10 @@ export const sendAdminChatMessage = async (userId, text, providerId = null, file
     }
   }
 }
+
+export const deleteAdminChatHistory = async (userId) => {
+  if (!userId) throw new Error('Missing userId')
+  return apiRequest(`/api/admin-chat/history/${userId}`, {
+    method: 'DELETE'
+  })
+}

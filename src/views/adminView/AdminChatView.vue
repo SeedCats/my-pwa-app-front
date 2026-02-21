@@ -76,45 +76,60 @@
           </p>
 
           <transition-group name="list" tag="div" class="space-y-1">
-            <button
+            <div
               v-for="user in filteredUsers"
               :key="user.id"
-              type="button"
-              @click="selectUser(user)"
-              class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-left group"
-              :class="selectedUser?.id === user.id
-                ? (isDarkMode ? 'bg-blue-600/20 ring-1 ring-blue-500' : 'bg-blue-50 ring-1 ring-blue-300')
-                : (isDarkMode ? 'hover:bg-gray-700/60' : 'hover:bg-gray-50')"
+              class="relative group"
             >
-              <!-- Avatar -->
-              <div class="relative shrink-0">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white"
-                     :style="{ background: stringToColor(user.name) }">
-                  {{ initials(user.name) }}
-                </div>
-                <span
-                  v-if="user.unreadCount > 0"
-                  class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center ring-2"
-                  :class="isDarkMode ? 'ring-gray-800' : 'ring-white'"
-                >
-                  {{ user.unreadCount > 99 ? '99+' : user.unreadCount }}
-                </span>
-              </div>
-
-              <!-- Info -->
-              <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline gap-1">
-                  <p class="text-sm font-semibold truncate" :class="themeClasses.textPrimary">{{ user.name }}</p>
-                  <span v-if="user.lastMessageTime" class="text-[10px] shrink-0" :class="themeClasses.textSecondary">
-                    {{ formatTime(user.lastMessageTime) }}
+              <button
+                type="button"
+                @click="selectUser(user)"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-left"
+                :class="selectedUser?.id === user.id
+                  ? (isDarkMode ? 'bg-blue-600/20 ring-1 ring-blue-500' : 'bg-blue-50 ring-1 ring-blue-300')
+                  : (isDarkMode ? 'hover:bg-gray-700/60' : 'hover:bg-gray-50')"
+              >
+                <!-- Avatar -->
+                <div class="relative shrink-0">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white"
+                       :style="{ background: stringToColor(user.name) }">
+                    {{ initials(user.name) }}
+                  </div>
+                  <span
+                    v-if="user.unreadCount > 0"
+                    class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center ring-2"
+                    :class="isDarkMode ? 'ring-gray-800' : 'ring-white'"
+                  >
+                    {{ user.unreadCount > 99 ? '99+' : user.unreadCount }}
                   </span>
                 </div>
-                <p class="text-xs truncate mt-0.5"
-                   :class="user.unreadCount > 0 ? (isDarkMode ? 'text-gray-300 font-medium' : 'text-gray-700 font-medium') : themeClasses.textSecondary">
-                  {{ user.lastMessage || user.email }}
-                </p>
-              </div>
-            </button>
+
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex justify-between items-baseline gap-1">
+                    <p class="text-sm font-semibold truncate" :class="themeClasses.textPrimary">{{ user.name }}</p>
+                    <span v-if="user.lastMessageTime" class="text-[10px] shrink-0" :class="themeClasses.textSecondary">
+                      {{ formatTime(user.lastMessageTime) }}
+                    </span>
+                  </div>
+                  <p class="text-xs truncate mt-0.5"
+                     :class="user.unreadCount > 0 ? (isDarkMode ? 'text-gray-300 font-medium' : 'text-gray-700 font-medium') : themeClasses.textSecondary">
+                    {{ user.lastMessage || user.email }}
+                  </p>
+                </div>
+              </button>
+
+              <!-- Delete Button -->
+              <button
+                @click.stop="deleteChat(user)"
+                class="absolute top-1 left-1 p-1.5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
+                :title="t('admin.deleteChatHistory') || 'Delete Chat'"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </transition-group>
         </div>
       </aside>
@@ -315,7 +330,7 @@ import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTheme } from '../../composables/useTheme'
 import { useLanguage } from '../../composables/useLanguage'
-import { fetchAdminChatHistory, fetchAdminChatUsers, fetchCurrentUserProfile, sendAdminChatMessage } from '../../services/userChatService'
+import { fetchAdminChatHistory, fetchAdminChatUsers, fetchCurrentUserProfile, sendAdminChatMessage, deleteAdminChatHistory } from '../../services/userChatService'
 
 const route = useRoute()
 const { themeClasses, isDarkMode } = useTheme()
@@ -441,12 +456,20 @@ const loadAssignedUsers = async () => {
       if (!userToSelect) {
         userToSelect = {
           id: queryUserId,
-          name: 'User', // We don't have the name, but we can still open the chat
-          email: '',
+          name: route.query.userName || 'User', // We don't have the name, but we can still open the chat
+          email: route.query.userEmail || '',
           unreadCount: 0
         }
         // Add to the top of the list so it's visible
         users.value.unshift(userToSelect)
+      } else {
+        // Update name and email if they are provided in query and missing in the list
+        if (route.query.userName && userToSelect.name === 'User') {
+          userToSelect.name = route.query.userName
+        }
+        if (route.query.userEmail && !userToSelect.email) {
+          userToSelect.email = route.query.userEmail
+        }
       }
       
       await selectUser(userToSelect)
@@ -478,6 +501,28 @@ const selectUser = async (user) => {
   } finally {
     messagesLoading.value = false
     scrollToBottom()
+  }
+}
+
+const deleteChat = async (user) => {
+  if (!confirm(t('admin.confirmDeleteChat') || 'Are you sure you want to delete this chat history? This action cannot be undone.')) return
+  
+  try {
+    await deleteAdminChatHistory(user.id)
+    
+    // Clear messages if the deleted chat is currently selected
+    if (selectedUser.value?.id === user.id) {
+      messages.value = []
+      selectedUser.value = null
+    }
+    
+    // Remove the user from the list
+    users.value = users.value.filter(u => u.id !== user.id)
+    
+    // Dispatch event to update unread count in top bar
+    window.dispatchEvent(new CustomEvent('messagesRead'))
+  } catch (error) {
+    errorMessage.value = error.message || 'Failed to delete chat history'
   }
 }
 
@@ -536,11 +581,18 @@ watch(() => route.query.userId, async (newUserId) => {
     if (!userToSelect) {
       userToSelect = {
         id: newUserId,
-        name: 'User',
-        email: '',
+        name: route.query.userName || 'User',
+        email: route.query.userEmail || '',
         unreadCount: 0
       }
       users.value.unshift(userToSelect)
+    } else {
+      if (route.query.userName && userToSelect.name === 'User') {
+        userToSelect.name = route.query.userName
+      }
+      if (route.query.userEmail && !userToSelect.email) {
+        userToSelect.email = route.query.userEmail
+      }
     }
     
     if (!selectedUser.value || String(selectedUser.value.id) !== String(newUserId)) {
