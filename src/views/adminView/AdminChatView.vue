@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen" :class="themeClasses.background">
-    <main class="h-[calc(100vh-4rem)] flex overflow-hidden">
+    <main class="h-[calc(100vh-4rem)] flex flex-col md:flex-row overflow-hidden">
 
       <!-- ── Left panel: patient list ─────────────────────────────── -->
       <aside
-        class="flex flex-col w-60 border-r shrink-0 transition-all duration-300"
-        :class="[themeClasses.cardBackground, themeClasses.border]"
+        class="flex flex-col w-full md:w-72 lg:w-80 border-r shrink-0 transition-all duration-300"
+        :class="[themeClasses.cardBackground, themeClasses.border, selectedUser ? 'hidden md:flex' : 'flex']"
       >
         <!-- Header -->
         <div class="px-4 pt-5 pb-3">
