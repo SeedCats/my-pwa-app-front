@@ -979,14 +979,22 @@ const formatDateForDisplay = (dateString) => {
   const date = new Date(dateString)
   const options = { year: 'numeric', month: 'long', day: 'numeric' }
   const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
-  return date.toLocaleDateString(loc, options)
+  let formatted = date.toLocaleDateString(loc, options)
+  if (locale.value === 'zh') {
+    formatted = formatted.replace(/\s+/g, '')
+  }
+  return formatted
 }
 
 // Calendar computed properties
 const calendarMonthYear = computed(() => {
   const date = new Date(calendarYear.value, calendarMonth.value, 1)
   const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
-  return date.toLocaleDateString(loc, { month: 'long', year: 'numeric' })
+  let formatted = date.toLocaleDateString(loc, { month: 'long', year: 'numeric' })
+  if (locale.value === 'zh') {
+    formatted = formatted.replace(/\s+/g, '')
+  }
+  return formatted
 })
 
 // Localized weekday short names for calendar header
@@ -1061,7 +1069,11 @@ const stressCalendarMonthYear = computed(() => {
   const date = new Date(y, m, 1)
   const loc = locale.value === 'zh' ? 'zh-TW' : 'en-US'
   try {
-    return date.toLocaleDateString(loc, { month: 'long', year: 'numeric' })
+    let formatted = date.toLocaleDateString(loc, { month: 'long', year: 'numeric' })
+    if (locale.value === 'zh') {
+      formatted = formatted.replace(/\s+/g, '')
+    }
+    return formatted
   } catch (e) {
     return ''
   }

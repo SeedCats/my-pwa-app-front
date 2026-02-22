@@ -6,7 +6,10 @@
     "search": "搜尋",
     "noResults": "未找到結果",
     "cancel": "取消",
-    "apply": "套用"
+    "apply": "套用",
+    "prev": "上一頁",
+    "next": "下一頁",
+    "sort": "排序"
   },
   "auth": {
     "welcomeBack": "歡迎回來",
@@ -57,7 +60,9 @@
     "bookingSystem": "預約系統",
     "admin": "管理面板",
     "userManagement": "使用者管理",
-    "provider": "醫護提供者"
+    "provider": "醫護提供者",
+    "notification": "通知",
+    "chatNotification": "聊天通知"
   },
   "admin": {
     "description": "基本管理面板。使用下列連結來管理系統。",
@@ -470,9 +475,9 @@
     "service": "服務項目",
     "selectService": "選擇服務",
     "generalCheckup": "一般檢查",
-    "dental": "牙科護理",
-    "cardiology": "心臟科",
-    "therapy": "物理治療",
+    "healthStatusCheckup": "健康狀態檢查",
+    "healthConsultation": "健康諮詢",
+    "therapy": "治療",
     "date": "日期",
     "time": "時間",
     "provider": "醫護人員",
@@ -486,6 +491,8 @@
     "pending": "待確認",
     "confirmed": "已確認",
     "cancelled": "已取消",
+    "rejected": "已拒絕",
+    "completed": "已完成",
     "success": "預約提交成功！",
     "adminTitle": "預約管理",
     "adminDesc": "管理病患預約",
@@ -493,7 +500,16 @@
     "action": "操作",
     "approve": "批准",
     "reject": "拒絕",
+    "complete": "完成",
+    "cancel": "取消",
+    "delete": "刪除",
+    "confirmCancel": "您確定要取消此預約嗎？",
+    "confirmDelete": "您確定要刪除此預約嗎？",
     "approvedSuccess": "預約已批准",
-    "rejectedSuccess": "預約已拒絕"
+    "rejectedSuccess": "預約已拒絕",
+    "completedSuccess": "預約已標記為完成",
+    "cancelledSuccess": "預約已取消",
+    "needHelp": "需要幫助？聯絡您的醫護人員或客服支援",
+    "ChatwithProvider": "與醫護人員聊天"
   }
 }

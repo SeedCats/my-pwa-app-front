@@ -174,8 +174,8 @@
                                     isDarkMode ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200',
                                     unreadCount > 0 && !hasViewedNotifications ? 'bg-opacity-10' : ''
                                 ]"
-                                :aria-label="'Notifications'"
-                                :title="'Notifications'"
+                                :aria-label="unreadCount > 0 ? t('nav.chatNotification') || 'Chat Notification' : t('nav.notification') || 'Notification'"
+                                :title="unreadCount > 0 ? t('nav.chatNotification') || 'Chat Notification' : t('nav.notification') || 'Notification'"
                             >
                                 <div class="relative">
                                     <BellIcon

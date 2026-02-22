@@ -6,7 +6,10 @@
     "search": "Search",
     "noResults": "No results found",
     "cancel": "Cancel",
-    "apply": "Apply"
+    "apply": "Apply",
+    "prev": "Prev",
+    "next": "Next",
+    "sort": "Sort"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -57,7 +60,9 @@
     "bookingSystem": "Booking System",
     "admin": "Admin Panel",
     "userManagement": "User Management",
-    "provider": "Provider"
+    "provider": "Provider",
+    "notification": "Notification",
+    "chatNotification": "Chat Notification"
   },
   "admin": {
     "description": "Basic administrative panel. Use the links below to manage the system.",
@@ -455,9 +460,9 @@
     "service": "Service",
     "selectService": "Select a service",
     "generalCheckup": "General Checkup",
-    "dental": "Dental Care",
-    "cardiology": "Cardiology",
-    "therapy": "Physical Therapy",
+    "healthStatusCheckup": "Health Status Checkup",
+    "healthConsultation": "Health Consultation",
+    "therapy": "Therapy",
     "date": "Date",
     "time": "Time",
     "provider": "Healthcare Provider",
@@ -471,6 +476,8 @@
     "pending": "Pending",
     "confirmed": "Confirmed",
     "cancelled": "Cancelled",
+    "rejected": "Rejected",
+    "completed": "Completed",
     "success": "Booking submitted successfully!",
     "adminTitle": "Booking Management",
     "adminDesc": "Manage patient appointments",
@@ -478,7 +485,16 @@
     "action": "Action",
     "approve": "Approve",
     "reject": "Reject",
+    "complete": "Complete",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirmCancel": "Are you sure you want to cancel this appointment?",
+    "confirmDelete": "Are you sure you want to delete this appointment?",
     "approvedSuccess": "Booking approved",
-    "rejectedSuccess": "Booking rejected"
+    "rejectedSuccess": "Booking rejected",
+    "completedSuccess": "Booking completed",
+    "cancelledSuccess": "Booking cancelled",
+    "needHelp": "Need help? Chat with your provider for assistance.",
+    "chatWithProvider": "Chat with your provider"
   }
 }
