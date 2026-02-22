@@ -74,32 +74,32 @@
                       {{ $t(`booking.${booking.status}`) }}
                     </span>
                   </td>
-                  <td class="p-4">
-                    <div class="flex flex-wrap justify-end gap-2 items-center">
+                  <td class="p-2">
+                    <div class="flex flex-col sm:flex-row flex-wrap justify-end gap-2 items-center">
                       <button 
                         v-if="booking.status === 'pending'"
                         @click="updateStatus(booking._id || booking.id, 'confirmed')"
-                        class="w-24 text-center px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors shadow-sm whitespace-nowrap"
+                        class="w-full sm:w-22 text-center px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors shadow-sm whitespace-nowrap"
                       >
                         {{ $t('booking.approve') }}
                       </button>
                       <button 
                         v-if="booking.status === 'pending'"
                         @click="updateStatus(booking._id || booking.id, 'rejected')"
-                        class="w-24 text-center px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors shadow-sm whitespace-nowrap"
+                        class="w-full sm:w-22 text-center px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors shadow-sm whitespace-nowrap"
                       >
                         {{ $t('booking.reject') }}
                       </button>
                       <button 
                         v-if="booking.status === 'confirmed'"
                         @click="updateStatus(booking._id || booking.id, 'completed')"
-                        class="w-24 text-center px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors shadow-sm whitespace-nowrap"
+                        class="w-full sm:w-22 text-center px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors shadow-sm whitespace-nowrap"
                       >
                         {{ $t('booking.complete') || 'Complete' }}
                       </button>
                       <button 
                         @click="deleteBookingRecord(booking._id || booking.id)"
-                        class="w-24 text-center px-2 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-sm rounded transition-colors duration-200 whitespace-nowrap"
+                        class="w-full sm:w-22 text-center px-2 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-sm rounded transition-colors duration-200 whitespace-nowrap"
                       >
                         {{ $t('booking.delete') || 'Delete' }}
                       </button>

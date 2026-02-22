@@ -4,7 +4,16 @@
         <div class="py-6">
           <h1 class="text-2xl font-bold mb-4" :class="themeClasses.textPrimary">{{ $t('admin.userManagementTitle') }}</h1>
 
-          <div class="mb-4 flex items-center">
+          <div class="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="w-full sm:w-auto">
+              <input 
+                type="text" 
+                v-model="searchQuery" 
+                :placeholder="$t('common.search') || 'Search...'" 
+                class="w-full sm:w-64 px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
+              />
+            </div>
             <div class="ml-auto">
               <span :class="['text-sm', themeClasses.textSecondary]">{{ $t('admin.userCount', { count: total }) }}</span>
             </div>
@@ -13,9 +22,9 @@
           <div v-if="loading" :class="themeClasses.textSecondary">{{ $t('common.loading') }}</div>
 
           <div v-else>
-            <div v-if="users.length === 0" class="text-gray-500">{{ $t('admin.noAssignedUsers') }}</div>
+            <div v-if="filteredUsers.length === 0" class="text-gray-500">{{ $t('admin.noAssignedUsers') }}</div>
 
-            <div v-else class="overflow-auto">
+            <div v-else class="overflow-x-auto">
               <table :class="['min-w-full divide-y', isDarkMode ? 'divide-gray-700' : 'divide-gray-200']">
                 <thead>
                   <tr>
@@ -29,7 +38,7 @@
                   </tr>
                 </thead>
                 <tbody :class="[themeClasses.cardBackground, 'divide-y', isDarkMode ? 'divide-gray-700' : 'divide-gray-200']">
-                  <tr v-for="u in users" :key="u.id" :class="themeClasses.cardBackground">
+                  <tr v-for="u in filteredUsers" :key="u.id" :class="themeClasses.cardBackground">
                     <td :class="['px-6 py-4 whitespace-nowrap text-sm', themeClasses.textPrimary]">{{ u.name }}</td>
                     <td :class="['px-6 py-4 whitespace-nowrap text-sm', themeClasses.textSecondary]">{{ u.email }}</td>
                     <td :class="['px-6 py-4 whitespace-nowrap text-sm', themeClasses.textSecondary]">{{ u.role }}</td>
@@ -175,6 +184,16 @@ const error = ref('')
 const page = ref(1)
 const limit = ref(10) // show up to 10 users per page
 const total = ref(0)
+const searchQuery = ref('')
+
+const filteredUsers = computed(() => {
+  if (!searchQuery.value) return users.value
+  const query = searchQuery.value.toLowerCase()
+  return users.value.filter(u => 
+    (u.name && u.name.toLowerCase().includes(query)) || 
+    (u.email && u.email.toLowerCase().includes(query))
+  )
+})
 
 const loadUsers = async () => {
   loading.value = true

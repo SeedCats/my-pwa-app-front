@@ -136,11 +136,20 @@
       </aside>
 
       <!-- ── Right panel: chat ────────────────────────────────────── -->
-      <div class="flex-1 flex flex-col min-w-0">
+      <div class="flex-1 flex flex-col min-w-0" :class="[!selectedUser ? 'hidden md:flex' : 'flex', themeClasses.border]">
 
         <!-- Chat header -->
-        <div class="flex items-center gap-4 px-6 py-4 border-b shrink-0"
+        <div class="flex items-center gap-4 px-4 md:px-6 py-4 border-b shrink-0"
              :class="[themeClasses.cardBackground, themeClasses.border]">
+          <button 
+            v-if="selectedUser" 
+            @click="selectedUser = null" 
+            class="md:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
           <div v-if="selectedUser" class="flex items-center gap-3 flex-1 min-w-0">
             <div class="relative shrink-0">
               <img v-if="selectedUser.icon || receiverIcon" :src="selectedUser.icon || receiverIcon" alt="User Icon" class="w-10 h-10 rounded-full object-cover" />
@@ -221,7 +230,7 @@
                 class="flex"
                 :class="message.isUser ? 'justify-start' : 'justify-end'"
               >
-              <div class="flex items-end gap-2 max-w-[72%]"
+              <div class="flex items-end gap-2 max-w-[85%] md:max-w-[75%] lg:max-w-[65%]"
                    :class="message.isUser ? 'flex-row' : 'flex-row-reverse'">
                 <!-- Avatar dot -->
                 <template v-if="message.isUser">

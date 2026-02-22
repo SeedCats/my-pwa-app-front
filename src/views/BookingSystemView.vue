@@ -69,10 +69,10 @@
         <div class="p-6 rounded-lg shadow-md border flex flex-col" :class="[themeClasses.cardBackground, themeClasses.border]">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('booking.upcoming') }}</h2>
-            <div class="w-full sm:w-auto flex gap-2">
+            <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
               <button 
                 @click="toggleSort"
-                class="px-3 py-2 rounded-lg border flex items-center gap-1 transition-colors"
+                class="w-full sm:w-auto px-3 py-2 rounded-lg border flex items-center justify-center gap-1 transition-colors"
                 :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground]"
                 :title="$t('common.sort') || 'Sort by Date'"
               >
@@ -110,14 +110,14 @@
                   {{ $t('booking.provider') }}: {{ getProviderName(booking.providerID || booking.providerId) }}
                 </p>
               </div>
-              <div class="flex flex-col items-end gap-2">
-                <span :class="getStatusClass(booking.status)" class="inline-block w-24 text-center px-4 py-1 rounded-full text-xs font-medium">
+              <div class="flex flex-col sm:items-end gap-2 w-full sm:w-auto mt-4 sm:mt-0">
+                <span :class="getStatusClass(booking.status)" class="inline-block w-full sm:w-24 text-center px-4 py-1 rounded-full text-xs font-medium">
                   {{ $t(`booking.${booking.status}`) }}
                 </span>
                 <button 
                   v-if="booking.status === 'pending'"
                   @click="cancelBooking(booking._id || booking.id)"
-                  class="w-24 text-center text-xs px-4 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors duration-200"
+                  class="w-full sm:w-24 text-center text-xs px-4 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors duration-200"
                 >
                   {{ $t('booking.cancel') || 'Cancel' }}
                 </button>
