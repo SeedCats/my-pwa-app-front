@@ -2,12 +2,47 @@
   <div class="min-h-screen" :class="themeClasses.background">
     <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-6">
       <div class="py-6">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
           <div>
             <h1 class="text-2xl font-bold mb-2" :class="themeClasses.textPrimary">{{ $t('booking.adminTitle') }}</h1>
             <p :class="themeClasses.textSecondary">{{ $t('booking.adminDesc') }}</p>
           </div>
-          <div class="w-full sm:w-auto flex-shrink-0">
+          <div class="w-full lg:w-auto flex flex-col sm:flex-row gap-2 flex-wrap">
+            <button 
+              @click="toggleSort('date')"
+              class="w-full sm:w-auto px-3 py-2 rounded-lg border flex items-center justify-center gap-1 transition-colors flex-shrink-0"
+              :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground]"
+              :title="$t('common.sort') || 'Sort by Date'"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span v-if="sortKey === 'date' && sortOrder === 'asc'">↑</span>
+              <span v-else-if="sortKey === 'date'">↓</span>
+            </button>
+            <select 
+              v-model="serviceFilter"
+              class="w-full sm:w-auto px-2 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors flex-shrink-0"
+              :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
+            >
+              <option value="">{{ $t('booking.allServices') || 'All Services' }}</option>
+              <option value="GeneralCheckup">{{ $t('booking.generalCheckup') }}</option>
+              <option value="Health Status Checkup">{{ $t('booking.healthStatusCheckup') }}</option>
+              <option value="Health Consultation">{{ $t('booking.healthConsultation') }}</option>
+              <option value="therapy">{{ $t('booking.therapy') }}</option>
+            </select>
+            <select 
+              v-model="statusFilter"
+              class="w-full sm:w-auto px-2 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors flex-shrink-0"
+              :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
+            >
+              <option value="">{{ $t('booking.allStatus') || 'All Status' }}</option>
+              <option value="pending">{{ $t('booking.pending') }}</option>
+              <option value="confirmed">{{ $t('booking.confirmed') }}</option>
+              <option value="completed">{{ $t('booking.completed') }}</option>
+              <option value="rejected">{{ $t('booking.rejected') }}</option>
+              <option value="cancelled">{{ $t('booking.cancelled') }}</option>
+            </select>
             <input 
               type="text" 
               v-model="searchQuery" 
@@ -23,21 +58,27 @@
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="border-b" :class="[themeClasses.border, themeClasses.background]">
-                  <th class="p-4 font-semibold cursor-pointer hover:opacity-80 whitespace-nowrap" :class="themeClasses.textPrimary" @click="toggleSort('name')">
+                  <th class="p-4 font-semibold whitespace-nowrap" :class="themeClasses.textPrimary">
                     <div class="flex items-center gap-1">
                       {{ $t('booking.patient') }}
-                      <span v-if="sortKey === 'name'" class="text-xs">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
                     </div>
                   </th>
-                  <th class="p-4 font-semibold whitespace-nowrap" :class="themeClasses.textPrimary">{{ $t('booking.service') }}</th>
-                  <th class="p-4 font-semibold cursor-pointer hover:opacity-80 whitespace-nowrap" :class="themeClasses.textPrimary" @click="toggleSort('date')">
+                  <th class="p-4 font-semibold whitespace-nowrap" :class="themeClasses.textPrimary">
+                    <div class="flex items-center gap-1">
+                      {{ $t('booking.service') }}
+                    </div>
+                  </th>
+                  <th class="p-4 font-semibold whitespace-nowrap" :class="themeClasses.textPrimary">
                     <div class="flex items-center gap-1">
                       {{ $t('booking.date') }} & {{ $t('booking.time') }}
-                      <span v-if="sortKey === 'date'" class="text-xs">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
                     </div>
                   </th>
                   <th class="p-4 font-semibold whitespace-nowrap" :class="themeClasses.textPrimary">{{ $t('booking.notes') }}</th>
-                  <th class="p-4 font-semibold whitespace-nowrap" :class="themeClasses.textPrimary">{{ $t('booking.status') }}</th>
+                  <th class="p-4 font-semibold whitespace-nowrap" :class="themeClasses.textPrimary">
+                    <div class="flex items-center gap-1">
+                      {{ $t('booking.status') }}
+                    </div>
+                  </th>
                   <th class="p-4 font-semibold text-right whitespace-nowrap" :class="themeClasses.textPrimary">{{ $t('booking.action') }}</th>
                 </tr>
               </thead>
@@ -181,6 +222,8 @@ const itemsPerPage = 10
 const searchQuery = ref('')
 const sortKey = ref('date')
 const sortOrder = ref('desc')
+const serviceFilter = ref('')
+const statusFilter = ref('')
 
 const toggleSort = (key) => {
   if (sortKey.value === key) {
@@ -191,12 +234,21 @@ const toggleSort = (key) => {
   }
 }
 
-watch([searchQuery, sortKey, sortOrder], () => {
+watch([searchQuery, sortKey, sortOrder, serviceFilter, statusFilter], () => {
   currentPage.value = 1
 })
 
 const filteredBookings = computed(() => {
   let result = bookings.value
+
+  if (serviceFilter.value) {
+    result = result.filter(b => b.service === serviceFilter.value)
+  }
+
+  if (statusFilter.value) {
+    result = result.filter(b => b.status === statusFilter.value)
+  }
+
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(b => {
@@ -216,6 +268,12 @@ const filteredBookings = computed(() => {
     } else if (sortKey.value === 'date') {
       valA = new Date(`${a.date}T${a.time || '00:00'}`).getTime()
       valB = new Date(`${b.date}T${b.time || '00:00'}`).getTime()
+    } else if (sortKey.value === 'service') {
+      valA = (t(`booking.${getServiceKey(a.service)}`) || '').toLowerCase()
+      valB = (t(`booking.${getServiceKey(b.service)}`) || '').toLowerCase()
+    } else if (sortKey.value === 'status') {
+      valA = (t(`booking.${a.status}`) || '').toLowerCase()
+      valB = (t(`booking.${b.status}`) || '').toLowerCase()
     }
     
     if (valA < valB) return sortOrder.value === 'asc' ? -1 : 1

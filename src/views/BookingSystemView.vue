@@ -73,7 +73,7 @@
               <button 
                 @click="toggleSort('date')"
                 class="w-full sm:w-auto px-3 py-2 rounded-lg border flex items-center justify-center gap-1 transition-colors flex-shrink-0"
-                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground, sortKey === 'date' ? 'ring-2 ring-blue-500' : '']"
+                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground]"
                 :title="$t('common.sort') || 'Sort by Date'"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -514,6 +514,7 @@
     "rejectMessage": "您在 {date} {time} 預約的 {service} 已被拒絕。原因：",
     "rejectReasonPrompt": "請填寫拒絕原因：",
     "needHelp": "需要幫助？聯絡您的醫護人員或客服支援",
-    "ChatwithProvider": "與醫護人員聊天"
+    "ChatwithProvider": "與醫護人員聊天",
+    "allServices": "所有服務"
   }
 }

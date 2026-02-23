@@ -499,6 +499,7 @@
     "rejectMessage": "Your booking for {service} on {date} {time} has been rejected. Reason:",
     "rejectReasonPrompt": "Please fill the reject reason:",
     "needHelp": "Need help? Chat with your provider for assistance.",
-    "chatWithProvider": "Chat with your provider"
+    "chatWithProvider": "Chat with your provider",
+    "allServices": "All Services"
   }
 }
