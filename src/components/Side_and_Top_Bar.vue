@@ -220,7 +220,8 @@
                                         :class="isDarkMode ? 'hover:bg-gray-700/70' : 'hover:bg-gray-50'"
                                     >
                                         <div class="flex-shrink-0">
-                                            <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                            <img v-if="unreadIcon" :src="unreadIcon" alt="Sender Icon" class="w-8 h-8 rounded-full object-cover" />
+                                            <div v-else class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                                                 <span class="text-blue-600 dark:text-blue-300 font-bold text-xs">
                                                     {{ (unreadSender || 'S').charAt(0).toUpperCase() }}
                                                 </span>
@@ -416,6 +417,7 @@ const isDesktopSidebarHidden = ref(false)
 const userData = ref(null)
 const unreadCount = ref(0)
 const unreadSender = ref('')
+const unreadIcon = ref('')
 const unreadLastText = ref('')
 const unreadTimestamp = ref('')
 const showNotificationPanel = ref(false)
@@ -530,6 +532,7 @@ const loadUnreadCount = async () => {
             const lastMessage = json?.lastMessage || json?.data?.lastMessage || null
             unreadLastText.value = lastMessage?.text || json?.lastMessageText || json?.data?.lastMessageText || ''
             unreadSender.value = lastMessage?.senderName || lastMessage?.sender || json?.senderName || json?.data?.senderName || ''
+            unreadIcon.value = lastMessage?.senderIcon || lastMessage?.icon || json?.senderIcon || json?.data?.senderIcon || json?.icon || json?.data?.icon || ''
             unreadTimestamp.value = lastMessage?.createdAt || lastMessage?.time || json?.lastMessageCreatedAt || json?.data?.lastMessageCreatedAt || ''
 
             loadedFromEndpoint = true
@@ -547,12 +550,14 @@ const loadUnreadCount = async () => {
             unreadCount.value = 0
             unreadLastText.value = ''
             unreadSender.value = ''
+            unreadIcon.value = ''
             unreadTimestamp.value = ''
         }
     } catch {
         unreadCount.value = 0
         unreadLastText.value = ''
         unreadSender.value = ''
+        unreadIcon.value = ''
         unreadTimestamp.value = ''
     }
 }

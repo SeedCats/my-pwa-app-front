@@ -7,12 +7,12 @@
             <h1 class="text-2xl font-bold mb-2" :class="themeClasses.textPrimary">{{ $t('booking.adminTitle') }}</h1>
             <p :class="themeClasses.textSecondary">{{ $t('booking.adminDesc') }}</p>
           </div>
-          <div class="w-full sm:w-auto">
+          <div class="w-full sm:w-auto flex-shrink-0">
             <input 
               type="text" 
               v-model="searchQuery" 
               :placeholder="$t('common.search') || 'Search...'" 
-              class="w-full sm:w-64 px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+              class="w-full sm:w-64 md:w-80 px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
               :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
             />
           </div>
@@ -143,9 +143,22 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useTheme } from '../../composables/useTheme'
 import { useI18n } from 'vue-i18n'
 import { fetchBookings, updateBooking, deleteBooking } from '../../services/bookingService'
+import { sendAdminChatMessage, fetchCurrentUserProfile } from '../../services/userChatService'
 
 const { themeClasses } = useTheme()
 const { t } = useI18n()
+
+const adminId = ref(null)
+
+const loadProfile = async () => {
+  try {
+    const profile = await fetchCurrentUserProfile()
+    const userData = profile?.data?.user || profile?.data || profile?.user || profile
+    adminId.value = userData?.id || userData?._id || null
+  } catch (error) {
+    console.error('Failed to load admin profile:', error)
+  }
+}
 
 const getServiceKey = (service) => {
   if (!service) return ''
@@ -238,6 +251,7 @@ const loadBookings = async () => {
 }
 
 onMounted(() => {
+  loadProfile()
   loadBookings()
 })
 
@@ -253,12 +267,41 @@ const getStatusClass = (status) => {
 }
 
 const updateStatus = async (id, newStatus) => {
+  let rejectReason = ''
+  if (newStatus === 'rejected') {
+    rejectReason = prompt(t('booking.rejectReasonPrompt') || 'Please fill the reject reason:')
+    if (rejectReason === null) return // User cancelled the prompt
+  }
+
   try {
     const res = await updateBooking(id, { status: newStatus })
     if (res?.success) {
       const booking = bookings.value.find(b => b._id === id || b.id === id)
       if (booking) {
         booking.status = newStatus
+        
+        // Send chat message
+        const userId = booking.userId || booking.patientId || booking.patientID
+        if (userId) {
+          let messageText = ''
+          const serviceName = t(`booking.${getServiceKey(booking.service)}`)
+          const bookingDate = booking.date
+          const bookingTime = booking.time
+
+          if (newStatus === 'confirmed') {
+            messageText = t('booking.approveMessage', { service: serviceName, date: bookingDate, time: bookingTime })
+          } else if (newStatus === 'rejected') {
+            messageText = `${t('booking.rejectMessage', { service: serviceName, date: bookingDate, time: bookingTime })} ${rejectReason}`
+          }
+          
+          if (messageText) {
+            try {
+              await sendAdminChatMessage(userId, messageText, adminId.value)
+            } catch (chatError) {
+              console.error('Failed to send chat message:', chatError)
+            }
+          }
+        }
       }
     } else {
       alert(res?.message || 'Failed to update status')

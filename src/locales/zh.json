@@ -488,6 +488,7 @@
     "upcoming": "即將到來的預約",
     "noUpcoming": "沒有即將到來的預約。",
     "status": "狀態",
+    "allStatus": "所有狀態",
     "pending": "待確認",
     "confirmed": "已確認",
     "cancelled": "已取消",
@@ -509,6 +510,9 @@
     "rejectedSuccess": "預約已拒絕",
     "completedSuccess": "預約已標記為完成",
     "cancelledSuccess": "預約已取消",
+    "approveMessage": "您在 {date} {time} 預約的 {service} 已獲批准。請準時到達。",
+    "rejectMessage": "您在 {date} {time} 預約的 {service} 已被拒絕。原因：",
+    "rejectReasonPrompt": "請填寫拒絕原因：",
     "needHelp": "需要幫助？聯絡您的醫護人員或客服支援",
     "ChatwithProvider": "與醫護人員聊天"
   }

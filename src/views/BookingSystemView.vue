@@ -67,26 +67,38 @@
 
         <!-- Upcoming Appointments -->
         <div class="p-6 rounded-lg shadow-md border flex flex-col" :class="[themeClasses.cardBackground, themeClasses.border]">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
             <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('booking.upcoming') }}</h2>
-            <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
+            <div class="w-full lg:w-auto flex flex-col sm:flex-row gap-2 flex-wrap">
               <button 
-                @click="toggleSort"
-                class="w-full sm:w-auto px-3 py-2 rounded-lg border flex items-center justify-center gap-1 transition-colors"
-                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground]"
+                @click="toggleSort('date')"
+                class="w-full sm:w-auto px-3 py-2 rounded-lg border flex items-center justify-center gap-1 transition-colors flex-shrink-0"
+                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground, sortKey === 'date' ? 'ring-2 ring-blue-500' : '']"
                 :title="$t('common.sort') || 'Sort by Date'"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span v-if="sortOrder === 'asc'">↑</span>
-                <span v-else>↓</span>
+                <span v-if="sortKey === 'date' && sortOrder === 'asc'">↑</span>
+                <span v-else-if="sortKey === 'date'">↓</span>
               </button>
+              <select 
+                v-model="statusFilter"
+                class="w-full sm:w-auto px-2 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors flex-shrink-0"
+                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
+              >
+                <option value="">{{ $t('booking.allStatus') || 'All Status' }}</option>
+                <option value="pending">{{ $t('booking.pending') }}</option>
+                <option value="confirmed">{{ $t('booking.confirmed') }}</option>
+                <option value="completed">{{ $t('booking.completed') }}</option>
+                <option value="rejected">{{ $t('booking.rejected') }}</option>
+                <option value="cancelled">{{ $t('booking.cancelled') }}</option>
+              </select>
               <input 
                 type="text" 
                 v-model="searchQuery" 
                 :placeholder="$t('common.search') || 'Search...'" 
-                class="w-full sm:w-48 px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                class="w-full sm:flex-1 md:w-64 lg:w-48 xl:w-64 px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors min-w-[150px]"
                 :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
               />
             </div>
@@ -206,17 +218,29 @@ const itemsPerPage = 3
 
 const searchQuery = ref('')
 const sortOrder = ref('desc')
+const sortKey = ref('date')
+const statusFilter = ref('')
 
-const toggleSort = () => {
-  sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+const toggleSort = (key) => {
+  if (sortKey.value === key) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortKey.value = key
+    sortOrder.value = 'asc'
+  }
 }
 
-watch([searchQuery, sortOrder], () => {
+watch([searchQuery, sortKey, sortOrder, statusFilter], () => {
   currentPage.value = 1
 })
 
 const filteredBookings = computed(() => {
   let result = bookings.value
+  
+  if (statusFilter.value) {
+    result = result.filter(b => b.status === statusFilter.value)
+  }
+  
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(b => {
@@ -228,12 +252,21 @@ const filteredBookings = computed(() => {
   }
   
   return result.slice().sort((a, b) => {
-    const valA = new Date(`${a.date}T${a.time || '00:00'}`).getTime()
-    const valB = new Date(`${b.date}T${b.time || '00:00'}`).getTime()
-    
-    if (valA < valB) return sortOrder.value === 'asc' ? -1 : 1
-    if (valA > valB) return sortOrder.value === 'asc' ? 1 : -1
-    return 0
+    if (sortKey.value === 'status') {
+      const statusA = (t(`booking.${a.status}`) || '').toLowerCase()
+      const statusB = (t(`booking.${b.status}`) || '').toLowerCase()
+      if (statusA < statusB) return sortOrder.value === 'asc' ? -1 : 1
+      if (statusA > statusB) return sortOrder.value === 'asc' ? 1 : -1
+      return 0
+    } else {
+      // Default to date sorting
+      const valA = new Date(`${a.date}T${a.time || '00:00'}`).getTime()
+      const valB = new Date(`${b.date}T${b.time || '00:00'}`).getTime()
+      
+      if (valA < valB) return sortOrder.value === 'asc' ? -1 : 1
+      if (valA > valB) return sortOrder.value === 'asc' ? 1 : -1
+      return 0
+    }
   })
 })
 

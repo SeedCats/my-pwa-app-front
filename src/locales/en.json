@@ -473,6 +473,7 @@
     "upcoming": "Upcoming Appointments",
     "noUpcoming": "No upcoming appointments.",
     "status": "Status",
+    "allStatus": "All Status",
     "pending": "Pending",
     "confirmed": "Confirmed",
     "cancelled": "Cancelled",
@@ -494,6 +495,9 @@
     "rejectedSuccess": "Booking rejected",
     "completedSuccess": "Booking completed",
     "cancelledSuccess": "Booking cancelled",
+    "approveMessage": "Your booking for {service} on {date} {time} has been approved. Please arrive on time.",
+    "rejectMessage": "Your booking for {service} on {date} {time} has been rejected. Reason:",
+    "rejectReasonPrompt": "Please fill the reject reason:",
     "needHelp": "Need help? Chat with your provider for assistance.",
     "chatWithProvider": "Chat with your provider"
   }
