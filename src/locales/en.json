@@ -500,6 +500,19 @@
     "rejectReasonPrompt": "Please fill the reject reason:",
     "needHelp": "Need help? Chat with your provider for assistance.",
     "chatWithProvider": "Chat with your provider",
-    "allServices": "All Services"
+    "allServices": "All Services",
+    "manageTimeSlots": "Manage Available Time Slots",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "providerAvailability": "Provider Availability",
+    "noTimeSlots": "No available time slots for this provider.",
+    "selectTimeSlot": "Select a time slot"
   }
 }

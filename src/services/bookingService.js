@@ -23,3 +23,14 @@ export const deleteBooking = async (id) => {
     method: 'DELETE'
   })
 }
+
+export const fetchTimeSlots = async (providerId) => {
+  return apiRequest(`/api/booking/timeslots/${providerId}`)
+}
+
+export const updateTimeSlots = async (slots) => {
+  return apiRequest('/api/booking/timeslots', {
+    method: 'POST',
+    body: { slots }
+  })
+}

@@ -5,6 +5,33 @@
         <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('booking.title') }}</h1>
       </div>
 
+      <!-- Provider Availability -->
+      <div v-if="form.provider" class="mb-8 p-6 rounded-lg shadow-md border" :class="[themeClasses.cardBackground, themeClasses.border]">
+        <h2 class="text-xl font-semibold mb-4" :class="themeClasses.textPrimary">{{ $t('booking.providerAvailability') || 'Provider Availability' }}</h2>
+        <div v-if="isLoadingSlots" class="text-center py-4" :class="themeClasses.textSecondary">
+          {{ $t('common.loading') || 'Loading...' }}
+        </div>
+        <div v-else-if="!hasAvailableSlots" class="text-center py-4" :class="themeClasses.textSecondary">
+          {{ $t('booking.noTimeSlots') || 'No available time slots for this provider.' }}
+        </div>
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div v-for="day in daysOfWeek" :key="day.value" v-show="providerTimeSlots[day.value] && providerTimeSlots[day.value].length > 0" class="p-4 rounded border" :class="[themeClasses.background, themeClasses.border]">
+            <h3 class="font-medium mb-2" :class="themeClasses.textPrimary">{{ $t(`booking.days.${day.value}`) || day.label }}</h3>
+            <div class="flex flex-wrap gap-2">
+              <button 
+                v-for="(time, index) in providerTimeSlots[day.value]" 
+                :key="index"
+                @click="selectTimeSlot(day.value, time)"
+                class="px-3 py-1 rounded text-sm transition-colors"
+                :class="isSlotSelected(day.value, time) ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800'"
+              >
+                {{ time }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Booking Form -->
         <div class="p-6 rounded-lg shadow-md border" :class="[themeClasses.cardBackground, themeClasses.border]">
@@ -183,7 +210,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from 'vue-i18n'
-import { fetchBookings, createBooking, updateBooking } from '../services/bookingService'
+import { fetchBookings, createBooking, updateBooking, fetchTimeSlots } from '../services/bookingService'
 import { fetchCurrentUserProfile } from '../services/userChatService'
 
 const { themeClasses } = useTheme()
@@ -286,9 +313,96 @@ const form = ref({
   notes: ''
 })
 
+const daysOfWeek = [
+  { value: 'monday', label: 'Monday' },
+  { value: 'tuesday', label: 'Tuesday' },
+  { value: 'wednesday', label: 'Wednesday' },
+  { value: 'thursday', label: 'Thursday' },
+  { value: 'friday', label: 'Friday' },
+  { value: 'saturday', label: 'Saturday' },
+  { value: 'sunday', label: 'Sunday' }
+]
+
+const providerTimeSlots = ref({})
+const isLoadingSlots = ref(false)
+
+const hasAvailableSlots = computed(() => {
+  return Object.values(providerTimeSlots.value).some(slots => slots && slots.length > 0)
+})
+
+const loadProviderTimeSlots = async (id) => {
+  if (!id) return
+  isLoadingSlots.value = true
+  try {
+    const res = await fetchTimeSlots(id)
+    if (res?.success && res.slots) {
+      providerTimeSlots.value = res.slots
+    } else {
+      providerTimeSlots.value = {}
+    }
+  } catch (error) {
+    console.error('Failed to load time slots:', error)
+    providerTimeSlots.value = {}
+  } finally {
+    isLoadingSlots.value = false
+  }
+}
+
+watch(() => form.value.provider, (newProviderId) => {
+  if (newProviderId) {
+    loadProviderTimeSlots(newProviderId)
+  } else {
+    providerTimeSlots.value = {}
+  }
+})
+
+const selectTimeSlot = (dayValue, time) => {
+  const daysMap = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 }
+  const targetDay = daysMap[dayValue]
+  
+  const today = new Date()
+  const currentDay = today.getDay()
+  
+  let daysToAdd = targetDay - currentDay
+  
+  if (daysToAdd < 0) {
+    daysToAdd += 7
+  } else if (daysToAdd === 0) {
+    // Check if time has passed today
+    const [hours, minutes] = time.split(':').map(Number)
+    const now = new Date()
+    if (now.getHours() > hours || (now.getHours() === hours && now.getMinutes() >= minutes)) {
+      daysToAdd += 7
+    }
+  }
+  
+  const targetDate = new Date(today)
+  targetDate.setDate(today.getDate() + daysToAdd)
+  
+  const year = targetDate.getFullYear()
+  const month = String(targetDate.getMonth() + 1).padStart(2, '0')
+  const day = String(targetDate.getDate()).padStart(2, '0')
+  
+  form.value.date = `${year}-${month}-${day}`
+  form.value.time = time
+}
+
+const isSlotSelected = (dayValue, time) => {
+  if (!form.value.date || !form.value.time) return false
+  
+  const selectedDate = new Date(form.value.date + 'T00:00:00')
+  const daysMap = { 0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday' }
+  const selectedDayValue = daysMap[selectedDate.getDay()]
+  
+  return selectedDayValue === dayValue && form.value.time === time
+}
+
 const minDate = computed(() => {
   const today = new Date()
-  return today.toISOString().split('T')[0]
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 })
 
 const getProviderName = (id) => {
