@@ -42,8 +42,16 @@
                                                         'text-gray-400 hover:bg-gray-800 hover:text-white',
                                                         'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95'
                                                     ]" @click="sidebarOpen = false">
-                                                        <component :is="item.icon" class="size-6 shrink-0"
-                                                            aria-hidden="true" />
+                                                        <div class="relative shrink-0">
+                                                            <component :is="item.icon" class="size-6" aria-hidden="true" />
+                                                            <span
+                                                                v-if="unreadCount > 0 && (item.to === '/chat' || item.to === '/admin/chats')"
+                                                                class="absolute -top-1 -left-1 flex h-2.5 w-2.5"
+                                                            >
+                                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                                            </span>
+                                                        </div>
                                                         {{ item.name }}
                                                     </router-link>
                                                 </li>
@@ -100,7 +108,16 @@
                                             : 'text-gray-400 hover:bg-gray-800 hover:text-white',
                                         'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95'
                                     ]">
-                                        <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
+                                        <div class="relative shrink-0">
+                                            <component :is="item.icon" class="size-6" aria-hidden="true" />
+                                            <span
+                                                v-if="unreadCount > 0 && (item.to === '/chat' || item.to === '/admin/chats')"
+                                                class="absolute -top-1 -left-1 flex h-2.5 w-2.5"
+                                            >
+                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                            </span>
+                                        </div>
                                         {{ item.name }}
                                     </router-link>
                                 </li>

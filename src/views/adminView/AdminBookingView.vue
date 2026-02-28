@@ -7,31 +7,6 @@
           <p :class="themeClasses.textSecondary">{{ $t('booking.adminDesc') }}</p>
         </div>
 
-        <!-- Manage Time Slots -->
-        <div class="mb-8 p-6 rounded-lg shadow-md border" :class="[themeClasses.cardBackground, themeClasses.border]">
-          <h2 class="text-xl font-semibold mb-4" :class="themeClasses.textPrimary">{{ $t('booking.manageTimeSlots') || 'Manage Available Time Slots' }}</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div v-for="day in daysOfWeek" :key="day.value" class="p-4 rounded border" :class="[themeClasses.background, themeClasses.border]">
-              <h3 class="font-medium mb-2" :class="themeClasses.textPrimary">{{ $t(`booking.days.${day.value}`) || day.label }}</h3>
-              <div class="flex flex-wrap gap-2 mb-3">
-                <span v-for="(time, index) in timeSlots[day.value]" :key="index" class="inline-flex items-center px-2 py-1 rounded text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                  {{ time }}
-                  <button @click="removeTimeSlot(day.value, index)" class="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-100">&times;</button>
-                </span>
-              </div>
-              <div class="flex gap-2">
-                <input type="time" v-model="newTimeSlot[day.value]" class="flex-1 p-1 rounded border text-sm outline-none" :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]" />
-                <button @click="addTimeSlot(day.value)" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors">+</button>
-              </div>
-            </div>
-          </div>
-          <div class="mt-4 flex justify-end">
-            <button @click="saveTimeSlots" :disabled="isSavingSlots" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors disabled:opacity-50">
-              {{ isSavingSlots ? ($t('common.loading') || 'Saving...') : ($t('common.apply') || 'Save Time Slots') }}
-            </button>
-          </div>
-        </div>
-
         <div class="flex flex-col sm:flex-row justify-end gap-2 flex-wrap mb-4">
           <button 
             @click="toggleSort('date')"
@@ -207,7 +182,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useTheme } from '../../composables/useTheme'
 import { useI18n } from 'vue-i18n'
-import { fetchBookings, updateBooking, deleteBooking, fetchTimeSlots, updateTimeSlots } from '../../services/bookingService'
+import { fetchBookings, updateBooking, deleteBooking } from '../../services/bookingService'
 import { sendAdminChatMessage, fetchCurrentUserProfile } from '../../services/userChatService'
 
 const { themeClasses } = useTheme()
@@ -215,88 +190,11 @@ const { t } = useI18n()
 
 const adminId = ref(null)
 
-const daysOfWeek = [
-  { value: 'monday', label: 'Monday' },
-  { value: 'tuesday', label: 'Tuesday' },
-  { value: 'wednesday', label: 'Wednesday' },
-  { value: 'thursday', label: 'Thursday' },
-  { value: 'friday', label: 'Friday' },
-  { value: 'saturday', label: 'Saturday' },
-  { value: 'sunday', label: 'Sunday' }
-]
-
-const timeSlots = ref({
-  monday: [],
-  tuesday: [],
-  wednesday: [],
-  thursday: [],
-  friday: [],
-  saturday: [],
-  sunday: []
-})
-
-const newTimeSlot = ref({
-  monday: '',
-  tuesday: '',
-  wednesday: '',
-  thursday: '',
-  friday: '',
-  saturday: '',
-  sunday: ''
-})
-
-const isSavingSlots = ref(false)
-
-const addTimeSlot = (day) => {
-  const time = newTimeSlot.value[day]
-  if (time && !timeSlots.value[day].includes(time)) {
-    timeSlots.value[day].push(time)
-    timeSlots.value[day].sort()
-    newTimeSlot.value[day] = ''
-  }
-}
-
-const removeTimeSlot = (day, index) => {
-  timeSlots.value[day].splice(index, 1)
-}
-
-const loadTimeSlots = async () => {
-  if (!adminId.value) return
-  try {
-    const res = await fetchTimeSlots(adminId.value)
-    if (res?.success && res.slots) {
-      timeSlots.value = { ...timeSlots.value, ...res.slots }
-    }
-  } catch (error) {
-    console.error('Failed to load time slots:', error)
-  }
-}
-
-const saveTimeSlots = async () => {
-  isSavingSlots.value = true
-  try {
-    const res = await updateTimeSlots(timeSlots.value)
-    if (res?.success) {
-      alert('Time slots saved successfully')
-    } else {
-      alert(res?.message || 'Failed to save time slots')
-    }
-  } catch (error) {
-    console.error('Error saving time slots:', error)
-    alert(error.message || 'Failed to save time slots')
-  } finally {
-    isSavingSlots.value = false
-  }
-}
-
 const loadProfile = async () => {
   try {
     const profile = await fetchCurrentUserProfile()
     const userData = profile?.data?.user || profile?.data || profile?.user || profile
     adminId.value = userData?.id || userData?._id || null
-    if (adminId.value) {
-      await loadTimeSlots()
-    }
   } catch (error) {
     console.error('Failed to load admin profile:', error)
   }
