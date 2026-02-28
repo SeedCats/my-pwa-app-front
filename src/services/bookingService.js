@@ -25,11 +25,18 @@ export const deleteBooking = async (id) => {
 }
 
 export const fetchTimeSlots = async (providerId) => {
-  return apiRequest(`/api/booking/timeslots/${providerId}`)
+  return apiRequest(`/api/bookingTimeSlot/${providerId}`)
+}
+
+export const markSlotBooked = async (providerId, date, time, booked = true) => {
+  return apiRequest('/api/bookingTimeSlot/mark-booked', {
+    method: 'PATCH',
+    body: { providerId, date, time, booked }
+  })
 }
 
 export const updateTimeSlots = async (slots) => {
-  return apiRequest('/api/booking/timeslots', {
+  return apiRequest('/api/bookingTimeSlot', {
     method: 'POST',
     body: { slots }
   })

@@ -9,7 +9,8 @@
     "apply": "套用",
     "prev": "上一頁",
     "next": "下一頁",
-    "sort": "排序"
+    "sort": "排序",
+    "refresh": "重新整理"
   },
   "auth": {
     "welcomeBack": "歡迎回來",
@@ -37,7 +38,6 @@
     "providerMessagePlaceholder": "留言（簡要說明需求）",
     "providerSubjectPlaceholder": "主旨（例如：合作、註冊）",
     "fillProviderFields": "請填寫機構/姓名、電子郵件、主旨與留言。",
-
     "providerRequestSuccess": "醫護申請已送出，我們會儘速聯絡您。",
     "providerRequestFailed": "提交申請失敗，請再試一次。",
     "passwordMismatch": "密碼不一致",
@@ -113,7 +113,6 @@
     "todayOverview": "今日心率概括",
     "todayStressOverview": "今日壓力概括",
     "restingHeartRate": "靜止心率",
-
     "maxHeartRate": "最大心率",
     "minHeartRate": "最小心率",
     "averageHeartRate": "平均心率",
@@ -270,7 +269,6 @@
     "emptyCsv": "CSV 檔案為空",
     "missingColumns": "缺少 Key/Value/UpdateTime 欄位",
     "noMatchingKey": "未找到 heart_rate 或 stress 的資料列",
-
     "fillHeightWeight": "請填寫身高與體重",
     "savedSuccessfully": "BMI 資料儲存成功！",
     "updatedSuccessfully": "BMI 資料更新成功！",
@@ -279,7 +277,6 @@
     "deleteBMI": "刪除所有 BMI 紀錄",
     "bmiDeleted": "BMI 資料已刪除",
     "deleteFailed": "刪除資料失敗，請再試一次。",
-
     "invalidCsvSelect": "請選擇有效的 CSV 檔案",
     "invalidCsvDrop": "請拖放有效的 CSV 檔案",
     "noFileSelected": "未選擇檔案",
@@ -290,7 +287,6 @@
     "uploadFailed": "上傳失敗",
     "uploadFailedTry": "上傳失敗，請再試一次。",
     "uploading": "上傳中...",
-
     "uploadStressOnly": "僅上傳壓力資料",
     "uploadHeartOnly": "僅上傳心率資料",
     "uploadedSuccessfullySummary": "上傳並處理完成",
@@ -304,7 +300,6 @@
     "dateDeleted": "該日期的資料已刪除",
     "noDates": "無可用日期",
     "delete": "刪除",
-
     "deleting": "刪除中...",
     "deleteAllConfirm": "您確定要刪除所有心率紀錄嗎？此操作無法復原。",
     "allHeartRateDeleted": "所有心率資料刪除成功！",
@@ -312,10 +307,8 @@
     "deleteAllStressConfirm": "您確定要刪除所有壓力紀錄嗎？此操作無法復原。",
     "allStressDeleted": "所有壓力資料刪除成功！",
     "deleteAllStressRecords": "刪除所有壓力紀錄",
-
     "uploadFile": "上傳檔案",
     "deleteAllRecords": "刪除所有紀錄",
-
     "saving": "儲存中...",
     "updating": "更新中...",
     "save": "儲存",
@@ -443,8 +436,8 @@
         "0": "一個健康的壓力水平應該是多少？",
         "1": "我可以做些什麼來更好地管理壓力？"
       }
-    },   
-    "hourlyStress": "每小時壓力分數：",   
+    },
+    "hourlyStress": "每小時壓力分數：",
     "rename": "重新命名",
     "load": "載入",
     "delete": "刪除",
@@ -513,8 +506,8 @@
     "approveMessage": "您在 {date} {time} 預約的 {service} 已獲批准。請準時到達。",
     "rejectMessage": "您在 {date} {time} 預約的 {service} 已被拒絕。原因：",
     "rejectReasonPrompt": "請填寫拒絕原因：",
+    "chatWithProvider": "與醫護人員聊天",
     "needHelp": "需要幫助？聯絡您的醫護人員或客服支援",
-    "ChatwithProvider": "與醫護人員聊天",
     "allServices": "所有服務",
     "manageTimeSlots": "管理可用時段",
     "days": {
@@ -526,8 +519,40 @@
       "saturday": "星期六",
       "sunday": "星期日"
     },
+    "pickAvailableDate": "選擇可預約日期",
+    "noSlotsForDate": "此日期沒有可用時段。",
+    "loadingSlots": "載入可用時段中…",
+    "noProviderSlots": "此醫護人員尚未設定可用時段。",
+    "availableDates": "可預約日期已展示",
+    "maxTwoSlots": "請選擇1至2個時段",
+    "slotBooked": "已預約",
+    "hasSlots": "已設定時段",
+    "selectedDate": "已選擇",
+    "selectedSlots": "已選 {n} 個時段",
+    "bookingStepService": "服務",
+    "bookingStepDateTime": "日期與時間",
+    "bookingStepNotes": "備註",
+    "bookingSummary": "預約摘要",
+    "noAppointments": "尚未有預約",
+    "noAppointmentsDesc": "使用左方表單預約您的第一個預約。",
     "providerAvailability": "醫護人員可用時段",
     "noTimeSlots": "此醫護人員目前沒有可用時段。",
-    "selectTimeSlot": "選擇一個時段"
+    "selectTimeSlot": "選擇一個時段",
+    "availabilityCalendar": "管理員可用日程表",
+    "availabilityDesc": "選擇日期並設定您為病患提供服務的可用時段",
+    "saveSlots": "儲存時段",
+    "slotsSaved": "時段儲存成功！",
+    "slotsSaveFailed": "儲存時段失敗。",
+    "noDateSelected": "點選日期以管理可用時段。",
+    "toggleAll": "全選/取消",
+    "calDayHeaders": [
+      "日",
+      "一",
+      "二",
+      "三",
+      "四",
+      "五",
+      "六"
+    ]
   }
 }

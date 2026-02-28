@@ -9,7 +9,8 @@
     "apply": "Apply",
     "prev": "Prev",
     "next": "Next",
-    "sort": "Sort"
+    "sort": "Sort",
+    "refresh": "Refresh"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -511,8 +512,32 @@
       "saturday": "Saturday",
       "sunday": "Sunday"
     },
+    "pickAvailableDate": "Select an available date",
+    "noSlotsForDate": "No available time slots for this date.",
+    "loadingSlots": "Loading available slots…",
+    "noProviderSlots": "No availability set by this provider yet.",
+    "availableDates": "Available dates are highlighted",
+    "maxTwoSlots": "Select 1 or 2 time slots",
+    "slotBooked": "Booked",
+    "hasSlots": "Has slots",
+    "selectedDate": "Selected",
+    "selectedSlots": "{n} slot(s) selected",
+    "bookingStepService": "Service",
+    "bookingStepDateTime": "Date & Time",
+    "bookingStepNotes": "Notes",
+    "bookingSummary": "Booking Summary",
+    "noAppointments": "No appointments yet",
+    "noAppointmentsDesc": "Book your first appointment using the form on the left.",
     "providerAvailability": "Provider Availability",
     "noTimeSlots": "No available time slots for this provider.",
-    "selectTimeSlot": "Select a time slot"
+    "selectTimeSlot": "Select a time slot",
+    "availabilityCalendar": "Admin Availability Calendar",
+    "availabilityDesc": "Select a date and set your available time slots for patient bookings",
+    "saveSlots": "Save Time Slots",
+    "slotsSaved": "Time slots saved successfully!",
+    "slotsSaveFailed": "Failed to save time slots.",
+    "noDateSelected": "Click on a date to manage its available time slots.",
+    "toggleAll": "Toggle All",
+    "calDayHeaders": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
   }
 }
