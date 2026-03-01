@@ -48,7 +48,34 @@
     "loginSuccess": "Login successful! Redirecting...",
     "loginFailed": "Login failed. Please check your credentials.",
     "serverConnectionError": "Cannot connect to server. Please check your internet connection.",
-    "networkError": "Network error. Please check your connection and try again."
+    "networkError": "Network error. Please check your connection and try again.",
+    "forgotPassword": "Forgot password?",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "secureLogin": "Secure Login",
+    "sslEncrypted": "SSL Encrypted",
+    "privacyProtected": "Privacy Protected",
+    "providerFormTitle": "Provider Application",
+    "providerFormSubtitle": "Submit a request to join as a healthcare provider",
+    "userTabLabel": "New User",
+    "providerTabLabel": "Healthcare Provider",
+    "nameLabel": "Full Name",
+    "emailLabel": "Email Address",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "providerNameLabel": "Provider / Organisation Name",
+    "providerSubjectLabel": "Subject",
+    "providerMessageLabel": "Message",
+    "providerFormInfo": "Fill in the form below and our team will review your application and reach out via email.",
+    "passwordWeak": "Weak",
+    "passwordFair": "Fair",
+    "passwordGood": "Good",
+    "passwordStrong": "Strong",
+    "fieldRequired": "This field is required",
+    "emailInvalid": "Please enter a valid email address",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "orDivider": "or",
+    "footerNote": "By creating an account you agree to our Terms of Service and Privacy Policy."
   },
   "nav": {
     "title": "Health Monitoring System",
@@ -63,7 +90,20 @@
     "userManagement": "User Management",
     "provider": "Provider",
     "notification": "Notification",
-    "chatNotification": "Chat Notification"
+    "chatNotification": "Chat Notification",
+    "menu": "Menu",
+    "settingsSection": "Settings",
+    "roleAdmin": "Admin",
+    "roleUser": "User",
+    "roleAdministrator": "Administrator",
+    "assignedProvider": "Assigned Provider",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode",
+    "notifications": "Notifications",
+    "newMessages": "New messages",
+    "newCount": "{count} new",
+    "allCaughtUp": "All caught up!",
+    "noNewNotifications": "No new notifications"
   },
   "admin": {
     "description": "Basic administrative panel. Use the links below to manage the system.",
@@ -117,6 +157,10 @@
   },
   "home": {
     "title": "Home",
+    "greeting": "Hello",
+    "healthDashboard": "Your Health Dashboard",
+    "healthScore": "Health Score",
+    "quickActions": "Quick Actions",
     "dataAnalysis": "Data Analysis",
     "todayOverview": "Today Heart Rate Overview",
     "todayStressOverview": "Today Stress Overview",
@@ -155,7 +199,14 @@
       "bpm": "bpm",
       "average": "Average",
       "averageBpm": "Average bpm",
-      "heartRateBpm": "Heart Rate (bpm)"
+      "heartRateBpm": "Heart Rate (bpm)",
+      "rangeTitle": "Heart Rate Ranges",
+      "range": {
+        "low": "Low (Bradycardia): < 60 bpm",
+        "normal": "Normal: 60 ~ 100 bpm",
+        "elevated": "Elevated: 101 ~ 130 bpm",
+        "high": "High (Tachycardia): > 130 bpm"
+      }
     },
     "stress": {
       "title": "Stress",
@@ -247,11 +298,11 @@
     "existingData": "Existing Data",
     "loadingData": "Loading existing data...",
     "age": "Age",
-    "enterAge": "Enter your age",
+    "enterAge": "e.g. 25",
     "height": "Height (cm)",
-    "enterHeight": "Enter your height in cm",
+    "enterHeight": "e.g. 175",
     "weight": "Weight (kg)",
-    "enterWeight": "Enter your weight in kg",
+    "enterWeight": "e.g. 70",
     "updateBMI": "Update BMI",
     "heartRateInfo": "Heart Rate Information",
     "heartRate": "Heart Rate (BPM)",
@@ -322,7 +373,15 @@
     "saving": "Saving...",
     "updating": "Updating...",
     "save": "Save",
-    "update": "Update"
+    "update": "Update",
+    "bmiSubtitle": "Track and manage your body mass index",
+    "uploadSubtitle": "Upload raw CSV health data — the system converts it automatically",
+    "dangerZone": "Danger Zone",
+    "uploadTypeLabel": "Upload Type",
+    "uploadAll": "Heart Rate + Stress",
+    "bmiGauge": "BMI Scale",
+    "bmiMin": "15",
+    "bmiMax": "40"
   },
   "formatSettings": {
     "title": "Settings",
@@ -337,8 +396,11 @@
     "darkModeDesc": "Easy on the eyes in low-light conditions",
     "autoTheme": "Auto Theme",
     "autoThemeDesc": "Automatically switch theme based on system preference",
+    "autoThemeOn": "On",
     "lightMode": "Light Mode",
-    "darkMode": "Dark Mode"
+    "darkMode": "Dark Mode",
+    "language": "Language",
+    "languageDesc": "Choose your preferred display language"
   },
   "userSettings": {
     "title": "Account Settings",
@@ -369,8 +431,15 @@
     "adminCannotDeleteSelf": "Admins cannot delete their own account. Please contact system owner.",
     "profileIcon": "Profile Icon",
     "profileIconDesc": "Upload a picture to personalize your profile.",
+    "uploadIcon": "Upload Photo",
     "removeIcon": "Remove Icon",
-    "cropImage": "Crop Image"
+    "cropImage": "Crop Image",
+    "passwordStrengthWeak": "Weak",
+    "passwordStrengthFair": "Fair",
+    "passwordStrengthStrong": "Strong",
+    "passwordStrengthVeryStrong": "Very Strong",
+    "passwordsMatch": "Passwords match",
+    "passwordsDoNotMatch": "Passwords do not match"
   },
   "aiSupport": {
     "title": "AI Support Chat",
@@ -408,6 +477,7 @@
     "topP": "Top-p",
     "topPDesc": "Alternative sampling parameter (complements temperature).",
     "sendFailed": "Failed to send message. Please try again.",
+    "settingsDescription": "Adjust to customize your experience!",
     "prompts": {
       "bmi": {
         "underweight": {

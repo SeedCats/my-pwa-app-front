@@ -2,11 +2,13 @@
   <div id="app">
     <Sidebar v-if="showSidebar" @update:sidebarState="updateSidebarState" />
     <div :class="[
-      'transition-all duration-300 ease-in-out',
+      'h-screen overflow-hidden flex flex-col transition-all duration-300 ease-in-out',
       showSidebar ? 'pt-16' : '',
       showSidebar && !sidebarHidden ? 'lg:ml-72' : 'lg:ml-0'
     ]">
-      <router-view />
+      <div class="flex-1 min-h-0 overflow-y-auto">
+        <router-view />
+      </div>
     </div>
   </div>
 </template>

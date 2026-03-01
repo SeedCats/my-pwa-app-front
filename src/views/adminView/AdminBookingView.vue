@@ -609,7 +609,7 @@ const filteredBookings = computed(() => {
     })
   }
 
-  const statusPriority = (s) => s === 'pending' ? 0 : s === 'confirmed' ? 1 : 2
+  const statusPriority = (s) => ({ pending: 0, confirmed: 1, completed: 2, rejected: 3, cancelled: 4 }[s] ?? 5)
 
   return result.slice().sort((a, b) => {
     // Active statuses always float to top unless user is explicitly sorting by status

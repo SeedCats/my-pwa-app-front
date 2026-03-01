@@ -1,11 +1,11 @@
 <template>
   <!-- Chat App Container -->
-  <main class="h-[calc(100vh-4rem)] w-full flex flex-col md:flex-row overflow-hidden transition-all duration-300"
+  <main class="h-full w-full flex flex-col md:flex-row overflow-hidden transition-all duration-300"
        :class="[themeClasses.cardBackground]">
 
       <!-- ── Left panel: patient list ─────────────────────────────── -->
         <aside
-          class="flex flex-col w-full md:w-80 lg:w-96 border-r shrink-0 transition-all duration-300 relative z-10 block"
+          class="flex flex-col w-full md:w-60 lg:w-72 border-r shrink-0 transition-all duration-300 relative z-10"
           :class="[themeClasses.border, selectedUser ? 'hidden md:flex' : 'flex', isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50']"
         >
           <!-- Header -->
@@ -331,7 +331,6 @@
                           <div class="flex items-center justify-end gap-1 mt-1 font-medium select-none"
                                :class="message.isUser ? (isDarkMode ? 'text-gray-400' : 'text-gray-400') : (isDarkMode ? 'text-blue-200' : 'text-green-100 sm:text-emerald-700/70')">
                             <span class="text-[10px]">{{ formatMsgTime(message.time).split(' ')[1] || formatMsgTime(message.time) }}</span>
-                            <svg v-if="!message.isUser" class="w-3.5 h-3.5" viewBox="0 0 16 15" fill="none" stroke="currentColor"><path d="M15.01 3.316l-8.49 8.49-3.79-3.791 M10.23 3.316l-4.22 4.22" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                           </div>
                         </div>
                       </div>
@@ -593,12 +592,9 @@ const selectUser = async (user) => {
   messagesLoading.value = true
   errorMessage.value = ''
   try {
-    const response = await fetchAdminChatHistory(user.id, adminId.value)
+    const response = await fetchAdminChatHistory(user.id, user.id)
     messages.value = response?.messages || []
-    receiverIcon.value = response?.receiverIcon || null
-    if (response?.icon) {
-      adminIcon.value = response.icon
-    }
+    receiverIcon.value = response?.receiverIcon || user.icon || null
     
     // Dispatch event to update unread count in top bar
     window.dispatchEvent(new CustomEvent('messagesRead'))
@@ -670,7 +666,7 @@ const sendMessage = async () => {
   clearSelectedFile()
 
   try {
-    const response = await sendAdminChatMessage(selectedUser.value.id, text, adminId.value, file)
+    const response = await sendAdminChatMessage(selectedUser.value.id, text, selectedUser.value.id, file)
     if (response?.message) {
       messages.value.push(response.message)
       scrollToBottom()

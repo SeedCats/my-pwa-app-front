@@ -1,16 +1,17 @@
 <template>
-    <div class="min-h-screen" :class="themeClasses.background">
-        <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-6">
+    <div class="h-full lg:h-auto flex flex-col overflow-hidden lg:overflow-visible" :class="themeClasses.background">
+        <main class="flex-1 lg:flex-none flex flex-col overflow-hidden lg:overflow-visible px-3 sm:px-4 md:px-6 lg:px-8">
             <!-- Header -->
-            <div class="mb-6 pt-4">
-                <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('aiSupport.title') }}</h1>
-                <p class="text-sm mt-2" :class="themeClasses.textSecondary">{{ $t('aiSupport.subtitle') }}
-                </p>
+            <div class="shrink-0 mb-2 pt-3 pb-1 flex items-center justify-between flex-wrap gap-2">
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent">{{ $t('aiSupport.title') }}</h1>
+                    <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('aiSupport.subtitle') }}</p>
+                </div>
             </div>
 
             <!-- Chat Container -->
-            <div class="max-w-9xl mx-auto">
-                <div class="relative">
+            <div class="flex-1 lg:flex-none min-h-0 flex flex-col max-w-7xl mx-auto w-full">
+                <div class="flex-1 lg:flex-none min-h-0 flex flex-col relative">
                     <div class="flex items-center justify-between mb-2 gap-2">
                         <div v-if="showTitle" class="text-base sm:text-lg font-semibold truncate"
                             :class="[themeClasses.textPrimary, isDarkMode ? 'text-white' : 'text-gray-900']">{{
@@ -42,12 +43,12 @@
                                 $t('aiSupport.newChat') }}</button>
                         </div>
                     </div>
-                    <div class="rounded-lg shadow-sm border"
+                    <div class="flex-1 lg:flex-none min-h-0 flex flex-col rounded-2xl shadow-lg border overflow-hidden"
                         :class="[themeClasses.cardBackground, themeClasses.border]">
                         <!-- Chat Messages -->
                         <div ref="chatContainer"
-                            class="h-[60vh] sm:h-[70vh] lg:h-128 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4"
-                            :class="isDarkMode ? 'bg-gray-900' : 'bg-gray-50'">
+                            class="flex-1 min-h-0 lg:min-h-[55vh] lg:max-h-[65vh] overflow-y-auto p-3 sm:p-5 space-y-4 chat-scroll"
+                            :class="isDarkMode ? 'bg-gray-950' : 'bg-gray-50/80'">
                             <!-- Welcome Message -->
                             <div v-if="visibleMessages.length === 0" class="flex items-center justify-center h-full">
                                 <div class="text-center py-8 max-w-2xl mx-auto">
@@ -88,16 +89,24 @@
                             </div>
 
                             <!-- Messages -->
-                            <div v-for="(message, index) in visibleMessages" :key="index" :class="[
-                                'flex',
-                                message && message.role === 'user' ? 'justify-end' : 'justify-start'
-                            ]">
+                            <div v-for="(message, index) in visibleMessages" :key="index"
+                                class="msg-appear flex gap-2"
+                                :class="message && message.role === 'user' ? 'justify-end' : 'justify-start'">
+
+                                <!-- AI Avatar -->
+                                <div v-if="message.role === 'assistant'" class="flex-shrink-0 mt-auto mb-1">
+                                    <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
+                                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                                        </svg>
+                                    </div>
+                                </div>
+
                                 <div :class="[
-                                    'max-w-[85%] sm:max-w-xs lg:max-w-md px-3 sm:px-4 py-2 rounded-lg',
+                                    'max-w-[85%] sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl px-3.5 sm:px-4 py-2.5 shadow-sm',
                                     message.role === 'user'
-                                        ? 'bg-blue-600 text-white rounded-br-none'
-                                        : themeClasses.cardBackground + ' border ' + themeClasses.border + ' rounded-bl-none',
-                                    (message.role !== 'user' && isDarkMode) ? 'text-white' : ''
+                                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl rounded-br-sm'
+                                        : (isDarkMode ? 'bg-gray-800 border border-gray-700 text-white rounded-2xl rounded-bl-sm' : 'bg-white border border-gray-200 text-gray-800 rounded-2xl rounded-bl-sm shadow-sm'),
                                 ]">
                                     <!-- File attachment indicator for user messages -->
                                     <div v-if="message.role === 'user' && message.fileName"
@@ -159,102 +168,123 @@
                                         </div>
                                     </div>
 
-                                    <p class="text-xs mt-3 opacity-70">
+                                    <p class="text-xs mt-2 opacity-50 select-none">
                                         {{ formatTime(message.timestamp) }}
                                     </p>
+                                </div>
+
+                                <!-- User Avatar -->
+                                <div v-if="message.role === 'user'" class="flex-shrink-0 mt-auto mb-1">
+                                    <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-gray-500 to-gray-700 flex items-center justify-center shadow-sm">
+                                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Typing Indicator -->
-                            <div v-if="isTyping" class="flex justify-start">
+                            <div v-if="isTyping" class="flex justify-start gap-2 msg-appear">
+                                <div class="flex-shrink-0 mt-auto mb-1">
+                                    <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
+                                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                                        </svg>
+                                    </div>
+                                </div>
                                 <div :class="[
-                                    'max-w-[85%] sm:max-w-xs lg:max-w-md px-3 sm:px-4 py-2 rounded-lg rounded-bl-none',
-                                    themeClasses.cardBackground,
-                                    themeClasses.border,
-                                    'border'
+                                    'px-4 py-3 rounded-2xl rounded-bl-sm border shadow-sm',
+                                    isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                                 ]">
-                                    <div class="flex items-center space-x-2">
-                                        <div class="flex space-x-1">
-                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                                                style="animation-delay: 0.1s"></div>
-                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                                                style="animation-delay: 0.2s"></div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex gap-1">
+                                            <div class="w-2 h-2 rounded-full bg-blue-400 typing-dot"></div>
+                                            <div class="w-2 h-2 rounded-full bg-blue-400 typing-dot" style="animation-delay:0.15s"></div>
+                                            <div class="w-2 h-2 rounded-full bg-blue-400 typing-dot" style="animation-delay:0.3s"></div>
                                         </div>
-                                        <span class="text-xs text-gray-500">{{ $t('aiSupport.thinking') }}</span>
+                                        <span class="text-xs" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{ $t('aiSupport.thinking') }}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Chat Input -->
-                        <div class="p-2 sm:p-4 border-t" :class="themeClasses.border">
+                        <div class="p-3 sm:p-4 border-t" :class="[themeClasses.border, isDarkMode ? 'bg-gray-900/50' : 'bg-white/80 backdrop-blur-sm']">
                             <!-- Error Message -->
                             <div v-if="errorMessage"
-                                class="mb-3 p-3 rounded-lg text-sm bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                class="mb-3 p-3 rounded-xl text-sm flex items-center gap-2 bg-red-50 text-red-700 border border-red-200">
+                                <svg class="w-4 h-4 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                                </svg>
                                 {{ errorMessage }}
                             </div>
 
                             <input ref="fileInput" type="file" @change="handleFileChange" accept=".txt,.csv,.json,.md"
                                 class="hidden" />
 
-                            <form @submit.prevent="sendMessage" class="flex items-center gap-1 sm:gap-2">
-                                <div v-if="selectedFile" class="flex-shrink-0">
-                                    <div class="inline-flex items-center max-w-[120px] sm:max-w-xs rounded-full px-2 py-1 text-xs border"
-                                        :class="isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-100 border-gray-200 text-gray-800'">
-                                        <svg class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg">
+                            <form @submit.prevent="sendMessage" class="flex flex-col gap-2">
+                                <!-- File chip -->
+                                <div v-if="selectedFile">
+                                    <div class="inline-flex items-center max-w-[180px] sm:max-w-xs rounded-full px-3 py-1.5 text-xs border gap-1.5"
+                                        :class="isDarkMode ? 'bg-blue-900/40 border-blue-700 text-blue-200' : 'bg-blue-50 border-blue-200 text-blue-700'">
+                                        <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="1.8">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M21.44 11.05l-8.49 8.49a5 5 0 01-7.07-7.07l8.49-8.49a3.5 3.5 0 014.95 4.95L10.83 17.83a2 2 0 01-2.83-2.83l8.49-8.49" />
                                         </svg>
-                                        <span class="ml-1 sm:ml-2 truncate text-xs">{{ selectedFile.name
-                                        }}</span>
+                                        <span class="truncate">{{ selectedFile.name }}</span>
                                         <button type="button" @click.prevent="removeSelectedFile"
-                                            class="ml-1 sm:ml-2 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-red-500 flex-shrink-0">✕</button>
+                                            class="flex-shrink-0 hover:text-red-500 transition-colors">✕</button>
                                     </div>
                                 </div>
 
-                                <input v-model="newMessage" type="text" :placeholder="$t('aiSupport.typingPlaceholder')"
-                                    class="flex-1 min-w-0 px-3 py-2 rounded-lg border transition-colors text-sm" :class="[
-                                        themeClasses.cardBackground,
-                                        themeClasses.border,
-                                        isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-800 placeholder-gray-400'
-                                    ]" :disabled="isTyping" @keydown.enter.prevent="sendMessage" />
+                                <!-- Input row -->
+                                <div class="flex items-center gap-2 w-full min-w-0">
+                                    <div class="relative flex-1 min-w-0">
+                                        <input v-model="newMessage" type="text" :placeholder="$t('aiSupport.typingPlaceholder')"
+                                            class="w-full px-4 py-2.5 rounded-2xl border text-sm transition-all focus:outline-none focus:ring-2"
+                                            :class="[
+                                                isDarkMode
+                                                    ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20'
+                                                    : 'bg-gray-100 border-transparent text-gray-800 placeholder-gray-400 focus:bg-white focus:border-blue-300 focus:ring-blue-200'
+                                            ]"
+                                            :disabled="isTyping" @keydown.enter.prevent="sendMessage" />
+                                    </div>
 
-                                <button type="button" @click.prevent="openFilePicker"
-                                    :aria-label="$t('aiSupport.attachFile')" :class="[
-                                        'flex-shrink-0 inline-flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-lg transition-colors border focus:outline-none focus:ring-2 focus:ring-blue-500/30',
-                                        isDarkMode
-                                            ? 'bg-white hover:bg-gray-100 border-gray-200 text-gray-800'
-                                            : 'bg-transparent hover:bg-gray-100 text-gray-700 border-gray-300'
-                                    ]">
-                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="1.8" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M21.44 11.05l-8.49 8.49a5 5 0 01-7.07-7.07l8.49-8.49a3.5 3.5 0 014.95 4.95L10.83 17.83a2 2 0 01-2.83-2.83l8.49-8.49" />
-                                    </svg>
-                                </button>
+                                    <button type="button" @click.prevent="openFilePicker"
+                                        :aria-label="$t('aiSupport.attachFile')"
+                                        :class="[
+                                            'flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30',
+                                            isDarkMode
+                                                ? 'bg-gray-800 border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-700'
+                                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+                                        ]">
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M21.44 11.05l-8.49 8.49a5 5 0 01-7.07-7.07l8.49-8.49a3.5 3.5 0 014.95 4.95L10.83 17.83a2 2 0 01-2.83-2.83l8.49-8.49" />
+                                        </svg>
+                                    </button>
 
-                                <button type="submit" :disabled="!newMessage.trim() || isTyping"
-                                    class="flex-shrink-0 w-10 h-10 sm:w-auto sm:px-5 sm:py-2 rounded-lg font-medium text-white transition-colors inline-flex items-center justify-center"
-                                    :class="newMessage.trim() && !isTyping
-                                        ? 'bg-blue-600 hover:bg-blue-700 active:scale-95'
-                                        : 'bg-gray-400 cursor-not-allowed'">
-                                    <svg v-if="isTyping" class="animate-spin h-5 w-5 sm:h-4 sm:w-4 sm:mr-2"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                            stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                        </path>
-                                    </svg>
-                                    <svg v-else class="w-5 h-5 sm:w-4 sm:h-4 sm:mr-2" fill="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                                    </svg>
-                                    <span class="hidden sm:inline">{{ isTyping ? $t('aiSupport.sending') :
-                                        $t('aiSupport.send') }}</span>
-                                </button>
+                                    <button type="submit" :disabled="!newMessage.trim() || isTyping"
+                                        class="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 sm:w-auto sm:px-5 sm:py-2.5 rounded-xl font-medium text-white transition-all duration-200"
+                                        :class="newMessage.trim() && !isTyping
+                                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-md shadow-blue-500/30 hover:shadow-blue-500/50 active:scale-95'
+                                            : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'">
+                                        <svg v-if="isTyping" class="animate-spin h-5 w-5"
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                            </path>
+                                        </svg>
+                                        <svg v-else class="w-5 h-5 sm:mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                                        </svg>
+                                        <span class="hidden sm:inline text-sm">{{ isTyping ? $t('aiSupport.sending') : $t('aiSupport.send') }}</span>
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -376,7 +406,7 @@
             </div>
 
             <!-- Conversation History Card -->
-            <div class="mt-6 max-w-9xl mx-auto">
+            <div class="shrink-0 mt-2 max-h-[28vh] lg:max-h-none overflow-y-auto lg:overflow-visible max-w-7xl mx-auto w-full pb-2">
                 <div class="rounded-lg shadow-sm border p-4"
                     :class="[themeClasses.cardBackground, themeClasses.border]">
                     <div class="flex items-center justify-between mb-3">
@@ -453,9 +483,9 @@
                             $t('aiSupport.noPastConversations') }}</div>
                         <ul class="space-y-2">
                             <li v-for="(chat, index) in chatList" :key="chat._id"
-                                class="flex items-start justify-between p-2 rounded border"
+                                class="group flex flex-col sm:flex-row sm:items-center gap-2 p-3 rounded-xl border transition-all duration-200 hover:shadow-md"
                                 :data-editing-id="parseId(chat._id || chat.id)"
-                                :class="[themeClasses.cardBackground, themeClasses.border]">
+                                :class="[isDarkMode ? 'bg-gray-800/60 border-gray-700 hover:border-gray-600 hover:bg-gray-800' : 'bg-gray-50 border-gray-200 hover:border-blue-200 hover:bg-white']">
                                 <div class="flex-1 min-w-0">
                                     <div class="font-medium truncate">
                                         <template v-if="editingId === parseId(chat._id || chat.id)">
@@ -475,19 +505,20 @@
                                     <div class="text-xs truncate" :class="isDarkMode ? 'text-white' : 'text-gray-600'">
                                         {{ chatPreviews[index] || '' }}</div>
                                 </div>
-                                <div class="ml-3 flex-shrink-0 flex items-center space-x-2">
+                                <div class="flex-shrink-0 flex flex-wrap items-center gap-1.5 sm:ml-3">
                                     <button @click.prevent="startEditing(chat)" :title="$t('aiSupport.rename')"
-                                        class="px-2 py-1 text-sm rounded bg-gray-100 text-gray-800 hover:bg-gray-200 border">{{ $t('aiSupport.rename') }}</button>
+                                        class="px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all duration-200"
+                                        :class="isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white border border-gray-600' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'">{{ $t('aiSupport.rename') }}</button>
                                     <button @click.prevent="loadChatIntoConversation(chat._id)" :disabled="isChatBusy"
                                         :aria-disabled="isChatBusy"
                                         :title="isChatBusy ? 'Finish current response before loading another chat' : 'Load'"
-                                        :class="isChatBusy ? 'px-2 py-1 text-sm rounded bg-blue-400 text-white cursor-not-allowed' : 'px-2 py-1 text-sm rounded bg-blue-600 text-white'">Load</button>
+                                        :class="isChatBusy ? 'px-2.5 py-1.5 text-xs font-medium rounded-lg bg-blue-300 text-white cursor-not-allowed' : 'px-2.5 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors'">{{ $t('aiSupport.load') }}</button>
                                     <div class="relative">
                                         <button
                                             @click.prevent="confirmDeleteId = confirmDeleteId === parseId(chat._id || chat.id) ? null : parseId(chat._id || chat.id)"
                                             :disabled="isChatBusy" :aria-disabled="isChatBusy"
                                             :title="isChatBusy ? $t('aiSupport.waitForResponse') : $t('common.delete')"
-                                            :class="isChatBusy ? 'px-2 py-1 text-sm rounded bg-red-100 text-red-400 cursor-not-allowed border opacity-50' : 'px-2 py-1 text-sm rounded bg-red-100 text-red-700 hover:bg-red-200 border'">
+                                            :class="isChatBusy ? 'p-1.5 rounded-lg bg-red-50 text-red-300 cursor-not-allowed border border-red-100 opacity-50' : 'p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 border border-red-100 transition-colors'">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -571,7 +602,6 @@
 
 <script setup>
 import { ref, nextTick, computed, onMounted, onBeforeUnmount } from 'vue'
-import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { sendMessageToGrok, sendMessageToGrokWithFile, fetchAichatList, fetchAichatById, createAichat, appendMessagesToAichat, deleteAichat, updateAichatTitle, updateAichatLastMessage } from '../services/grokService'
 import { useI18n } from 'vue-i18n'
@@ -1785,23 +1815,47 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.animate-bounce {
-    animation: bounce 1.4s infinite ease-in-out both;
+/* ============ Message entrance animation ============ */
+@keyframes msgSlideIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.msg-appear {
+    animation: msgSlideIn 0.22s ease-out both;
 }
 
-.animate-bounce:nth-child(1) {
-    animation-delay: -0.32s;
+/* ============ Typing indicator dots ============ */
+@keyframes typingPulse {
+    0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+    40%            { transform: scale(1);   opacity: 1; }
+}
+.typing-dot {
+    animation: typingPulse 1.2s infinite ease-in-out both;
 }
 
-.animate-bounce:nth-child(2) {
-    animation-delay: -0.16s;
+/* ============ Custom scrollbar for chat window ============ */
+.chat-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99,102,241,0.25) transparent;
+}
+.chat-scroll::-webkit-scrollbar {
+    width: 5px;
+}
+.chat-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+.chat-scroll::-webkit-scrollbar-thumb {
+    background: rgba(99,102,241,0.3);
+    border-radius: 99px;
+}
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(99,102,241,0.55);
 }
 
-/* Small click animation and consistent button look for history header */
+/* ============ Button utilities ============ */
 .btn-ux {
     transition: transform 120ms ease, box-shadow 120ms ease;
 }
-
 .btn-ux:active {
     transform: scale(0.96);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
@@ -1813,13 +1867,19 @@ onBeforeUnmount(() => {
     padding-right: 0.6rem;
     box-shadow: 0 6px 18px rgba(13, 42, 148, 0.06);
 }
-
 .btn-ux-fancy:hover {
     transform: translateY(-2px);
 }
-
 .btn-ux-fancy:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+}
+
+/* ============ Gradient text clip ============ */
+.gradient-text {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 </style>

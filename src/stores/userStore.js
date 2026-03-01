@@ -83,9 +83,9 @@ export const getCachedStressRecord = (date) => {
 }
 export const setCachedStressRecord = (date, record) => setLS(`stress:${date}`, { ts: Date.now(), record })
 
-export const invalidateBmiCache = () => { state.bmiData = null; state.lastBmiLoad = 0 }
-export const invalidateHeartRateCache = () => { state.heartRateDates = null; state.lastHeartRateDatesLoad = 0 }
-export const invalidateStressCache = () => { state.stressDates = null; state.lastStressDatesLoad = 0 }
+export const invalidateBmiCache = () => { state.bmiData = null; state.lastBmiLoad = 0; removeLS('bmiData') }
+export const invalidateHeartRateCache = () => { state.heartRateDates = null; state.lastHeartRateDatesLoad = 0; removeLS('heartRateDates') }
+export const invalidateStressCache = () => { state.stressDates = null; state.lastStressDatesLoad = 0; removeLS('stressDates') }
 
 export const clearAllCaches = () => {
   Object.assign(state, { isAuthenticated: null, user: null, bmiData: null, heartRateDates: null, stressDates: null, lastAuthCheck: 0, lastBmiLoad: 0, lastHeartRateDatesLoad: 0, lastStressDatesLoad: 0 })

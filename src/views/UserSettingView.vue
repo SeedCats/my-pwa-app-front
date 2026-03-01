@@ -1,79 +1,120 @@
 <template>
   <div class="min-h-screen" :class="themeClasses.background">
-    <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-8">
+    <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-12">
 
       <!-- Admin banner when editing another user's settings -->
-      <div v-if="isViewingOtherUser" class="mb-4 p-3 rounded-md text-sm"
-        :class="[themeClasses.border, isDarkMode ? 'bg-gray-800 text-white' : 'bg-blue-50 text-blue-900']">
-        <div class="flex items-center justify-between">
-          <div>
-            <strong class="mr-2">{{ $t('home.viewingUser') }}</strong>
-            <span>
-              <template v-if="displayedUserEmail">{{ displayedUserEmail }}</template> <template v-else>{{ viewedUserId
-                }}</template>
-            </span>
+      <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0">
+        <div v-if="isViewingOtherUser" class="mb-6 rounded-xl border shadow-sm overflow-hidden"
+          :class="isDarkMode ? 'bg-indigo-900/40 border-indigo-700' : 'bg-indigo-50 border-indigo-200'">
+          <div class="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                :class="isDarkMode ? 'bg-indigo-700' : 'bg-indigo-100'">
+                <svg class="w-4 h-4" :class="isDarkMode ? 'text-indigo-300' : 'text-indigo-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-medium uppercase tracking-wide" :class="isDarkMode ? 'text-indigo-400' : 'text-indigo-500'">{{ $t('home.viewingUser') }}</p>
+                <p class="text-sm font-semibold truncate" :class="isDarkMode ? 'text-white' : 'text-indigo-900'">
+                  <template v-if="displayedUserEmail">{{ displayedUserEmail }}</template>
+                  <template v-else>{{ viewedUserId }}</template>
+                </p>
+              </div>
+            </div>
+            <button @click="goBackToUserManagement"
+              class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+              :class="isDarkMode ? 'bg-indigo-700 hover:bg-indigo-600 text-white' : 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700'">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              {{ $t('home.returnToUserManagement') }}
+            </button>
           </div>
-          <div class="flex items-center gap-2">
-            <button @click="goBackToUserManagement" class="underline text-sm">{{ $t('home.returnToUserManagement')
-              }}</button>
+        </div>
+      </transition>
+
+      <!-- Header -->
+      <div class="mb-8 pt-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md">
+            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('userSettings.title') }}</h1>
+            <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.subtitle') }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Header -->
-      <div class="mb-8 pt-4">
-        <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('userSettings.title') }}</h1>
-        <p class="mt-2 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.subtitle') }}</p>
-      </div>
-
       <!-- Success/Error Messages -->
-      <div v-if="successMessage" class="mb-6 p-4 rounded-lg"
-        :class="isDarkMode ? 'bg-green-900 border border-green-700' : 'bg-green-50 border border-green-200'">
-        <p class="text-sm" :class="isDarkMode ? 'text-green-200' : 'text-green-600'">{{ successMessage }}</p>
-      </div>
+      <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-200" leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+        <div v-if="successMessage" class="mb-6 p-4 rounded-xl border flex items-start gap-3"
+          :class="isDarkMode ? 'bg-green-900/50 border-green-700' : 'bg-green-50 border-green-200'">
+          <div class="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5" :class="isDarkMode ? 'bg-green-700' : 'bg-green-200'">
+            <svg class="w-3 h-3" :class="isDarkMode ? 'text-green-300' : 'text-green-700'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+          </div>
+          <p class="text-sm flex-1" :class="isDarkMode ? 'text-green-200' : 'text-green-700'">{{ successMessage }}</p>
+        </div>
+      </transition>
 
-      <div v-if="errorMessage" class="mb-6 p-4 rounded-lg"
-        :class="isDarkMode ? 'bg-red-900 border border-red-700' : 'bg-red-50 border border-red-200'">
-        <p class="text-sm" :class="isDarkMode ? 'text-red-200' : 'text-red-600'">{{ errorMessage }}</p>
-      </div>
+      <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-200" leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+        <div v-if="errorMessage" class="mb-6 p-4 rounded-xl border flex items-start gap-3"
+          :class="isDarkMode ? 'bg-red-900/50 border-red-700' : 'bg-red-50 border-red-200'">
+          <div class="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5" :class="isDarkMode ? 'bg-red-700' : 'bg-red-200'">
+            <svg class="w-3 h-3" :class="isDarkMode ? 'text-red-300' : 'text-red-700'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+          </div>
+          <p class="text-sm flex-1" :class="isDarkMode ? 'text-red-200' : 'text-red-700'">{{ errorMessage }}</p>
+        </div>
+      </transition>
 
-      <div class="space-y-8">
+      <div class="space-y-6">
         <!-- Profile Information -->
-        <div class="shadow-sm rounded-lg border" :class="[themeClasses.cardBackground, themeClasses.border]">
-          <div class="px-6 py-4 border-b" :class="themeClasses.border">
-            <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('userSettings.profile') }}</h2>
-            <p class="mt-1 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.profileDesc') }}</p>
+        <div class="shadow-sm rounded-xl border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
+          <div class="px-6 py-5 border-b flex items-center gap-3" :class="themeClasses.border">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" :class="isDarkMode ? 'bg-indigo-900 text-indigo-400' : 'bg-indigo-50 text-indigo-600'">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+            </div>
+            <div>
+              <h2 class="text-base sm:text-lg font-semibold" :class="themeClasses.textPrimary">{{ $t('userSettings.profile') }}</h2>
+              <p class="text-xs sm:text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.profileDesc') }}</p>
+            </div>
           </div>
 
           <form @submit.prevent="updateProfile" class="p-6 space-y-6">
             <!-- Profile Icon -->
-            <div class="flex items-center gap-6 mb-6">
-              <div class="relative group cursor-pointer" @click="triggerIconUpload">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 mb-6 p-4 rounded-xl" :class="isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'">
+              <div class="relative group cursor-pointer flex-shrink-0" @click="triggerIconUpload">
                 <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0 scale-90" enter-to-class="opacity-100 scale-100" mode="out-in">
-                  <img v-if="profileForm.icon" :key="profileForm.icon" :src="profileForm.icon" class="w-24 h-24 rounded-full object-cover border-2 shadow-sm transition-all duration-200 group-hover:brightness-75" :class="themeClasses.border" />
-                  <div v-else class="w-24 h-24 rounded-full flex items-center justify-center border-2 border-dashed transition-colors duration-200" :class="[themeClasses.border, themeClasses.textSecondary, 'group-hover:border-indigo-500 group-hover:text-indigo-500']">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  <img v-if="profileForm.icon" :key="profileForm.icon" :src="profileForm.icon" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 shadow-lg transition-all duration-200" :class="isDarkMode ? 'border-gray-600' : 'border-white'" />
+                  <div v-else class="w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border-2 border-dashed transition-colors duration-200" :class="[themeClasses.border, themeClasses.textSecondary, 'group-hover:border-indigo-500 group-hover:text-indigo-500']">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   </div>
                 </transition>
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-black/30">
-                  <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                </div>
-                <button type="button" class="absolute bottom-0 right-0 bg-indigo-600 text-white p-1.5 rounded-full shadow-md transition-transform duration-200 group-hover:scale-110 group-active:scale-95">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                <button type="button" class="absolute bottom-1 right-1 bg-indigo-600 text-white p-1.5 rounded-full shadow-lg border-2 transition-all duration-200 group-hover:scale-110 group-active:scale-95" :class="isDarkMode ? 'border-gray-700' : 'border-white'">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </button>
                 <input type="file" ref="iconInput" class="hidden" accept="image/*" @change="onIconSelected" />
               </div>
-              <div>
-                <h3 class="text-sm font-medium" :class="themeClasses.textPrimary">{{ $t('userSettings.profileIcon') || 'Profile Icon' }}</h3>
-                <p class="text-xs mt-1" :class="themeClasses.textSecondary">{{ $t('userSettings.profileIconDesc') || 'Upload a picture to personalize your profile.' }}</p>
-                <button v-if="profileForm.icon" type="button" @click="removeIcon" class="mt-3 inline-flex items-center px-3 py-1.5 border border-red-200 text-xs font-medium rounded-md text-red-600 bg-red-50 hover:bg-red-100 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/50">
-                  <svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  {{ $t('userSettings.removeIcon') || 'Remove Icon' }}
-                </button>
+              <div class="text-center sm:text-left">
+                <h3 class="text-sm font-semibold" :class="themeClasses.textPrimary">{{ $t('userSettings.profileIcon') }}</h3>
+                <p class="text-xs mt-1 leading-relaxed" :class="themeClasses.textSecondary">{{ $t('userSettings.profileIconDesc') }}</p>
+                <div class="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
+                  <button type="button" @click="triggerIconUpload"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 border text-xs font-medium rounded-lg transition-all duration-200"
+                    :class="isDarkMode ? 'border-gray-600 text-gray-300 bg-gray-700 hover:bg-gray-600' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    {{ $t('userSettings.uploadIcon') }}
+                  </button>
+                  <button v-if="profileForm.icon" type="button" @click="removeIcon"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 border text-xs font-medium rounded-lg transition-all duration-200"
+                    :class="isDarkMode ? 'border-red-800 text-red-400 bg-red-900/30 hover:bg-red-900/50' : 'border-red-200 text-red-600 bg-red-50 hover:bg-red-100'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    {{ $t('userSettings.removeIcon') }}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <!-- Name -->
               <div>
                 <label for="name" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{
@@ -95,16 +136,14 @@
               </div>
             </div>
 
-            <div class="flex justify-end pt-4">
+            <div class="flex flex-col sm:flex-row sm:justify-end gap-3 pt-2">
               <button type="submit" :disabled="profileLoading"
-                class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105">
-                <svg v-if="profileLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none"
-                  viewBox="0 0 24 24">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md active:scale-95">
+                <svg v-if="profileLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                  </path>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
+                <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                 {{ profileLoading ? $t('userSettings.updating') : $t('userSettings.updateProfile') }}
               </button>
             </div>
@@ -112,66 +151,111 @@
         </div>
 
         <!-- Change Password -->
-        <div class="shadow-sm rounded-lg border" :class="[themeClasses.cardBackground, themeClasses.border]">
-          <div class="px-6 py-4 border-b" :class="themeClasses.border">
-            <h2 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('userSettings.changePassword') }}
-            </h2>
-            <p class="mt-1 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.changePasswordDesc') }}</p>
+        <div class="shadow-sm rounded-xl border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
+          <div class="px-6 py-5 border-b flex items-center gap-3" :class="themeClasses.border">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" :class="isDarkMode ? 'bg-amber-900/50 text-amber-400' : 'bg-amber-50 text-amber-600'">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+            </div>
+            <div>
+              <h2 class="text-base sm:text-lg font-semibold" :class="themeClasses.textPrimary">{{ $t('userSettings.changePassword') }}</h2>
+              <p class="text-xs sm:text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.changePasswordDesc') }}</p>
+            </div>
           </div>
 
           <!-- Admin notice when editing another user -->
           <div v-if="isViewingOtherUser" class="px-6 pt-4 pb-2">
-            <div class="p-3 rounded-md text-sm"
-              :class="isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-50 text-blue-900'">
-              <strong>{{ $t('home.adminNote') }}:</strong> {{ $t('home.adminPasswordNote') }}
+            <div class="p-3 rounded-lg text-sm flex items-start gap-2"
+              :class="isDarkMode ? 'bg-blue-900/50 border border-blue-700 text-blue-200' : 'bg-blue-50 border border-blue-200 text-blue-800'">
+              <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span><strong>{{ $t('home.adminNote') }}:</strong> {{ $t('home.adminPasswordNote') }}</span>
             </div>
           </div>
 
-          <form @submit.prevent="updatePassword" class="p-6 space-y-6">
-            <div class="grid grid-cols-1 gap-6">
+          <form @submit.prevent="updatePassword" class="p-6 space-y-5">
+            <div class="grid grid-cols-1 gap-5">
               <!-- Current Password (only shown when user is editing their own password) -->
               <div v-if="!isViewingOtherUser">
                 <label for="current-password" class="block text-sm font-medium mb-2"
                   :class="themeClasses.textPrimary">{{
                     $t('userSettings.currentPassword') }}</label>
-                <input type="password" id="current-password" v-model="passwordForm.currentPassword" :class="[
-                  'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
-                  isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
-                ]" :placeholder="$t('userSettings.currentPasswordPlaceholder')" required />
+                <div class="relative">
+                  <input :type="showCurrentPassword ? 'text' : 'password'" id="current-password" v-model="passwordForm.currentPassword" :class="[
+                    'block w-full px-3 py-2.5 pr-10 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
+                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                  ]" :placeholder="$t('userSettings.currentPasswordPlaceholder')" required />
+                  <button type="button" @click="showCurrentPassword = !showCurrentPassword"
+                    class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                    <svg v-if="!showCurrentPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                  </button>
+                </div>
               </div>
 
               <!-- New Password -->
-              <div>
-                <label for="new-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{
+              <div class="space-y-1.5">
+                <label for="new-password" class="block text-sm font-medium" :class="themeClasses.textPrimary">{{
                   $t('userSettings.newPassword') }}</label>
-                <input type="password" id="new-password" v-model="passwordForm.newPassword" :class="[
-                  'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
-                  isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
-                ]" :placeholder="$t('userSettings.newPasswordPlaceholder')" required />
+                <div class="relative">
+                  <input :type="showNewPassword ? 'text' : 'password'" id="new-password" v-model="passwordForm.newPassword" :class="[
+                    'block w-full px-3 py-2.5 pr-10 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
+                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                  ]" :placeholder="$t('userSettings.newPasswordPlaceholder')" required />
+                  <button type="button" @click="showNewPassword = !showNewPassword"
+                    class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                    <svg v-if="!showNewPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                  </button>
+                </div>
+                <!-- Password strength indicator -->
+                <div v-if="passwordForm.newPassword" class="mt-2 space-y-1">
+                  <div class="flex gap-1">
+                    <div v-for="i in 4" :key="i" class="h-1 flex-1 rounded-full transition-all duration-300"
+                      :class="i <= passwordStrength.score ? passwordStrength.barColor : (isDarkMode ? 'bg-gray-600' : 'bg-gray-200')"></div>
+                  </div>
+                  <p class="text-xs font-medium" :class="passwordStrength.textColor">{{ passwordStrength.label }}</p>
+                </div>
               </div>
 
               <!-- Confirm New Password -->
-              <div>
-                <label for="confirm-password" class="block text-sm font-medium mb-2"
+              <div class="space-y-1.5">
+                <label for="confirm-password" class="block text-sm font-medium"
                   :class="themeClasses.textPrimary">{{
                     $t('userSettings.confirmNewPassword') }}</label>
-                <input type="password" id="confirm-password" v-model="passwordForm.confirmPassword" :class="[
-                  'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
-                  isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
-                ]" :placeholder="$t('userSettings.confirmPasswordPlaceholder')" required />
+                <div class="relative">
+                  <input :type="showConfirmPassword ? 'text' : 'password'" id="confirm-password" v-model="passwordForm.confirmPassword" :class="[
+                    'block w-full px-3 py-2.5 pr-10 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200',
+                    passwordMatchState === 'match' ? 'border-green-500 focus:ring-green-500 focus:border-green-500' :
+                    passwordMatchState === 'mismatch' ? 'border-red-500 focus:ring-red-500 focus:border-red-500' :
+                    'focus:ring-indigo-500 focus:border-indigo-500',
+                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                  ]" :placeholder="$t('userSettings.confirmPasswordPlaceholder')" required />
+                  <button type="button" @click="showConfirmPassword = !showConfirmPassword"
+                    class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                    <svg v-if="!showConfirmPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                  </button>
+                </div>
+                <transition enter-active-class="transition duration-200" enter-from-class="opacity-0 -translate-y-1" enter-to-class="opacity-100 translate-y-0">
+                  <p v-if="passwordMatchState === 'match'" class="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                    {{ $t('userSettings.passwordsMatch') }}
+                  </p>
+                  <p v-else-if="passwordMatchState === 'mismatch'" class="text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                    {{ $t('userSettings.passwordsDoNotMatch') }}
+                  </p>
+                </transition>
               </div>
             </div>
 
-            <div class="flex justify-end pt-4">
+            <div class="flex flex-col sm:flex-row sm:justify-end gap-3 pt-2">
               <button type="submit" :disabled="passwordLoading"
-                class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105">
-                <svg v-if="passwordLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none"
-                  viewBox="0 0 24 24">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md active:scale-95">
+                <svg v-if="passwordLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                  </path>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
+                <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 {{ passwordLoading ? $t('userSettings.updating') : $t('userSettings.updatePassword') }}
               </button>
             </div>
@@ -179,65 +263,84 @@
         </div>
 
         <!-- Delete Account -->
-        <div class="shadow-sm rounded-lg border"
-          :class="isDarkMode ? 'bg-gray-800 border-red-600' : 'bg-white border-red-200'">
-          <div class="px-6 py-4 border-b" :class="isDarkMode ? 'border-red-600' : 'border-red-200'">
-            <h2 class="text-xl font-semibold text-red-600">{{ $t('userSettings.deleteAccount') }}</h2>
-            <p class="mt-1 text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.deleteAccountWarning') }}
-            </p>
+        <div class="shadow-sm rounded-xl border overflow-hidden"
+          :class="isDarkMode ? 'bg-gray-800 border-red-800' : 'bg-white border-red-200'">
+          <div class="px-6 py-5 border-b flex items-center gap-3" :class="isDarkMode ? 'border-red-800' : 'border-red-200'">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" :class="isDarkMode ? 'bg-red-900/60 text-red-400' : 'bg-red-50 text-red-600'">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </div>
+            <div>
+              <h2 class="text-base sm:text-lg font-semibold text-red-600">{{ $t('userSettings.deleteAccount') }}</h2>
+              <p class="text-xs sm:text-sm" :class="themeClasses.textSecondary">{{ $t('userSettings.deleteAccountWarning') }}</p>
+            </div>
           </div>
 
           <div class="p-6">
             <!-- Admin warning when trying to delete own account -->
             <div v-if="userState.user && userState.user.role === 'admin' && !isViewingOtherUser"
-              class="mb-4 p-3 rounded-md text-sm"
-              :class="isDarkMode ? 'bg-red-900 text-red-200' : 'bg-red-50 text-red-900'">
-              <strong>{{ $t('userSettings.adminCannotDeleteSelf') }}</strong>
+              class="flex items-start gap-3 p-4 rounded-xl border"
+              :class="isDarkMode ? 'bg-red-900/40 border-red-800 text-red-300' : 'bg-red-50 border-red-200 text-red-800'">
+              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <strong class="text-sm">{{ $t('userSettings.adminCannotDeleteSelf') }}</strong>
             </div>
 
-            <div v-else class="max-w-full text-sm mb-4" :class="themeClasses.textSecondary">
-              <p>{{ $t('userSettings.deleteAccountDesc') }}</p>
-            </div>
+            <div v-else class="space-y-4">
+              <div class="flex items-start gap-3 p-4 rounded-xl border"
+                :class="isDarkMode ? 'bg-red-900/20 border-red-900 text-red-300' : 'bg-red-50 border-red-100 text-red-700'">
+                <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <p class="text-sm">{{ $t('userSettings.deleteAccountDesc') }}</p>
+              </div>
 
-            <!-- Password confirmation input (appears when delete is clicked and user is not admin viewing other user) -->
-            <div v-if="showDeletePassword && !isViewingOtherUser" class="mb-4">
-              <label for="delete-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">
-                {{ $t('userSettings.enterPasswordToConfirmDeletion') }}
-              </label>
-              <input type="password" id="delete-password" v-model="deletePassword" :class="[
-                'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200',
-                isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
-              ]" :placeholder="$t('userSettings.enterPasswordToConfirmDeletion')" @keyup.enter="deleteAccount" />
-            </div>
+              <!-- Password confirmation input -->
+              <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0">
+                <div v-if="showDeletePassword && !isViewingOtherUser">
+                  <label for="delete-password" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">
+                    {{ $t('userSettings.enterPasswordToConfirmDeletion') }}
+                  </label>
+                  <div class="relative">
+                    <input :type="showDeletePasswordField ? 'text' : 'password'" id="delete-password" v-model="deletePassword" :class="[
+                      'block w-full px-3 py-2.5 pr-10 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200',
+                      isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                    ]" :placeholder="$t('userSettings.enterPasswordToConfirmDeletion')" @keyup.enter="deleteAccount" />
+                    <button type="button" @click="showDeletePasswordField = !showDeletePasswordField"
+                      class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                      <svg v-if="!showDeletePasswordField" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                    </button>
+                  </div>
+                </div>
+              </transition>
 
-            <div class="flex gap-3">
-              <button
-                v-if="!showDeletePassword && !(userState.user && userState.user.role === 'admin' && !isViewingOtherUser)"
-                @click="showDeletePassword = true"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                {{ $t('userSettings.deleteAccount') }}
-              </button>
-
-              <template v-if="showDeletePassword">
-                <button @click="deleteAccount"
-                  :disabled="deleteLoading || (!isViewingOtherUser && !deletePassword.trim())"
-                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                  <svg v-if="deleteLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none"
-                    viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                    </path>
-                  </svg>
-                  {{ deleteLoading ? $t('userSettings.deleting') : $t('userSettings.confirmDelete') }}
+              <div class="flex flex-wrap gap-3">
+                <button
+                  v-if="!showDeletePassword && !(userState.user && userState.user.role === 'admin' && !isViewingOtherUser)"
+                  @click="showDeletePassword = true"
+                  class="inline-flex items-center gap-2 px-4 py-2.5 border text-sm font-medium rounded-xl transition-all duration-200 active:scale-95"
+                  :class="isDarkMode ? 'border-red-800 text-red-400 bg-red-900/30 hover:bg-red-900/50' : 'border-red-200 text-red-700 bg-red-50 hover:bg-red-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  {{ $t('userSettings.deleteAccount') }}
                 </button>
 
-                <button @click="showDeletePassword = false; deletePassword = ''"
-                  class="inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  :class="isDarkMode ? 'border-gray-600 text-gray-300 bg-gray-700 hover:bg-gray-600' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'">
-                  {{ $t('common.close') }}
-                </button>
-              </template>
+                <template v-if="showDeletePassword">
+                  <button @click="deleteAccount"
+                    :disabled="deleteLoading || (!isViewingOtherUser && !deletePassword.trim())"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 border border-transparent text-sm font-medium rounded-xl text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-95">
+                    <svg v-if="deleteLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    {{ deleteLoading ? $t('userSettings.deleting') : $t('userSettings.confirmDelete') }}
+                  </button>
+
+                  <button @click="showDeletePassword = false; deletePassword = ''"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 border text-sm font-medium rounded-xl focus:outline-none transition-all duration-200 active:scale-95"
+                    :class="isDarkMode ? 'border-gray-600 text-gray-300 bg-gray-700 hover:bg-gray-600' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    {{ $t('common.cancel') }}
+                  </button>
+                </template>
+              </div>
             </div>
           </div>
         </div>
@@ -288,6 +391,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useTheme } from '../composables/useTheme'
 import { getUserById, updateUserById, deleteUserById, updateUserPasswordById } from '../services/adminService'
 import { useUserStore } from '../stores/userStore'
@@ -296,12 +400,46 @@ const router = useRouter()
 const route = useRoute()
 const userState = useUserStore()
 const { isDarkMode, themeClasses } = useTheme()
+const { t } = useI18n()
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 // State
 const profileForm = ref({ name: '', email: '', icon: '' })
 const targetUserId = ref(null)
 const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
+
+// Password visibility toggles
+const showCurrentPassword = ref(false)
+const showNewPassword = ref(false)
+const showConfirmPassword = ref(false)
+const showDeletePasswordField = ref(false)
+
+// Password strength computed
+const passwordStrength = computed(() => {
+  const pw = passwordForm.value.newPassword
+  if (!pw) return { score: 0, label: '', barColor: '', textColor: '' }
+  let score = 0
+  if (pw.length >= 8) score++
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++
+  if (/[0-9]/.test(pw)) score++
+  if (/[^A-Za-z0-9]/.test(pw)) score++
+  const meta = [
+    { label: t('userSettings.passwordStrengthWeak'), barColor: 'bg-red-500', textColor: 'text-red-500 dark:text-red-400' },
+    { label: t('userSettings.passwordStrengthFair'), barColor: 'bg-yellow-500', textColor: 'text-yellow-500 dark:text-yellow-400' },
+    { label: t('userSettings.passwordStrengthStrong'), barColor: 'bg-blue-500', textColor: 'text-blue-500 dark:text-blue-400' },
+    { label: t('userSettings.passwordStrengthVeryStrong'), barColor: 'bg-green-500', textColor: 'text-green-500 dark:text-green-400' },
+  ]
+  const m = meta[Math.max(0, score - 1)]
+  return { score, ...m }
+})
+
+// Password match state
+const passwordMatchState = computed(() => {
+  const np = passwordForm.value.newPassword
+  const cp = passwordForm.value.confirmPassword
+  if (!cp) return 'idle'
+  return np === cp ? 'match' : 'mismatch'
+})
 
 // Cropper State
 const iconInput = ref(null)

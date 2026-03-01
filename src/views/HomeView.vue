@@ -1,313 +1,382 @@
 <template>
   <div class="min-h-full" :class="themeClasses.background">
-      <main class="px-3 sm:px-4 md:px-6 lg:px-6 pb-4">
+    <main class="px-3 sm:px-4 md:px-6 lg:px-8 pb-10 w-full">
 
-        <!-- Banner shown to admins when viewing another user's home -->
-        <div v-if="isViewingOtherUser" class="mb-4 p-3 rounded-md text-sm" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800 text-white' : 'bg-blue-50 text-blue-900']">
-          <div class="flex items-center justify-between">
-            <div>
-              <strong class="mr-2">{{ $t('home.viewingUser') }}</strong>
-              <span>
+      <!-- ── Admin: viewing another user banner ── -->
+      <div v-if="isViewingOtherUser"
+        class="mt-4 mb-4 rounded-xl border-l-4 border-indigo-500 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+        :class="isDarkMode ? 'bg-indigo-900/20 text-indigo-200' : 'bg-indigo-50 text-indigo-900'">
+        <div class="flex items-start gap-3">
+          <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+            :class="isDarkMode ? 'bg-indigo-700' : 'bg-indigo-100'">
+            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold leading-snug">{{ $t('home.viewingUser') }}
+              <span class="font-normal ml-1">
                 <template v-if="viewedUserLoading">{{ $t('home.loadingUser') }}</template>
                 <template v-else-if="viewedUser && viewedUser.email">{{ viewedUser.email }}</template>
                 <template v-else-if="viewedUserEmail">{{ viewedUserEmail }}</template>
                 <template v-else-if="viewedUserError">{{ viewedUserError }}</template>
                 <template v-else>{{ viewedUserId }}</template>
               </span>
-
-              <!-- Admin-only action: Modify Health Data (appears under viewing user text) -->
-              <div v-if="isViewingOtherUser && userState.user && userState.user.role === 'admin'" class="mt-2">
-                <button @click="goToModifyHealthData" class="px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 text-sm">
-                  {{ $t('home.modifyHealthData') }}
-                </button>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <!-- Show badge only when service is completed; hide the 'On-going' badge -->
-              <template v-if="viewedUser && viewedUser.serviceStatusKey === 'completed'">
-                <span :class="['inline-block px-2 py-1 rounded text-sm font-semibold', isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800']">
-                  {{ $t('admin.statusCompleted') }}
-                </span>
-              </template>
-              <button @click="goBackToUserManagement" class="underline text-sm">{{ $t('home.returnToUserManagement') }}</button>
+            </p>
+            <div v-if="userState.user && userState.user.role === 'admin'" class="mt-2">
+              <button @click="goToModifyHealthData"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                {{ $t('home.modifyHealthData') }}
+              </button>
             </div>
           </div>
         </div>
-
-        <!-- Offline Indicator Banner -->
-        <div v-if="!isOnline" class="mb-4 p-3 rounded-md text-sm flex items-center justify-between" :class="[themeClasses.border, isDarkMode ? 'bg-orange-900/30 text-orange-200 border-orange-700' : 'bg-orange-50 text-orange-900 border-orange-200']">
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3"></path>
-            </svg>
-            <strong>{{ $t('home.offline.title') }}</strong>
-            <span>{{ $t('home.offline.message') }}</span>
-          </div>
-          <button 
-            @click="manualRefreshAllData" 
-            class="px-3 py-1 rounded text-sm font-semibold transition-colors"
-            :class="isDarkMode ? 'bg-orange-700 hover:bg-orange-600 text-white' : 'bg-orange-200 hover:bg-orange-300 text-orange-900'">
-            {{ $t('home.offline.retry') }}
+        <div class="flex items-center gap-3 flex-shrink-0">
+          <template v-if="viewedUser && viewedUser.serviceStatusKey === 'completed'">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+              :class="isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800'">
+              {{ $t('admin.statusCompleted') }}
+            </span>
+          </template>
+          <button @click="goBackToUserManagement"
+            class="inline-flex items-center gap-1 text-xs font-medium underline underline-offset-2 opacity-80 hover:opacity-100 transition-opacity">
+            {{ $t('home.returnToUserManagement') }}
           </button>
         </div>
+      </div>
 
-        <!-- Cached Data Indicator (shown when displaying offline data) -->
-        <div v-if="showingCachedData" class="mb-4 p-3 rounded-md text-sm flex items-center justify-between" :class="[themeClasses.border, isDarkMode ? 'bg-blue-900/30 text-blue-200 border-blue-700' : 'bg-blue-50 text-blue-900 border-blue-200']">
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+      <!-- ── Offline banner ── -->
+      <div v-if="!isOnline"
+        class="mb-4 rounded-xl border-l-4 border-orange-500 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shadow-sm"
+        :class="isDarkMode ? 'bg-orange-900/20 text-orange-200' : 'bg-orange-50 text-orange-900'">
+        <div class="flex items-center gap-2.5">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3"></path>
+          </svg>
+          <div>
+            <span class="font-semibold text-sm">{{ $t('home.offline.title') }}</span>
+            <span class="text-xs ml-2 opacity-80">{{ $t('home.offline.message') }}</span>
+          </div>
+        </div>
+        <button @click="manualRefreshAllData"
+          class="self-start sm:self-auto px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+          :class="isDarkMode ? 'bg-orange-700 hover:bg-orange-600 text-white' : 'bg-orange-200 hover:bg-orange-300 text-orange-900'">
+          {{ $t('home.offline.retry') }}
+        </button>
+      </div>
+
+      <!-- ── Cached data banner ── -->
+      <div v-if="showingCachedData"
+        class="mb-4 rounded-xl border-l-4 border-blue-400 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shadow-sm"
+        :class="isDarkMode ? 'bg-blue-900/20 text-blue-200' : 'bg-blue-50 text-blue-900'">
+        <div class="flex items-center gap-2.5">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+          </svg>
+          <div>
+            <span class="font-semibold text-sm">{{ $t('home.cached.title') }}</span>
+            <span class="text-xs ml-2 opacity-80">{{ $t('home.cached.message') }}</span>
+          </div>
+        </div>
+        <button @click="manualRefreshAllData"
+          class="self-start sm:self-auto px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+          :class="isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-200 hover:bg-blue-300 text-blue-900'">
+          {{ $t('home.cached.refresh') }}
+        </button>
+      </div>
+
+      <!-- ── Greeting header ── -->
+      <div class="pt-5 pb-6" v-if="!isViewingOtherUser">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight" :class="themeClasses.textPrimary">
+              {{ $t('home.greeting') }}<span v-if="userState.user?.name">, {{ userState.user.name }}</span>
+            </h1>
+            <p class="mt-1 text-sm sm:text-base" :class="themeClasses.textSecondary">{{ $t('home.healthDashboard') }}</p>
+          </div>
+          <div v-if="showOverallAnalysis"
+            class="inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm font-semibold"
+            :class="[themeClasses.border, overallAnalysis.badgeClass, 'text-white shadow-sm']">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <strong>{{ $t('home.cached.title') }}</strong>
-            <span>{{ $t('home.cached.message') }}</span>
-          </div>
-          <button 
-            @click="manualRefreshAllData" 
-            class="px-3 py-1 rounded text-sm font-semibold transition-colors"
-            :class="isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-200 hover:bg-blue-300 text-blue-900'">
-            {{ $t('home.cached.refresh') }}
-          </button>
-        </div>
-
-        <!-- Overall Analysis Section -->
-        <div v-if="showOverallAnalysis" class="mb-6 pt-4">
-          <div class="rounded-lg shadow-sm p-4 border flex items-center justify-between"
-            :class="[themeClasses.cardBackground, themeClasses.border]">
-            <div>
-              <h2 class="text-2xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.overallAnalysis.title') }}
-              </h2>
-              <p class="text-sm mt-1" :class="themeClasses.textSecondary">{{ overallAnalysis.summary }}</p>
-              <div class="mt-2 flex items-center gap-3">
-                <div class="text-4xl font-bold" :class="themeClasses.textPrimary">{{ overallAnalysis.score }}</div>
-                <div class="inline-block text-white px-3 py-1 rounded-full text-sm font-semibold"
-                  :class="overallAnalysis.badgeClass">{{
-                    $t(`home.overallAnalysis.statuses.${overallAnalysis.statusKey}`) }}</div>
-              </div>
-              <div class="mt-3 text-sm" :class="themeClasses.textSecondary">
-                <h4 class="font-semibold">{{ $t('home.overallAnalysis.adviceTitle') }}</h4>
-                <ul class="list-disc list-inside mt-1">
-                  <li v-for="(a, i) in overallAnalysis.advice" :key="i">{{ a }}</li>
-                </ul>
-              </div>
-            </div>
-            <div class="w-48">
-              <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                <div :style="{ width: overallAnalysis.score + '%' }" class="h-full rounded-full"
-                  :class="overallAnalysis.progressClass"></div>
-              </div>
-            </div>
+            {{ $t(`home.overallAnalysis.statuses.${overallAnalysis.statusKey}`) }} · {{ overallAnalysis.score }}
           </div>
         </div>
+      </div>
 
-        <!-- BMI Information Section -->
-        <div class="mb-8 pt-4">
-          <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-            <!-- BMI Title -->
-            <div class="flex items-center justify-center mb-6">
-              <div class="text-center">
-                <h2 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.bmi.title') }}</h2>
-              </div>
-            </div>
-
-            <!-- Loading State -->
-            <div v-if="isBMILoading" class="text-center py-8">
-              <svg class="animate-spin h-8 w-8 mx-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                </path>
+      <!-- ── Overall Analysis ── -->
+      <div v-if="showOverallAnalysis" class="mb-8">
+        <div class="rounded-2xl shadow-sm border overflow-hidden"
+          :class="[themeClasses.cardBackground, themeClasses.border]">
+          <!-- Header strip -->
+          <div class="px-5 py-4 border-b flex items-center gap-3" :class="themeClasses.border">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center"
+              :class="isDarkMode ? 'bg-emerald-900/40' : 'bg-emerald-100'">
+              <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
-              <p :class="themeClasses.textSecondary" class="mt-2">{{ $t('home.bmi.loading') }}</p>
             </div>
-
-            <!-- No Data Message -->
-            <div v-else-if="!bmiData.bmi" class="text-center py-8">
-              <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.bmi.noData') }}</p>
-              <router-link v-if="!isViewingOtherUser" to="/data-setting"
-                class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                {{ $t('home.bmi.addData') }}
-              </router-link>
+            <h2 class="text-lg font-bold" :class="themeClasses.textPrimary">{{ $t('home.overallAnalysis.title') }}</h2>
+          </div>
+          <!-- Body -->
+          <div class="p-5 flex flex-col md:flex-row md:items-start gap-6">
+            <!-- Score ring column -->
+            <div class="flex flex-col items-center justify-center gap-2 md:w-44 flex-shrink-0">
+              <div class="relative w-32 h-32">
+                <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="50" fill="none" stroke-width="12"
+                    :stroke="isDarkMode ? '#374151' : '#e5e7eb'" />
+                  <circle cx="60" cy="60" r="50" fill="none" stroke-width="12"
+                    :stroke-dasharray="`${(overallAnalysis.score / 100) * 314} 314`"
+                    stroke-linecap="round"
+                    :stroke="{ excellent: '#22c55e', good: '#14b8a6', fair: '#eab308', poor: '#f97316', critical: '#dc2626', noData: '#9ca3af' }[overallAnalysis.statusKey] || '#9ca3af'"
+                    style="transition: stroke-dasharray 0.6s ease;" />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <span class="text-3xl font-extrabold leading-none" :class="themeClasses.textPrimary">{{ overallAnalysis.score }}</span>
+                  <span class="text-xs mt-0.5" :class="themeClasses.textSecondary">/ 100</span>
+                </div>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold text-white" :class="overallAnalysis.badgeClass">
+                {{ $t(`home.overallAnalysis.statuses.${overallAnalysis.statusKey}`) }}
+              </span>
+              <p class="text-xs text-center leading-relaxed" :class="themeClasses.textSecondary">{{ overallAnalysis.summary }}</p>
             </div>
-
-            <!-- BMI Value and Status -->
-            <div v-else>
-              <div class="text-center mb-8">
-                <div class="text-6xl font-bold mb-2" :class="themeClasses.textPrimary">{{ bmiData.bmi }}</div>
-                <div class="inline-block text-white px-4 py-1 rounded-full text-sm font-semibold mb-4"
-                  :class="bmiCategoryStyle">{{ bmiCategoryKey ? $t(`home.bmi.categories.${bmiCategoryKey}`) :
-                    bmiData.category }}</div>
-              </div>
-
-              <!-- BMI Slider -->
-              <div class="mb-8">
-                <div class="relative h-2 bg-gradient-to-r from-blue-400 via-green-400 to-orange-500 rounded-full mb-2">
-                  <!-- BMI Indicator -->
-                  <div
-                    class="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-gray-800 rounded-full shadow-lg"
-                    :style="{ left: bmiSliderPosition + '%' }"></div>
+            <!-- Divider -->
+            <div class="hidden md:block w-px self-stretch" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'"></div>
+            <!-- Advice column -->
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-semibold mb-3" :class="themeClasses.textPrimary">{{ $t('home.overallAnalysis.adviceTitle') }}</h4>
+              <ul class="space-y-2">
+                <li v-for="(a, i) in overallAnalysis.advice" :key="i"
+                  class="flex items-start gap-2 text-sm" :class="themeClasses.textSecondary">
+                  <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span>{{ a }}</span>
+                </li>
+              </ul>
+              <!-- Progress bar at bottom -->
+              <div class="mt-5">
+                <div class="flex justify-between text-xs mb-1" :class="themeClasses.textSecondary">
+                  <span>0</span><span>{{ $t('home.healthScore') }}</span><span>100</span>
                 </div>
-                <div class="flex justify-between text-xs" :class="themeClasses.textSecondary">
-                  <span>18.5</span>
-                  <span>24.0</span>
-                  <span>29.0</span>
-                </div>
-              </div>
-
-              <!-- BMI Categories -->
-              <div class="grid grid-cols-4 gap-2 mb-8 text-center text-xs">
-                <div class="flex flex-col items-center">
-                  <div class="w-4 h-4 rounded-full bg-blue-400 mb-2"
-                    :class="{ 'ring-2 ring-offset-2 ring-blue-400': bmiCategoryKey === 'underweight' }"></div>
-                  <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'underweight' }]">{{
-                    $t('home.bmi.categories.underweight') }}</span>
-                </div>
-                <div class="flex flex-col items-center">
-                  <div class="w-4 h-4 rounded-full bg-green-400 mb-2"
-                    :class="{ 'ring-2 ring-offset-2 ring-green-400': bmiCategoryKey === 'normal' }"></div>
-                  <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'normal' }]">{{
-                    $t('home.bmi.categories.normal') }}</span>
-                </div>
-                <div class="flex flex-col items-center">
-                  <div class="w-4 h-4 rounded-full bg-yellow-400 mb-2"
-                    :class="{ 'ring-2 ring-offset-2 ring-yellow-400': bmiCategoryKey === 'overweight' }"></div>
-                  <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'overweight' }]">{{
-                    $t('home.bmi.categories.overweight') }}</span>
-                </div>
-                <div class="flex flex-col items-center">
-                  <div class="w-4 h-4 rounded-full bg-orange-500 mb-2"
-                    :class="{ 'ring-2 ring-offset-2 ring-orange-500': bmiCategoryKey === 'obese' }"></div>
-                  <span :class="[themeClasses.textSecondary, { 'font-bold': bmiCategoryKey === 'obese' }]">{{
-                    $t('home.bmi.categories.obese') }}</span>
-                </div>
-              </div>
-
-              <!-- Data Analysis Section -->
-              <div class="border-t pt-6" :class="themeClasses.border">
-                <h4 class="text-lg font-semibold mb-6" :class="themeClasses.textPrimary">{{ $t('home.dataAnalysis') }}
-                </h4>
-                <div class="space-y-4">
-                  <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                    <span :class="themeClasses.textSecondary">{{ $t('dataSettings.age') }}</span>
-                    <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.age || '--'
-                    }}</span>
-                  </div>
-                  <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                    <span :class="themeClasses.textSecondary">{{ $t('dataSettings.height') }}</span>
-                    <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.height || '--'
-                    }}</span>
-                  </div>
-                  <div class="flex justify-between items-center pb-4 border-b" :class="themeClasses.border">
-                    <span :class="themeClasses.textSecondary">{{ $t('dataSettings.weight') }}</span>
-                    <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiData.weight || '--'
-                    }}</span>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span :class="themeClasses.textSecondary">{{ $t('home.bmi.bmiRange') }}</span>
-                    <span class="text-lg font-semibold" :class="themeClasses.textPrimary">{{ bmiRangeDisplay }}</span>
-                  </div>
+                <div class="h-2 rounded-full overflow-hidden" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'">
+                  <div :style="{ width: overallAnalysis.score + '%' }" class="h-full rounded-full transition-all duration-700"
+                    :class="overallAnalysis.progressClass"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Header Section -->
-        <div class="mb-6 sm:mt-4 md:mt-4">
+<!-- ══ BMI Section ══ -->
+      <div class="mb-8">
+        <!-- Section header -->
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center"
+            :class="isDarkMode ? 'bg-blue-900/40' : 'bg-blue-100'">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
+            </svg>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.bmi.title') }}</h2>
+        </div>
 
-          <div class="flex items-center justify-center mb-4">
-            <div class="text-center">
-              <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.heartRate.title') }}</h1>
+        <div class="rounded-2xl shadow-sm border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
+          <!-- Loading -->
+          <div v-if="isBMILoading" class="flex flex-col items-center justify-center py-14 gap-3">
+            <svg class="animate-spin h-9 w-9 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.bmi.loading') }}</p>
+          </div>
+
+          <!-- No data -->
+          <div v-else-if="!bmiData.bmi" class="flex flex-col items-center justify-center py-14 gap-4">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center"
+              :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-100'">
+              <svg class="w-8 h-8" :class="themeClasses.textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.bmi.noData') }}</p>
+            <router-link v-if="!isViewingOtherUser" to="/data-setting"
+              class="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors shadow-sm">
+              {{ $t('home.bmi.addData') }}
+            </router-link>
+          </div>
+
+          <!-- BMI data -->
+          <div v-else class="p-5 sm:p-6">
+            <!-- Score + Badge row -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+              <div class="flex items-end gap-3">
+                <span class="text-6xl sm:text-7xl font-extrabold leading-none" :class="themeClasses.textPrimary">{{ bmiData.bmi }}</span>
+                <span class="mb-1 text-sm font-medium" :class="themeClasses.textSecondary">BMI</span>
+              </div>
+              <span class="self-start sm:self-auto text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm"
+                :class="bmiCategoryStyle">
+                {{ bmiCategoryKey ? $t(`home.bmi.categories.${bmiCategoryKey}`) : bmiData.category }}
+              </span>
+            </div>
+
+            <!-- BMI Gradient Slider -->
+            <div class="mb-6">
+              <div class="relative h-3 bg-gradient-to-r from-blue-400 via-green-400 to-orange-500 rounded-full mb-3 shadow-inner">
+                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 bg-white border-[3px] border-gray-700 dark:border-gray-200 rounded-full shadow-lg transition-all duration-500"
+                  :style="{ left: bmiSliderPosition + '%' }"></div>
+              </div>
+              <div class="flex justify-between text-xs font-medium" :class="themeClasses.textSecondary">
+                <span>18.5</span><span>24.0</span><span>29.0</span>
+              </div>
+            </div>
+
+            <!-- BMI Category Legend -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+              <div class="flex items-center gap-2 p-2 rounded-xl border"
+                :class="[themeClasses.border, bmiCategoryKey === 'underweight' ? (isDarkMode ? 'ring-1 ring-blue-400' : 'ring-1 ring-blue-400') : '']">
+                <div class="w-3 h-3 rounded-full flex-shrink-0 bg-blue-400"
+                  :class="bmiCategoryKey === 'underweight' ? 'ring-2 ring-offset-1 ring-blue-400' : ''"></div>
+                <span class="text-xs" :class="[themeClasses.textSecondary, bmiCategoryKey === 'underweight' ? 'font-bold' : '']">
+                  {{ $t('home.bmi.categories.underweight') }}
+                </span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-xl border"
+                :class="[themeClasses.border, bmiCategoryKey === 'normal' ? (isDarkMode ? 'ring-1 ring-green-400' : 'ring-1 ring-green-400') : '']">
+                <div class="w-3 h-3 rounded-full flex-shrink-0 bg-green-400"
+                  :class="bmiCategoryKey === 'normal' ? 'ring-2 ring-offset-1 ring-green-400' : ''"></div>
+                <span class="text-xs" :class="[themeClasses.textSecondary, bmiCategoryKey === 'normal' ? 'font-bold' : '']">
+                  {{ $t('home.bmi.categories.normal') }}
+                </span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-xl border"
+                :class="[themeClasses.border, bmiCategoryKey === 'overweight' ? (isDarkMode ? 'ring-1 ring-yellow-400' : 'ring-1 ring-yellow-400') : '']">
+                <div class="w-3 h-3 rounded-full flex-shrink-0 bg-yellow-400"
+                  :class="bmiCategoryKey === 'overweight' ? 'ring-2 ring-offset-1 ring-yellow-400' : ''"></div>
+                <span class="text-xs" :class="[themeClasses.textSecondary, bmiCategoryKey === 'overweight' ? 'font-bold' : '']">
+                  {{ $t('home.bmi.categories.overweight') }}
+                </span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-xl border"
+                :class="[themeClasses.border, bmiCategoryKey === 'obese' ? (isDarkMode ? 'ring-1 ring-orange-500' : 'ring-1 ring-orange-500') : '']">
+                <div class="w-3 h-3 rounded-full flex-shrink-0 bg-orange-500"
+                  :class="bmiCategoryKey === 'obese' ? 'ring-2 ring-offset-1 ring-orange-500' : ''"></div>
+                <span class="text-xs" :class="[themeClasses.textSecondary, bmiCategoryKey === 'obese' ? 'font-bold' : '']">
+                  {{ $t('home.bmi.categories.obese') }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Data Analysis cards -->
+            <div class="border-t pt-5" :class="themeClasses.border">
+              <h4 class="text-sm font-semibold mb-4" :class="themeClasses.textPrimary">{{ $t('home.dataAnalysis') }}</h4>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="rounded-xl border p-3 text-center" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/70']">
+                  <div class="text-xl font-bold mb-0.5" :class="themeClasses.textPrimary">{{ bmiData.age || '--' }}</div>
+                  <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('dataSettings.age') }}</div>
+                </div>
+                <div class="rounded-xl border p-3 text-center" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/70']">
+                  <div class="text-xl font-bold mb-0.5" :class="themeClasses.textPrimary">{{ bmiData.height || '--' }}</div>
+                  <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('dataSettings.height') }}</div>
+                </div>
+                <div class="rounded-xl border p-3 text-center" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/70']">
+                  <div class="text-xl font-bold mb-0.5" :class="themeClasses.textPrimary">{{ bmiData.weight || '--' }}</div>
+                  <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('dataSettings.weight') }}</div>
+                </div>
+                <div class="rounded-xl border p-3 text-center" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/70']">
+                  <div class="text-xl font-bold mb-0.5" :class="themeClasses.textPrimary">{{ bmiRangeDisplay }}</div>
+                  <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.bmi.bmiRange') }}</div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- ══ Heart Rate Section ══ -->
+      <div class="mb-8">
+        <!-- Section header -->
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center"
+            :class="isDarkMode ? 'bg-red-900/40' : 'bg-red-100'">
+            <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+            </svg>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.heartRate.title') }}</h2>
+        </div>
 
           <!-- Date Picker with Available Dates Indicator -->
           <template v-if="hasHeartRateData">
-            <div class="flex justify-center gap-4 mb-4 items-center">
+            <div class="flex justify-center items-center gap-3 mb-5 w-full">
               <button @click="previousDate"
-                class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+                class="w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
                 :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-                <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
               </button>
 
-              <!-- Custom Date Selector -->
               <div class="relative">
                 <button @click="showDatePicker = !showDatePicker"
-                  class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
+                  class="px-4 py-2 rounded-xl border flex items-center gap-2 min-w-[200px] sm:min-w-[220px] justify-between transition-all duration-150 hover:scale-105 active:scale-95 hover:shadow-md font-medium text-sm"
                   :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']">
-                  <span>{{ currentDate || $t('home.selectDate') }}</span>
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  <span class="flex-1 text-center">{{ currentDate || $t('home.selectDate') }}</span>
+                  <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                   </svg>
                 </button>
 
-                <!-- Date Picker Dropdown -->
                 <div v-if="showDatePicker"
-                  class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-lg shadow-xl border p-4 min-w-[320px]"
+                  class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-2xl shadow-xl border p-4 min-w-[320px]"
                   :class="[themeClasses.cardBackground, themeClasses.border]">
-                  <!-- Month Navigation -->
                   <div class="flex items-center justify-between mb-4">
-                    <button @click="previousMonth"
-                      class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
-                      <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                        </path>
+                    <button @click="previousMonth" class="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                      <svg class="w-4 h-4" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                       </svg>
                     </button>
-                    <span class="font-semibold" :class="themeClasses.textPrimary">
-                      {{ calendarMonthYear }}
-                    </span>
-                    <button @click="nextMonth"
-                      class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
-                      <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
+                    <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ calendarMonthYear }}</span>
+                    <button @click="nextMonth" class="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                      <svg class="w-4 h-4" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                       </svg>
                     </button>
                   </div>
-
-                  <!-- Day Headers -->
                   <div class="grid grid-cols-7 gap-1 mb-2">
-                    <div v-for="day in weekDayNames" :key="day" class="text-center text-xs font-medium py-1"
-                      :class="themeClasses.textSecondary">
-                      {{ day }}
-                    </div>
+                    <div v-for="day in weekDayNames" :key="day" class="text-center text-xs font-medium py-1" :class="themeClasses.textSecondary">{{ day }}</div>
                   </div>
-
-                  <!-- Calendar Days -->
                   <div class="grid grid-cols-7 gap-1">
-                    <button v-for="day in calendarDays" :key="day.date" @click="selectDate(day)"
-                      :disabled="!day.currentMonth"
-                      class="relative p-2 text-sm rounded-lg transition-all duration-150 transform active:scale-90"
+                    <button v-for="day in calendarDays" :key="day.date" @click="selectDate(day)" :disabled="!day.currentMonth"
+                      class="relative p-2 text-xs rounded-lg transition-all duration-150 active:scale-90"
                       :class="[
                         day.currentMonth ? 'hover:scale-105' : 'opacity-30 cursor-not-allowed',
-                        day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
-                        day.isToday && !day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
-                        !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700 hover:shadow-md' : 'hover:bg-gray-100 hover:shadow-md') : '',
+                        day.isSelected ? 'bg-blue-600 text-white shadow-md scale-105' : '',
+                        day.isToday && !day.isSelected ? 'bg-blue-600 text-white shadow-md scale-105' : '',
+                        !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100') : '',
                         day.isSelected ? '' : themeClasses.textPrimary
                       ]">
                       {{ day.dayNumber }}
-                      <!-- Data Available Indicator -->
                       <span v-if="day.hasData && day.currentMonth"
-                        class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-transform duration-150"
-                        :class="(day.isSelected || day.isToday) ? 'bg-white scale-125' : 'bg-green-500'"></span>
+                        class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                        :class="(day.isSelected || day.isToday) ? 'bg-white' : 'bg-green-500'"></span>
                     </button>
                   </div>
-
-                  <!-- Legend -->
-                  <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs"
-                    :class="themeClasses.border">
-                    <div class="flex items-center gap-1">
+                  <div class="mt-3 pt-3 border-t flex items-center justify-center gap-4 text-xs" :class="themeClasses.border">
+                    <div class="flex items-center gap-1.5">
                       <span class="w-2 h-2 rounded-full bg-green-500"></span>
                       <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.hasData') }}</span>
                     </div>
-                    <div class="flex items-center gap-1">
-                      <span class="w-4 h-4 rounded ring-2 ring-blue-400"></span>
+                    <div class="flex items-center gap-1.5">
+                      <span class="w-3.5 h-3.5 rounded bg-blue-600"></span>
                       <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.today') }}</span>
                     </div>
                   </div>
@@ -315,175 +384,176 @@
               </div>
 
               <button @click="nextDate"
-                class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+                class="w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
                 :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-                <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
               </button>
             </div>
 
-            <!-- Main Heart Rate Stats -->
-            <div class="text-center mb-6">
-              <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
-              <div class="text-lg mb-4" :class="themeClasses.textSecondary">{{ $t('home.heartRate.averageBpm') }}</div>
+            <!-- Average BPM Hero -->
+            <div class="text-center mb-5">
+              <div class="text-6xl sm:text-7xl font-extrabold leading-none mb-1" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
+              <div class="text-sm font-medium" :class="themeClasses.textSecondary">{{ $t('home.heartRate.averageBpm') }}</div>
             </div>
           </template>
 
-          <div v-else class="text-center py-8">
-            <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.heartRate.noData') }}</p>
+          <div v-else class="flex flex-col items-center py-10 gap-4">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center"
+              :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-100'">
+              <svg class="w-8 h-8 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+              </svg>
+            </div>
+            <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.heartRate.noData') }}</p>
             <router-link v-if="!isViewingOtherUser" to="/data-setting"
-              class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              class="inline-flex items-center gap-2 px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-medium transition-colors shadow-sm">
               {{ $t('home.heartRate.addData') }}
             </router-link>
           </div>
-        </div>
 
         <!-- Heart Rate Chart -->
-        <div class="mb-8">
-          <div class="rounded-lg shadow-sm pb-4 pl-4 pr-4 border"
-            :class="[themeClasses.cardBackground, themeClasses.border]">
-            <div class="relative" style="height: 500px;">
+        <div class="mb-5">
+          <div class="rounded-2xl shadow-sm p-4 border" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="relative" style="height: 300px;">
               <Line v-if="chartData" :data="chartData" :options="chartOptions" />
-              <div v-else class="h-full flex items-center justify-center"
-                :class="isDarkMode ? 'bg-gray-800' : 'bg-gray-50'">
-                <span :class="themeClasses.textSecondary">{{ isHeartRateLoading ? $t('home.heartRate.loading') :
-                  $t('home.heartRate.noData') }}</span>
+              <div v-else class="h-full flex items-center justify-center rounded-xl"
+                :class="isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50'">
+                <span class="text-sm" :class="themeClasses.textSecondary">{{ isHeartRateLoading ? $t('home.heartRate.loading') : $t('home.heartRate.noData') }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Today Heart Rate Overview Section -->
-        <div class="mb-8">
-          <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-            <div class="flex items-center mb-6">
-              <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center mr-4">
-                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z">
-                  </path>
+        <!-- Today Heart Rate Stats -->
+        <div class="mb-2">
+          <div class="rounded-2xl shadow-sm p-5 border" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-red-500">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
                 </svg>
               </div>
-              <h3 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('home.todayOverview') }}</h3>
+              <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('home.todayOverview') }}</h3>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+              <div class="rounded-xl border p-3 sm:p-4 text-center" :class="[themeClasses.border, hrCardClasses(stats.resting).bg]">
+                <div class="text-3xl sm:text-4xl font-bold mb-1" :class="hrCardClasses(stats.resting).text">{{ stats.resting }}</div>
+                <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.restingHeartRate') }}</div>
+              </div>
+              <div class="rounded-xl border p-3 sm:p-4 text-center" :class="[themeClasses.border, hrCardClasses(stats.max).bg]">
+                <div class="text-3xl sm:text-4xl font-bold mb-1" :class="hrCardClasses(stats.max).text">{{ stats.max }}</div>
+                <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.maxHeartRate') }}</div>
+              </div>
+              <div class="rounded-xl border p-3 sm:p-4 text-center" :class="[themeClasses.border, hrCardClasses(stats.min).bg]">
+                <div class="text-3xl sm:text-4xl font-bold mb-1" :class="hrCardClasses(stats.min).text">{{ stats.min }}</div>
+                <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.minHeartRate') }}</div>
+              </div>
+              <div class="rounded-xl border p-3 sm:p-4 text-center" :class="[themeClasses.border, hrCardClasses(stats.avg).bg]">
+                <div class="text-3xl sm:text-4xl font-bold mb-1" :class="hrCardClasses(stats.avg).text">{{ stats.avg }}</div>
+                <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.averageHeartRate') }}</div>
+              </div>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 gap-4">
-              <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.resting }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.restingHeartRate') }}</div>
-              </div>
-              <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.max }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.maxHeartRate') }}</div>
-              </div>
-              <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.min }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.minHeartRate') }}</div>
-              </div>
-              <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stats.avg }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.averageHeartRate') }}</div>
+            <!-- Heart Rate Range Legend -->
+            <div class="pt-4 border-t" :class="themeClasses.border">
+              <h4 class="text-xs font-semibold mb-3" :class="themeClasses.textPrimary">{{ $t('home.heartRate.rangeTitle') }}</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-400 flex-shrink-0"></span>{{ $t('home.heartRate.range.low') }}
+                </div>
+                <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
+                  <span class="w-2.5 h-2.5 rounded-full bg-green-400 flex-shrink-0"></span>{{ $t('home.heartRate.range.normal') }}
+                </div>
+                <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
+                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 flex-shrink-0"></span>{{ $t('home.heartRate.range.elevated') }}
+                </div>
+                <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0"></span>{{ $t('home.heartRate.range.high') }}
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="flex items-center justify-center mb-4">
-          <div class="text-center">
-            <h1 class="text-3xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.stress.title') }}</h1>
+      <!-- ══ Stress Section ══ -->
+      <div class="mb-8">
+        <!-- Section header -->
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center"
+            :class="isDarkMode ? 'bg-teal-900/40' : 'bg-teal-100'">
+            <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
           </div>
+          <h2 class="text-xl sm:text-2xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.stress.title') }}</h2>
         </div>
 
         <!-- Date Picker with Available Dates Indicator for Stress -->
         <template v-if="hasStressData">
-          <div class="flex justify-center gap-4 mb-4 items-center mt-3">
+          <div class="flex justify-center items-center gap-3 mb-5 w-full">
             <button @click="previousStressDate"
-              class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+              class="w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
               :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-              <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
               </svg>
             </button>
 
-            <!-- Custom Date Selector -->
             <div class="relative">
               <button @click="showStressDatePicker = !showStressDatePicker"
-                class="px-4 py-2 rounded-lg border flex items-center gap-2 min-w-[200px] justify-between transition-all duration-150 transform hover:scale-105 active:scale-95 hover:shadow-md"
+                class="px-4 py-2 rounded-xl border flex items-center gap-2 min-w-[200px] sm:min-w-[220px] justify-between transition-all duration-150 hover:scale-105 active:scale-95 hover:shadow-md font-medium text-sm"
                 :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']">
-                <span>{{ currentStressDate || $t('home.selectDate') }}</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                <span class="flex-1 text-center">{{ currentStressDate || $t('home.selectDate') }}</span>
+                <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
               </button>
 
-              <!-- Date Picker Dropdown -->
               <div v-if="showStressDatePicker"
-                class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-lg shadow-xl border p-4 min-w-[320px]"
+                class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 rounded-2xl shadow-xl border p-4 min-w-[320px]"
                 :class="[themeClasses.cardBackground, themeClasses.border]">
-                <!-- Month Navigation -->
                 <div class="flex items-center justify-between mb-4">
-                  <button @click="previousStressMonth"
-                    class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
-                    <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                      </path>
+                  <button @click="previousStressMonth" class="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <svg class="w-4 h-4" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
                   </button>
-                  <span class="font-semibold" :class="themeClasses.textPrimary">
-                    {{ stressCalendarMonthYear || $t('home.selectDate') }}
-                  </span>
-                  <button @click="nextStressMonth"
-                    class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-transform duration-150 transform hover:scale-110 active:scale-90">
-                    <svg class="w-5 h-5" :class="themeClasses.textPrimary" fill="none" stroke="currentColor"
-                      viewBox="0 0 24 24">
+                  <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ stressCalendarMonthYear || $t('home.selectDate') }}</span>
+                  <button @click="nextStressMonth" class="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <svg class="w-4 h-4" :class="themeClasses.textPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
                   </button>
                 </div>
-
-                <!-- Day Headers -->
                 <div class="grid grid-cols-7 gap-1 mb-2">
-                  <div v-for="day in weekDayNames" :key="day" class="text-center text-xs font-medium py-1"
-                    :class="themeClasses.textSecondary">
-                    {{ day }}
-                  </div>
+                  <div v-for="day in weekDayNames" :key="day" class="text-center text-xs font-medium py-1" :class="themeClasses.textSecondary">{{ day }}</div>
                 </div>
-
-                <!-- Calendar Days -->
                 <div class="grid grid-cols-7 gap-1">
-                  <button v-for="day in stressCalendarDays" :key="day.date" @click="selectStressDate(day)"
-                    :disabled="!day.currentMonth"
-                    class="relative p-2 text-sm rounded-lg transition-all duration-150 transform active:scale-90"
+                  <button v-for="day in stressCalendarDays" :key="day.date" @click="selectStressDate(day)" :disabled="!day.currentMonth"
+                    class="relative p-2 text-xs rounded-lg transition-all duration-150 active:scale-90"
                     :class="[
                       day.currentMonth ? 'hover:scale-105' : 'opacity-30 cursor-not-allowed',
-                      day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
-                      day.isToday && !day.isSelected ? 'bg-blue-600 text-white shadow-lg scale-105' : '',
-                      !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700 hover:shadow-md' : 'hover:bg-gray-100 hover:shadow-md') : '',
+                      day.isSelected ? 'bg-blue-600 text-white shadow-md scale-105' : '',
+                      day.isToday && !day.isSelected ? 'bg-blue-600 text-white shadow-md scale-105' : '',
+                      !day.isSelected && day.currentMonth ? (isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100') : '',
                       day.isSelected ? '' : themeClasses.textPrimary
                     ]">
                     {{ day.dayNumber }}
-                    <!-- Data Available Indicator -->
                     <span v-if="day.hasData && day.currentMonth"
-                      class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-transform duration-150"
-                      :class="(day.isSelected || day.isToday) ? 'bg-white scale-125' : 'bg-green-500'"></span>
+                      class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                      :class="(day.isSelected || day.isToday) ? 'bg-white' : 'bg-green-500'"></span>
                   </button>
                 </div>
-
-                <!-- Legend -->
-                <div class="mt-4 pt-3 border-t flex items-center justify-center gap-4 text-xs"
-                  :class="themeClasses.border">
-                  <div class="flex items-center gap-1">
+                <div class="mt-3 pt-3 border-t flex items-center justify-center gap-4 text-xs" :class="themeClasses.border">
+                  <div class="flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-green-500"></span>
                     <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.hasData') }}</span>
                   </div>
-                  <div class="flex items-center gap-1">
-                    <span class="w-4 h-4 rounded ring-2 ring-blue-400"></span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-3.5 h-3.5 rounded bg-blue-600"></span>
                     <span :class="themeClasses.textSecondary">{{ $t('home.heartRate.today') }}</span>
                   </div>
                 </div>
@@ -491,181 +561,192 @@
             </div>
 
             <button @click="nextStressDate"
-              class="px-4 py-2 rounded-lg transition-all duration-150 transform hover:scale-110 active:scale-90"
+              class="w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
               :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
-              <svg class="w-6 h-6" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </button>
           </div>
 
-          <div class="text-center mb-6">
-            <div class="text-6xl font-bold mb-1" :class="themeClasses.textPrimary">{{ stressScore }}</div>
-            <div class="text-lg mb-2" :class="themeClasses.textSecondary">{{ $t('home.stress.name') }}</div>
-            <div class="mb-4">
-              <div class="inline-block text-white px-3 py-1 rounded-full text-sm font-semibold" :class="stressCategoryBadgeClass">{{ stressCategoryLabel || '--' }}</div>
-            </div>
+          <!-- Stress Score Hero -->
+          <div class="text-center mb-5">
+            <div class="text-6xl sm:text-7xl font-extrabold leading-none mb-1" :class="themeClasses.textPrimary">{{ stressScore }}</div>
+            <div class="text-sm font-medium mb-2" :class="themeClasses.textSecondary">{{ $t('home.stress.name') }}</div>
+            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-bold text-white shadow-sm" :class="stressCategoryBadgeClass">
+              {{ stressCategoryLabel || '--' }}
+            </span>
           </div>
         </template>
 
-        <div v-else class="text-center py-6">
-          <p :class="themeClasses.textSecondary" class="mb-4">{{ $t('home.stress.noData') }}</p>
+        <div v-else class="flex flex-col items-center py-10 gap-4">
+          <div class="w-16 h-16 rounded-full flex items-center justify-center"
+            :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-100'">
+            <svg class="w-8 h-8 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.stress.noData') }}</p>
           <router-link v-if="!isViewingOtherUser" to="/data-setting"
-            class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            {{ $t('home.stress.addData') }}</router-link>
+            class="inline-flex items-center gap-2 px-5 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-sm font-medium transition-colors shadow-sm">
+            {{ $t('home.stress.addData') }}
+          </router-link>
         </div>
 
         <!-- Stress Chart -->
-        <div class="mb-8">
-          <div class="rounded-lg shadow-sm pb-4 pl-4 pr-4 border"
-            :class="[themeClasses.cardBackground, themeClasses.border]">
-            <div class="relative" style="height: 400px;">
+        <div class="mb-5">
+          <div class="rounded-2xl shadow-sm p-4 border" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="relative" style="height: 260px;">
               <Line v-if="stressChartData" :data="stressChartData" :options="stressChartOptions" />
-              <div v-else class="h-full flex items-center justify-center"
-                :class="isDarkMode ? 'bg-gray-800' : 'bg-gray-50'">
-                <span :class="themeClasses.textSecondary">{{ isStressLoading ? $t('home.stress.loading') :
-                  $t('home.stress.noData') }}</span>
+              <div v-else class="h-full flex items-center justify-center rounded-xl"
+                :class="isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50'">
+                <span class="text-sm" :class="themeClasses.textSecondary">{{ isStressLoading ? $t('home.stress.loading') : $t('home.stress.noData') }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Today Pressure Overview Section -->
-        <div class="mb-8">
-          <div class="rounded-lg shadow-sm p-6 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-            <div class="flex items-center mb-6">
-              <div class="w-12 h-12 rounded-full bg-teal-500 flex items-center justify-center mr-4">
-                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 2a6 6 0 100 12 6 6 0 000-12z"></path>
-                </svg>
-              </div>
-              <h3 class="text-xl font-semibold" :class="themeClasses.textPrimary">{{ $t('home.todayStressOverview') }}
-              </h3>
+        <!-- Today Stress Stats -->
+        <div class="rounded-2xl shadow-sm p-5 border" :class="[themeClasses.cardBackground, themeClasses.border]">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-teal-500">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
             </div>
+            <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('home.todayStressOverview') }}</h3>
+          </div>
 
-            <!-- Stats Grid: Max / Min / Average -->
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ typeof stressStats.max === 'number' ? stressStats.max : '--' }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.stress.max') }}</div>
+          <!-- Stats: Max / Min / Average -->
+          <div class="grid grid-cols-3 gap-3 mb-5">
+            <div class="rounded-xl border p-3 sm:p-4 text-center" :class="[themeClasses.border, stressCardClasses(stressStats.max).bg]">
+              <div class="text-3xl sm:text-4xl font-bold mb-1" :class="stressCardClasses(stressStats.max).text">{{ typeof stressStats.max === 'number' ? stressStats.max : '--' }}</div>
+              <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.stress.max') }}</div>
+            </div>
+            <div class="rounded-xl border p-3 sm:p-4 text-center" :class="[themeClasses.border, stressCardClasses(stressStats.min).bg]">
+              <div class="text-3xl sm:text-4xl font-bold mb-1" :class="stressCardClasses(stressStats.min).text">{{ typeof stressStats.min === 'number' ? stressStats.min : '--' }}</div>
+              <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.stress.min') }}</div>
+            </div>
+            <div class="rounded-xl border p-3 sm:p-4 text-center" :class="[themeClasses.border, stressCardClasses(stressMeanRounded).bg]">
+              <div class="text-3xl sm:text-4xl font-bold mb-1" :class="stressCardClasses(stressMeanRounded).text">{{ stressMeanRounded !== null ? stressMeanRounded : '--' }}</div>
+              <div class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.stress.average') }}</div>
+            </div>
+          </div>
+
+          <!-- Stress Range Legend -->
+          <div class="pt-4 border-t" :class="themeClasses.border">
+            <h4 class="text-xs font-semibold mb-3" :class="themeClasses.textPrimary">{{ $t('home.stress.rangeTitle') }}</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
+                <span class="w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0"></span>{{ $t('home.stress.range.relaxed') }}
               </div>
-              <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ typeof stressStats.min === 'number' ? stressStats.min : '--' }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.stress.min') }}</div>
+              <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-400 flex-shrink-0"></span>{{ $t('home.stress.range.light') }}
               </div>
-              <div class="text-center p-3">
-                <div class="text-4xl font-bold mb-2" :class="themeClasses.textPrimary">{{ stressMeanRounded !== null ?
-                  stressMeanRounded : '--' }}</div>
-                <div class="text-sm" :class="themeClasses.textSecondary">{{ $t('home.stress.average') }}</div>
+              <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 flex-shrink-0"></span>{{ $t('home.stress.range.moderate') }}
+              </div>
+              <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
+                <span class="w-2.5 h-2.5 rounded-full bg-orange-500 flex-shrink-0"></span>{{ $t('home.stress.range.severe') }}
               </div>
             </div>
-
-            <!-- Stress Ranges -->
-            <div class="mt-4 pt-4 border-t" :class="themeClasses.border">
-              <h4 class="text-sm font-semibold mb-2" :class="themeClasses.textPrimary">{{ $t('home.stress.rangeTitle') }}</h4>
-              <div class="text-xs grid grid-cols-1 sm:grid-cols-2 gap-2" :class="themeClasses.textSecondary">
-                <div>{{ $t('home.stress.range.relaxed') }}</div>
-                <div>{{ $t('home.stress.range.light') }}</div>
-                <div>{{ $t('home.stress.range.moderate') }}</div>
-                <div>{{ $t('home.stress.range.severe') }}</div>
-              </div>
-            </div> 
           </div>
         </div>
+      </div>
 
-        <!-- Quick Actions Cards -->
-        <div v-if="!hideQuickActions" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Data Setting Card -->
-          <router-link to="/data-setting" class="block transform transition-transform duration-200 hover:scale-105">
-            <div
-              class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
-              :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-blue-300']">
-              <div class="flex items-center mb-4">
-                <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'">
-                  <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <!-- ══ Quick Actions ══ -->
+      <div v-if="!hideQuickActions" class="mb-2">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center"
+            :class="isDarkMode ? 'bg-violet-900/40' : 'bg-violet-100'">
+            <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.quickActions') }}</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Data Settings card -->
+          <router-link to="/data-setting" class="group block">
+            <div class="rounded-2xl shadow-sm border h-full flex flex-col p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+              :class="[themeClasses.cardBackground, themeClasses.border]">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                  :class="isDarkMode ? 'bg-blue-900/40' : 'bg-blue-100'">
+                  <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.dataSettings') }}
-                  </h3>
-                  <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.quickAdd') }}</p>
+                  <h3 class="text-sm font-semibold leading-tight" :class="themeClasses.textPrimary">{{ $t('nav.dataSettings') }}</h3>
+                  <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('home.quickAdd') }}</p>
                 </div>
               </div>
-              <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
-                {{ $t('home.recordData') }}
-              </p>
-              <div class="flex items-center text-blue-600 text-xs font-medium mt-auto">
+              <p class="text-xs leading-relaxed flex-grow mb-4" :class="themeClasses.textSecondary">{{ $t('home.recordData') }}</p>
+              <div class="flex items-center text-blue-500 text-xs font-semibold gap-1 mt-auto">
                 <span>{{ $t('home.addRecord') }}</span>
-                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                <svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
                 </svg>
               </div>
             </div>
           </router-link>
 
-          <!-- AI Advice Card -->
-          <router-link to="/ai-support" class="block transform transition-transform duration-200 hover:scale-105">
-            <div
-              class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
-              :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-purple-300']">
-              <div class="flex items-center mb-4">
-                <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'">
-                  <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
-                    </path>
+          <!-- AI Support card -->
+          <router-link to="/ai-support" class="group block">
+            <div class="rounded-2xl shadow-sm border h-full flex flex-col p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+              :class="[themeClasses.cardBackground, themeClasses.border]">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                  :class="isDarkMode ? 'bg-purple-900/40' : 'bg-purple-100'">
+                  <svg class="h-6 w-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.aiSupport') }}</h3>
-                  <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.availableAlways') }}</p>
+                  <h3 class="text-sm font-semibold leading-tight" :class="themeClasses.textPrimary">{{ $t('nav.aiSupport') }}</h3>
+                  <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('home.availableAlways') }}</p>
                 </div>
               </div>
-              <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
-                {{ $t('home.getAdvice') }}
-              </p>
-              <div class="flex items-center text-purple-600 text-xs font-medium mt-auto">
+              <p class="text-xs leading-relaxed flex-grow mb-4" :class="themeClasses.textSecondary">{{ $t('home.getAdvice') }}</p>
+              <div class="flex items-center text-purple-500 text-xs font-semibold gap-1 mt-auto">
                 <span>{{ $t('home.getAdviceButton') }}</span>
-                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                <svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
                 </svg>
               </div>
             </div>
           </router-link>
 
-          <!-- Chat Card -->
-          <router-link to="/chat" class="block transform transition-transform duration-200 hover:scale-105">
-            <div
-              class="rounded-lg shadow-sm p-6 border cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col"
-              :class="[themeClasses.cardBackground, themeClasses.border, 'hover:border-green-300']">
-              <div class="flex items-center mb-4">
-                <div class="p-3 rounded-full mr-4" :class="isDarkMode ? 'bg-green-900/30' : 'bg-green-100'">
-                  <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                    </path>
+          <!-- Chat card -->
+          <router-link to="/chat" class="group block sm:col-span-2 lg:col-span-1">
+            <div class="rounded-2xl shadow-sm border h-full flex flex-col p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+              :class="[themeClasses.cardBackground, themeClasses.border]">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                  :class="isDarkMode ? 'bg-green-900/40' : 'bg-green-100'">
+                  <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('nav.chat') }}</h3>
-                  <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('home.chat.available') }}</p>
+                  <h3 class="text-sm font-semibold leading-tight" :class="themeClasses.textPrimary">{{ $t('nav.chat') }}</h3>
+                  <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('home.chat.available') }}</p>
                 </div>
               </div>
-              <p class="text-sm mb-4 leading-relaxed flex-grow" :class="themeClasses.textSecondary">
-                {{ $t('home.chat.description') }}
-              </p>
-              <div class="flex items-center text-green-600 text-xs font-medium mt-auto">
+              <p class="text-xs leading-relaxed flex-grow mb-4" :class="themeClasses.textSecondary">{{ $t('home.chat.description') }}</p>
+              <div class="flex items-center text-green-500 text-xs font-semibold gap-1 mt-auto">
                 <span>{{ $t('home.chat.openChat') }}</span>
-                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                <svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
                 </svg>
               </div>
             </div>
           </router-link>
         </div>
-      </main>
+      </div>
+    </main>
   </div>
 </template>
 
@@ -795,6 +876,28 @@ const stressCategoryBadgeClass = computed(() => {
   const map = { relaxed: 'bg-teal-400', light: 'bg-green-400', moderate: 'bg-yellow-500', severe: 'bg-orange-500' }
   return map[stressCategoryKey.value] || 'bg-gray-400'
 })
+
+// Heart rate card color helper based on bpm ranges
+// Low (bradycardia): < 60, Normal: 60-100, Elevated: 101-130, High (tachycardia): > 130
+const hrCardClasses = (val) => {
+  const v = Number(val)
+  if (!val && val !== 0 || isNaN(v) || v === 0) return { bg: isDarkMode.value ? 'bg-gray-800/30' : 'bg-gray-50', text: isDarkMode.value ? 'text-gray-300' : 'text-gray-500' }
+  if (v < 60)   return { bg: isDarkMode.value ? 'bg-blue-900/20'   : 'bg-blue-50',   text: 'text-blue-500' }
+  if (v <= 100) return { bg: isDarkMode.value ? 'bg-green-900/20'  : 'bg-green-50',  text: 'text-green-500' }
+  if (v <= 130) return { bg: isDarkMode.value ? 'bg-yellow-900/20' : 'bg-yellow-50', text: 'text-yellow-500' }
+  return           { bg: isDarkMode.value ? 'bg-red-900/20'    : 'bg-red-50',    text: 'text-red-500' }
+}
+
+// Stress card color helper based on stress score ranges
+// Relaxed: 1-25, Light: 26-50, Moderate: 51-80, Severe: 81-100
+const stressCardClasses = (val) => {
+  const v = Number(val)
+  if (val === null || val === undefined || isNaN(v)) return { bg: isDarkMode.value ? 'bg-gray-800/30' : 'bg-gray-50', text: isDarkMode.value ? 'text-gray-300' : 'text-gray-500' }
+  if (v <= 25)  return { bg: isDarkMode.value ? 'bg-teal-900/20'   : 'bg-teal-50',   text: 'text-teal-500' }
+  if (v <= 50)  return { bg: isDarkMode.value ? 'bg-green-900/20'  : 'bg-green-50',  text: 'text-green-500' }
+  if (v <= 80)  return { bg: isDarkMode.value ? 'bg-yellow-900/20' : 'bg-yellow-50', text: 'text-yellow-500' }
+  return          { bg: isDarkMode.value ? 'bg-orange-900/20'  : 'bg-orange-50',  text: 'text-orange-500' }
+}
 
 // Calendar state
 const showDatePicker = ref(false)

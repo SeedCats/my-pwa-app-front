@@ -3,13 +3,36 @@
     <main class="px-3 sm:px-4 md:px-6 lg:px-8 pt-6 pb-12">
 
       <!-- ── Page Header ── -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold tracking-tight" :class="themeClasses.textPrimary">
-          {{ $t('booking.title') }}
-        </h1>
-        <p class="mt-1 text-sm" :class="themeClasses.textSecondary">
-          {{ $t('booking.adminDesc') }}
-        </p>
+      <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3 mb-1">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200 dark:shadow-blue-900/40">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight" :class="themeClasses.textPrimary">
+              {{ $t('booking.title') }}
+            </h1>
+          </div>
+          <p class="text-sm ml-13 pl-0.5" :class="themeClasses.textSecondary">
+            {{ $t('booking.adminDesc') }}
+          </p>
+        </div>
+        <!-- Quick stats badges -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+            {{ bookings.length }} {{ $t('booking.statsTotal') }}
+          </div>
+          <div v-if="pendingCount > 0" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border border-amber-200 dark:border-amber-700">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+            </span>
+            {{ pendingCount }} {{ $t('booking.pending') }}
+          </div>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 xl:gap-8 items-start">
@@ -20,14 +43,39 @@
         <div class="xl:col-span-2">
           <div class="rounded-2xl shadow-sm border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
 
-            <!-- Card header -->
-            <div class="px-6 py-4 border-b flex items-center gap-3" :class="themeClasses.border">
-              <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
+            <!-- Card header gradient banner -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 px-6 py-5">
+              <!-- Decorative circles -->
+              <div class="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-full"></div>
+              <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-white/10 rounded-full"></div>
+              <div class="relative flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-base font-bold text-white">{{ $t('booking.bookService') }}</h2>
+                  <p class="text-[11px] text-blue-100 mt-0.5">{{ $t('booking.selectService') }}</p>
+                </div>
               </div>
-              <h2 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('booking.bookService') }}</h2>
+              <!-- Step trail -->
+              <div class="relative flex items-center gap-1 mt-4">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold" :class="form.service ? 'bg-white text-blue-600' : 'bg-white/30 text-white'">1</div>
+                  <span class="text-[10px] font-medium" :class="form.service ? 'text-white' : 'text-blue-200'">{{ $t('booking.bookingStepService') }}</span>
+                </div>
+                <div class="flex-1 h-px" :class="form.service ? 'bg-white/60' : 'bg-white/20'"></div>
+                <div class="flex items-center gap-1.5">
+                  <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold" :class="form.date && form.times.length > 0 ? 'bg-white text-blue-600' : 'bg-white/30 text-white'">2</div>
+                  <span class="text-[10px] font-medium" :class="form.date && form.times.length > 0 ? 'text-white' : 'text-blue-200'">{{ $t('booking.bookingStepDateTime') }}</span>
+                </div>
+                <div class="flex-1 h-px" :class="form.date && form.times.length > 0 ? 'bg-white/60' : 'bg-white/20'"></div>
+                <div class="flex items-center gap-1.5">
+                  <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-white/30 text-white">3</div>
+                  <span class="text-[10px] font-medium text-blue-200">{{ $t('booking.bookingStepNotes') }}</span>
+                </div>
+              </div>
             </div>
 
             <form @submit.prevent="submitBooking" class="p-6 space-y-5">
@@ -37,20 +85,29 @@
                 <label class="block text-xs font-semibold uppercase tracking-wide mb-2" :class="themeClasses.textSecondary">
                   {{ $t('booking.service') }}
                 </label>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-2.5">
                   <button
                     v-for="svc in SERVICE_LIST"
                     :key="svc.value"
                     type="button"
                     @click="form.service = svc.value"
-                    class="flex flex-col items-start p-3 rounded-xl border-2 transition-all text-left"
+                    class="group relative flex flex-col items-start p-3.5 rounded-2xl border-2 transition-all duration-200 text-left overflow-hidden hover:scale-[1.02] active:scale-[0.99]"
                     :class="form.service === svc.value
-                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30'
-                      : [themeClasses.inputBackground, themeClasses.border, themeClasses.hoverBackground]
+                      ? 'border-blue-600 shadow-md shadow-blue-100 dark:shadow-blue-900/20'
+                      : [themeClasses.inputBackground, themeClasses.border, 'hover:border-blue-300 dark:hover:border-blue-700']
                     "
                   >
-                    <span class="text-lg mb-0.5">{{ svc.icon }}</span>
-                    <span class="text-xs font-medium leading-tight" :class="form.service === svc.value ? 'text-blue-600 dark:text-blue-400' : themeClasses.textPrimary">
+                    <!-- Selected glow bg -->
+                    <div v-if="form.service === svc.value" class="absolute inset-0 bg-gradient-to-br opacity-10" :class="svc.gradientFrom + ' ' + svc.gradientTo"></div>
+                    <!-- Checkmark -->
+                    <div v-if="form.service === svc.value" class="absolute top-2 right-2 w-4.5 h-4.5">
+                      <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    </div>
+                    <!-- Icon circle -->
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center text-xl mb-2 transition-transform group-hover:scale-110" :class="svc.iconBg">
+                      {{ svc.icon }}
+                    </div>
+                    <span class="text-xs font-semibold leading-tight relative z-10" :class="form.service === svc.value ? 'text-blue-600 dark:text-blue-400' : themeClasses.textPrimary">
                       {{ $t(`booking.${svc.key}`) }}
                     </span>
                   </button>
@@ -147,12 +204,17 @@
                           :disabled="!bookDateAvailable(cell)"
                           class="relative aspect-square w-full flex items-center justify-center rounded-lg text-xs font-medium transition-all"
                           :class="form.date === bookDateKey(cell)
-                            ? 'bg-blue-600 text-white shadow-md scale-105'
-                            : bookDateAvailable(cell)
-                              ? [themeClasses.hoverBackground, themeClasses.textPrimary, 'ring-1 ring-green-500 ring-inset font-semibold']
-                              : ['opacity-25 cursor-not-allowed', themeClasses.textSecondary]
+                            ? 'bg-blue-600 text-white shadow-md scale-105 ring-2 ring-blue-400 ring-offset-1'
+                            : bookDateKey(cell) === todayKey
+                              ? ['ring-2 ring-blue-400 font-bold', themeClasses.textPrimary, themeClasses.hoverBackground]
+                              : bookDateAvailable(cell)
+                                ? [themeClasses.hoverBackground, themeClasses.textPrimary, 'ring-1 ring-green-500 ring-inset font-semibold']
+                                : ['opacity-25 cursor-not-allowed', themeClasses.textSecondary]
                           "
-                        >{{ cell }}</button>
+                        >
+                          {{ cell }}
+                          <span v-if="bookDateKey(cell) === todayKey && form.date !== bookDateKey(cell)" class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-500"></span>
+                        </button>
                       </div>
                     </div>
                     <div class="px-3 py-1.5 border-t flex items-center gap-1.5 text-[10px]" :class="[themeClasses.border, themeClasses.textSecondary]">
@@ -193,18 +255,19 @@
                         type="button"
                         @click="!slot.booked && toggleTimeSlot(slot.time)"
                         :disabled="slot.booked || (!form.times.includes(slot.time) && form.times.length >= 2)"
-                        class="py-2 rounded-xl text-xs font-medium border transition-all flex flex-col items-center justify-center leading-tight"
+                        class="py-2.5 rounded-xl text-xs font-medium border transition-all duration-150 flex flex-col items-center justify-center leading-tight hover:scale-[1.03] active:scale-[0.97]"
                         :class="slot.booked
-                          ? ['opacity-50 cursor-not-allowed line-through', themeClasses.inputBackground, themeClasses.border, themeClasses.textSecondary]
+                          ? ['opacity-40 cursor-not-allowed', themeClasses.inputBackground, themeClasses.border, themeClasses.textSecondary]
                           : form.times.includes(slot.time)
-                            ? 'bg-blue-600 border-blue-600 text-white shadow-sm scale-[1.03]'
+                            ? 'bg-gradient-to-br from-blue-500 to-blue-700 border-blue-600 text-white shadow-md scale-[1.05]'
                             : form.times.length >= 2
-                              ? ['opacity-35 cursor-not-allowed', themeClasses.inputBackground, themeClasses.border, themeClasses.textSecondary]
-                              : [themeClasses.inputBackground, themeClasses.border, themeClasses.textPrimary, themeClasses.hoverBackground]
+                              ? ['opacity-30 cursor-not-allowed', themeClasses.inputBackground, themeClasses.border, themeClasses.textSecondary]
+                              : [themeClasses.inputBackground, 'border-transparent ring-1 ring-inset', themeClasses.textPrimary, themeClasses.hoverBackground, 'hover:ring-blue-400 dark:hover:ring-blue-500']
                         "
                       >
+                        <svg v-if="form.times.includes(slot.time)" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                         <span>{{ slot.time }}</span>
-                        <span v-if="slot.booked" class="text-[9px] font-semibold uppercase tracking-wide mt-0.5 opacity-70">{{ $t('booking.slotBooked') }}</span>
+                        <span v-if="slot.booked" class="text-[8px] font-bold uppercase tracking-wide mt-0.5 opacity-60">{{ $t('booking.slotBooked') }}</span>
                       </button>
                     </div>
 
@@ -239,17 +302,62 @@
                 <textarea
                   v-model="form.notes"
                   rows="3"
-                  class="w-full p-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none resize-none text-sm transition-all"
+                  class="w-full p-3 rounded-xl border focus:ring-2 focus:ring-blue-500 focus:border-blue-400 outline-none resize-none text-sm transition-all"
                   :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
                   :placeholder="$t('booking.notes') + '...'"
                 ></textarea>
               </div>
 
+              <!-- Booking Summary -->
+              <transition name="summary-slide">
+                <div
+                  v-if="form.service && form.date && form.times.length > 0"
+                  class="rounded-2xl border-2 border-blue-200 dark:border-blue-800 overflow-hidden"
+                >
+                  <div class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 border-b border-blue-200 dark:border-blue-800 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <span class="text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wide">{{ $t('booking.bookingSummary') }}</span>
+                  </div>
+                  <div class="p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                      <span class="flex items-center gap-1.5 text-xs" :class="themeClasses.textSecondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                        {{ $t('booking.service') }}
+                      </span>
+                      <span class="text-xs font-semibold" :class="themeClasses.textPrimary">
+                        {{ SERVICE_LIST.find(s => s.value === form.service)?.icon }} {{ $t(`booking.${SERVICE_LIST.find(s => s.value === form.service)?.key}`) }}
+                      </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="flex items-center gap-1.5 text-xs" :class="themeClasses.textSecondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        {{ $t('booking.date') }}
+                      </span>
+                      <span class="text-xs font-semibold" :class="themeClasses.textPrimary">{{ form.date }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="flex items-center gap-1.5 text-xs" :class="themeClasses.textSecondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ $t('booking.time') }}
+                      </span>
+                      <span class="text-xs font-semibold" :class="themeClasses.textPrimary">{{ form.times.join(' • ') }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="flex items-center gap-1.5 text-xs" :class="themeClasses.textSecondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        {{ $t('booking.provider') }}
+                      </span>
+                      <span class="text-xs font-semibold" :class="themeClasses.textPrimary">{{ getProviderName(form.provider) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </transition>
+
               <!-- Submit -->
               <button
                 type="submit"
                 :disabled="isSubmitting || !form.service || !form.date || form.times.length === 0"
-                class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.99]"
+                class="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:shadow-blue-200 dark:hover:shadow-blue-900/40 active:scale-[0.99]"
               >
                 <span v-if="isSubmitting" class="flex items-center justify-center gap-2">
                   <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -258,7 +366,10 @@
                   </svg>
                   {{ $t('common.loading') }}
                 </span>
-                <span v-else>{{ $t('booking.submit') }}</span>
+                <span v-else class="flex items-center justify-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  {{ $t('booking.submit') }}
+                </span>
               </button>
 
               <!-- Feedback -->
@@ -285,25 +396,25 @@
         <!-- ══════════════════════════════════════════════════════════
              RIGHT COLUMN  …Appointments  (xl: 3/5 width)
         ═══════════════════════════════════════════════════════════-->
-        <div class="xl:col-span-3 flex flex-col gap-4">
+        <div ref="appointmentsRef" class="xl:col-span-3 flex flex-col gap-4">
 
           <!-- Section header + filters -->
           <div class="rounded-2xl shadow-sm border p-4" :class="[themeClasses.cardBackground, themeClasses.border]">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
               <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <h2 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('booking.upcoming') }}</h2>
-                <span v-if="bookings.length > 0" class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 font-medium">
-                  {{ bookings.length }}
+                <span v-if="filteredBookings.length > 0" class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 font-bold">
+                  {{ filteredBookings.length }}
                 </span>
               </div>
               <button
                 @click="toggleSort('date')"
-                class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-colors flex-shrink-0"
+                class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
                 :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground]"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -312,88 +423,97 @@
                 {{ $t('common.sort') }} {{ sortKey === 'date' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
               </button>
             </div>
-            <div class="flex flex-col sm:flex-row gap-2">
-              <select
-                v-model="statusFilter"
-                class="flex-1 px-3 py-2 rounded-xl border text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
-                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
+            <!-- Status pill filter tabs -->
+            <div class="flex flex-wrap gap-1.5 mb-2">
+              <button
+                v-for="tab in STATUS_TABS"
+                :key="tab.value"
+                @click="statusFilter = tab.value"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all border"
+                :class="statusFilter === tab.value
+                  ? tab.activeClass
+                  : [themeClasses.inputBackground, themeClasses.border, themeClasses.textSecondary, 'hover:border-current']
+                "
               >
-                <option value="">{{ $t('booking.allStatus') }}</option>
-                <option value="pending">{{ $t('booking.pending') }}</option>
-                <option value="confirmed">{{ $t('booking.confirmed') }}</option>
-                <option value="completed">{{ $t('booking.completed') }}</option>
-                <option value="rejected">{{ $t('booking.rejected') }}</option>
-                <option value="cancelled">{{ $t('booking.cancelled') }}</option>
-              </select>
-              <div class="relative flex-[2]">
-                <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  v-model="searchQuery"
-                  :placeholder="$t('common.search') + '...'"
-                  class="w-full pl-9 pr-4 py-2 rounded-xl border text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
-                  :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
-                />
-              </div>
+                <span>{{ tab.icon }}</span>
+                <span>{{ $t(tab.label) }}</span>
+                <span v-if="tab.value && bookings.filter(b => b.status === tab.value).length > 0" class="ml-0.5 opacity-80">({{ bookings.filter(b => b.status === tab.value).length }})</span>
+              </button>
+            </div>
+            <!-- Search -->
+            <div class="relative">
+              <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                v-model="searchQuery"
+                :placeholder="$t('common.search') + '...'"
+                class="w-full pl-9 pr-4 py-2 rounded-xl border text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 outline-none transition-colors"
+                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
+              />
             </div>
           </div>
 
           <!-- Loading state -->
           <div v-if="isLoading" class="flex flex-col items-center justify-center py-16 gap-3">
-            <svg class="animate-spin h-7 w-7 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-            </svg>
-            <p class="text-sm" :class="themeClasses.textSecondary">{{ $t('common.loading') }}</p>
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+              <svg class="animate-spin h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+            </div>
+            <p class="text-sm font-medium" :class="themeClasses.textSecondary">{{ $t('common.loading') }}</p>
           </div>
 
           <!-- Empty state -->
-          <div v-else-if="filteredBookings.length === 0" class="flex flex-col items-center justify-center py-16 gap-3 rounded-2xl border border-dashed" :class="[themeClasses.border, themeClasses.cardBackground]">
-            <div class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div v-else-if="filteredBookings.length === 0" class="flex flex-col items-center justify-center py-16 gap-4 rounded-2xl border border-dashed" :class="[themeClasses.border, themeClasses.cardBackground]">
+            <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <p class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('booking.noAppointments') }}</p>
-            <p class="text-xs text-center max-w-xs" :class="themeClasses.textSecondary">{{ $t('booking.noAppointmentsDesc') }}</p>
+            <div class="text-center">
+              <p class="font-bold text-sm" :class="themeClasses.textPrimary">{{ $t('booking.noAppointments') }}</p>
+              <p class="text-xs mt-1 max-w-xs" :class="themeClasses.textSecondary">{{ $t('booking.noAppointmentsDesc') }}</p>
+            </div>
           </div>
 
           <!-- Appointment cards -->
           <template v-else>
             <div
-              v-for="booking in paginatedBookings"
+              v-for="(booking, idx) in paginatedBookings"
               :key="booking._id || booking.id"
-              class="rounded-2xl border shadow-sm overflow-hidden transition-all hover:shadow-md"
+              class="rounded-2xl border shadow-sm overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 card-enter"
               :class="[themeClasses.cardBackground, themeClasses.border]"
+              :style="{ animationDelay: `${idx * 50}ms` }"
             >
               <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-4">
                 <!-- Icon -->
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg"
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl shadow-sm"
                   :class="getServiceBg(booking.service)">
                   {{ getServiceIcon(booking.service) }}
                 </div>
 
                 <!-- Info -->
                 <div class="flex-1 min-w-0">
-                  <h3 class="font-semibold text-sm truncate" :class="themeClasses.textPrimary">
+                  <h3 class="font-bold text-sm truncate" :class="themeClasses.textPrimary">
                     {{ $t(`booking.${getServiceKey(booking.service)}`) }}
                   </h3>
-                  <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
-                    <span class="flex items-center gap-1 text-xs" :class="themeClasses.textSecondary">
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
+                    <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full" :class="[themeClasses.inputBackground, themeClasses.textSecondary]">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       {{ booking.date }}
                     </span>
-                    <span class="flex items-center gap-1 text-xs" :class="themeClasses.textSecondary">
+                    <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full" :class="[themeClasses.inputBackground, themeClasses.textSecondary]">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       {{ booking.time }}
                     </span>
-                    <span class="flex items-center gap-1 text-xs" :class="themeClasses.textSecondary">
+                    <span class="inline-flex items-center gap-1 text-xs" :class="themeClasses.textSecondary">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
@@ -404,13 +524,14 @@
 
                 <!-- Status + action -->
                 <div class="flex sm:flex-col items-center sm:items-end gap-2 flex-shrink-0">
-                  <span :class="getStatusClass(booking.status)" class="inline-block px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
+                  <span :class="getStatusClass(booking.status)" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap">
+                    <span class="w-1.5 h-1.5 rounded-full" :class="getStatusDot(booking.status)"></span>
                     {{ $t(`booking.${booking.status}`) }}
                   </span>
                   <button
                     v-if="booking.status === 'pending'"
                     @click="cancelBooking(booking._id || booking.id)"
-                    class="text-xs px-3 py-1 rounded-lg border border-red-400 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all"
+                    class="text-xs px-3 py-1 rounded-lg border border-red-300 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all hover:scale-[1.03] active:scale-[0.97]"
                   >
                     {{ $t('booking.cancel') }}
                   </button>
@@ -421,7 +542,7 @@
             <!-- Pagination -->
             <div v-if="totalPages > 1" class="flex justify-center items-center gap-2 pt-2">
               <button
-                @click="currentPage--"
+                @click="changePage(currentPage - 1)"
                 :disabled="currentPage === 1"
                 class="flex items-center gap-1 px-4 py-2 rounded-xl border text-sm disabled:opacity-40 transition-all"
                 :class="[themeClasses.inputBackground, themeClasses.border, themeClasses.textPrimary, themeClasses.hoverBackground]"
@@ -433,7 +554,7 @@
               </button>
               <span class="text-sm font-medium px-3" :class="themeClasses.textSecondary">{{ currentPage }} / {{ totalPages }}</span>
               <button
-                @click="currentPage++"
+                @click="changePage(currentPage + 1)"
                 :disabled="currentPage === totalPages"
                 class="flex items-center gap-1 px-4 py-2 rounded-xl border text-sm disabled:opacity-40 transition-all"
                 :class="[themeClasses.inputBackground, themeClasses.border, themeClasses.textPrimary, themeClasses.hoverBackground]"
@@ -445,26 +566,6 @@
               </button>
             </div>
           </template>
-
-          <!-- Chat CTA -->
-          <div class="rounded-2xl border p-4 flex flex-col sm:flex-row items-center gap-4" :class="[themeClasses.cardBackground, themeClasses.border]">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="flex-1 text-center sm:text-left">
-              <p class="text-sm font-medium" :class="themeClasses.textPrimary">{{ $t('booking.needHelp') }}</p>
-              <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('booking.chatWithProvider') }}</p>
-            </div>
-            <router-link
-              to="/chat"
-              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm flex-shrink-0"
-            >
-              {{ $t('booking.chatWithProvider') }}
-            </router-link>
-          </div>
-
         </div>
       </div>
     </main>
@@ -493,14 +594,54 @@ const getServiceKey = (service) => {
 }
 
 const SERVICE_LIST = [
-  { value: 'GeneralCheckup',        key: 'generalCheckup',       icon: '🩺' },
-  { value: 'Health Status Checkup', key: 'healthStatusCheckup',  icon: '📊' },
-  { value: 'Health Consultation',   key: 'healthConsultation',   icon: '💬' },
-  { value: 'therapy',               key: 'therapy',              icon: '🧘' }
+  { value: 'GeneralCheckup',        key: 'generalCheckup',       icon: '🩺', iconBg: 'bg-red-50 dark:bg-red-900/30',    gradientFrom: 'from-red-400',    gradientTo: 'to-rose-500' },
+  { value: 'Health Status Checkup', key: 'healthStatusCheckup',  icon: '📊', iconBg: 'bg-blue-50 dark:bg-blue-900/30',  gradientFrom: 'from-blue-400',   gradientTo: 'to-cyan-500' },
+  { value: 'Health Consultation',   key: 'healthConsultation',   icon: '💬', iconBg: 'bg-purple-50 dark:bg-purple-900/30', gradientFrom: 'from-purple-400', gradientTo: 'to-violet-500' },
+  { value: 'therapy',               key: 'therapy',              icon: '🧘', iconBg: 'bg-green-50 dark:bg-green-900/30', gradientFrom: 'from-green-400',  gradientTo: 'to-emerald-500' }
+]
+
+const STATUS_TABS = [
+  { value: '',           label: 'booking.allStatus', icon: '📋', activeClass: 'bg-gray-800 text-white border-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:border-gray-100' },
+  { value: 'pending',   label: 'booking.pending',   icon: '⏳', activeClass: 'bg-amber-500 text-white border-amber-500' },
+  { value: 'confirmed', label: 'booking.confirmed', icon: '✅', activeClass: 'bg-green-500 text-white border-green-500' },
+  { value: 'completed', label: 'booking.completed',  icon: '🏁', activeClass: 'bg-blue-500 text-white border-blue-500' },
+  { value: 'rejected',  label: 'booking.rejected',  icon: '❌', activeClass: 'bg-red-500 text-white border-red-500' },
+  { value: 'cancelled', label: 'booking.cancelled', icon: '🚫', activeClass: 'bg-slate-500 text-white border-slate-500' }
 ]
 
 const getServiceIcon = (service) => {
   return SERVICE_LIST.find(s => s.value === service)?.icon || '📅'
+}
+
+const todayKey = (() => {
+  const d = new Date()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${mm}-${dd}`
+})()
+
+const pendingCount = computed(() => bookings.value.filter(b => b.status === 'pending').length)
+
+const getStatusAccentBg = (status) => {
+  switch (status) {
+    case 'confirmed': return 'bg-green-400'
+    case 'pending':   return 'bg-amber-400'
+    case 'cancelled': return 'bg-slate-400'
+    case 'rejected':  return 'bg-red-500'
+    case 'completed': return 'bg-blue-500'
+    default:          return 'bg-gray-300'
+  }
+}
+
+const getStatusDot = (status) => {
+  switch (status) {
+    case 'confirmed': return 'bg-green-600 dark:bg-green-400'
+    case 'pending':   return 'bg-amber-500 dark:bg-amber-400'
+    case 'cancelled': return 'bg-slate-500 dark:bg-slate-400'
+    case 'rejected':  return 'bg-red-600 dark:bg-red-400'
+    case 'completed': return 'bg-blue-600 dark:bg-blue-400'
+    default:          return 'bg-gray-400'
+  }
 }
 
 const getServiceBg = (service) => {
@@ -632,6 +773,12 @@ const bookings = ref([])
 
 const currentPage = ref(1)
 const itemsPerPage = 10
+const appointmentsRef = ref(null)
+
+const changePage = (page) => {
+  currentPage.value = page
+  appointmentsRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
 const _userSort = (() => {
   try { return JSON.parse(localStorage.getItem('userBookingSort') || '{}') } catch { return {} }
@@ -680,7 +827,7 @@ const filteredBookings = computed(() => {
     })
   }
 
-  const statusPriority = (s) => s === 'pending' ? 0 : s === 'confirmed' ? 1 : 2
+  const statusPriority = (s) => ({ pending: 0, confirmed: 1, completed: 2, rejected: 3, cancelled: 4 }[s] ?? 5)
 
   return result.slice().sort((a, b) => {
     // Active statuses always float to top unless user is explicitly sorting by status
@@ -870,5 +1017,42 @@ const cancelBooking = async (id) => {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-4px);
+}
+
+/* Booking summary slide-in */
+.summary-slide-enter-active {
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.summary-slide-leave-active {
+  transition: all 0.2s ease;
+}
+.summary-slide-enter-from,
+.summary-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.97);
+}
+
+/* Appointment card entrance */
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.card-enter {
+  animation: card-in 0.3s ease both;
+}
+
+/* Hide scrollbar for filter tabs */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 </style>
