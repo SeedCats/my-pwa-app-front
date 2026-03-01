@@ -459,6 +459,7 @@
     "conversationHistory": "Conversation History",
     "deleteAll": "Delete All",
     "deleteAllConfirm": "Are you sure you want to DELETE ALL conversations? This cannot be undone.",
+    "deleteConversationConfirm": "Delete this conversation? This action cannot be undone.",
     "hide": "Hide",
     "show": "Show",
     "noPastConversations": "No past conversations.",

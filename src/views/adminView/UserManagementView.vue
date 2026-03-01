@@ -377,6 +377,7 @@ import { useLanguage } from '../../composables/useLanguage'
 import { useTheme } from '../../composables/useTheme'
 import { fetchWithAuth } from '../../utils/fetchWithAuth'
 const { t } = useLanguage()
+const { themeClasses, isDarkMode } = useTheme()
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 
@@ -384,7 +385,7 @@ const users = ref([])
 const loading = ref(true)
 const error = ref('')
 const page = ref(1)
-const limit = ref(10) // show up to 10 users per page
+const limit = ref(10)
 const total = ref(0)
 const searchQuery = ref('')
 
@@ -411,21 +412,16 @@ const loadUsers = async () => {
     if (!res.ok) throw new Error(t('admin.failedLoadAssignedUsers'))
     const json = await res.json()
     const data = json.data || json
-    // Initialize users with a default 'ongoing' status, then fetch actual status (if any)
-    users.value = (data.users || []).map(u => ({ ...u, serviceStatusKey: 'ongoing', serviceStatus: t('admin.statusOnGoing') }))
-    // Fetch each user's status in parallel using the new API endpoint
+    users.value = (data.users || []).map(u => ({ ...u, serviceStatusKey: 'ongoing' }))
     await Promise.all(users.value.map(async (u, idx) => {
       try {
         const resStatus = await fetchWithAuth(`${API_URL}/api/admin/users/${u.id}/status`, { credentials: 'include' })
         if (resStatus.ok) {
           const jsonStatus = await resStatus.json().catch(() => null)
           const statusText = jsonStatus?.data?.status || 'On-going'
-          const key = String(statusText).toLowerCase() === 'completed' ? 'completed' : 'ongoing'
-          users.value[idx] = { ...users.value[idx], serviceStatusKey: key, serviceStatus: key === 'completed' ? t('admin.statusCompleted') : t('admin.statusOnGoing') }
+          users.value[idx] = { ...users.value[idx], serviceStatusKey: String(statusText).toLowerCase() === 'completed' ? 'completed' : 'ongoing' }
         }
-      } catch (e) {
-        // Keep default status if status fetch fails
-      }
+      } catch { }
     }))
 
     total.value = data.total || users.value.length
@@ -440,10 +436,7 @@ const loadUsers = async () => {
 }
 
 const sortUsers = () => {
-  users.value.sort((a, b) => {
-    const rank = (u) => u.serviceStatusKey === 'ongoing' ? 0 : 1
-    return rank(a) - rank(b)
-  })
+  users.value.sort((a, b) => (a.serviceStatusKey === 'ongoing' ? 0 : 1) - (b.serviceStatusKey === 'ongoing' ? 0 : 1))
 }
 
 const totalPages = computed(() => Math.max(1, Math.ceil(total.value / limit.value)))
@@ -499,10 +492,9 @@ const completeService = async (user) => {
     // Update local status immediately and re-sort
     const idx = users.value.findIndex(u => u.id === user.id)
     if (idx !== -1) {
-      users.value[idx] = { ...users.value[idx], serviceStatusKey: 'completed', serviceStatus: t('admin.statusCompleted') }
+      users.value[idx] = { ...users.value[idx], serviceStatusKey: 'completed' }
       if (selectedUser.value && selectedUser.value.id === user.id) {
         selectedUser.value.serviceStatusKey = 'completed'
-        selectedUser.value.serviceStatus = t('admin.statusCompleted')
       }
       sortUsers()
     }
@@ -521,7 +513,6 @@ const goToDashboard = (user) => {
 const goToUserSetting = (user) => {
   if (!user) return
   closeOperations()
-  // Navigate to the User Setting page and pass the user's id and email via query
   router.push({ name: 'UserSetting', query: { userId: user.id, userEmail: user.email } })
 }
 
@@ -548,10 +539,9 @@ const setOnGoingService = async (user) => {
     // Update local status immediately and re-sort
     const idx = users.value.findIndex(u => u.id === user.id)
     if (idx !== -1) {
-      users.value[idx] = { ...users.value[idx], serviceStatusKey: 'ongoing', serviceStatus: t('admin.statusOnGoing') }
+      users.value[idx] = { ...users.value[idx], serviceStatusKey: 'ongoing' }
       if (selectedUser.value && selectedUser.value.id === user.id) {
         selectedUser.value.serviceStatusKey = 'ongoing'
-        selectedUser.value.serviceStatus = t('admin.statusOnGoing')
       }
       sortUsers()
     }
@@ -569,8 +559,6 @@ const formatDate = (d) => {
     return ''
   }
 }
-
-const { themeClasses, isDarkMode } = useTheme()
 
 onMounted(loadUsers)
 </script>

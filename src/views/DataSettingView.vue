@@ -534,11 +534,7 @@ const isDeletingBMI = ref(false)
 const deleteBMIStatus = ref(null)
 const isStressOnlyUpload = ref(false)
 const isHeartOnlyUpload = ref(false)
-const isProcessing = ref(false)
 const fileProcessStatus = ref(null)
-
-watch(isHeartOnlyUpload, (val) => { if (val) isStressOnlyUpload.value = false })
-watch(isStressOnlyUpload, (val) => { if (val) isHeartOnlyUpload.value = false })
 
 // Computed
 const isUpdateMode = computed(() => !!(existingBMIRecord.value?._id || existingBMIRecord.value?.id))
@@ -565,14 +561,6 @@ const bmiCategoryKey = computed(() => {
     if (raw.includes('over')) return 'overweight'
     if (raw.includes('obese')) return 'obese'
     return ''
-})
-
-const bmiCategoryColor = computed(() => {
-    const bmi = parseFloat(calculatedBMI.value)
-    if (!bmi) return ''
-    const key = bmi < 18.5 ? 'underweight' : bmi < 25 ? 'normal' : bmi < 30 ? 'overweight' : 'obese'
-    const colors = { underweight: ['text-blue-400', 'text-blue-600'], normal: ['text-green-400', 'text-green-600'], overweight: ['text-yellow-400', 'text-yellow-600'], obese: ['text-red-400', 'text-red-600'] }
-    return isDarkMode.value ? colors[key][0] : colors[key][1]
 })
 
 // BMI arc gauge: arc total ≈ 125.6 (half circle, r=40, π*40)
@@ -616,7 +604,6 @@ const bmiSegments = [
     { key: 'obese', color: 'text-red-500' }
 ]
 
-const updateSidebarState = () => {}
 const viewedUserId = computed(() => route.query.userId || null)
 const currentUserId = computed(() => userState.user?.id || null)
 const isViewingOtherUser = computed(() =>
@@ -835,7 +822,6 @@ const submitFileUpload = async () => {
     }
 
     isUploading.value = true
-    isProcessing.value = true
     uploadStatus.value = null
     fileProcessStatus.value = { type: 'info', message: t('dataSettings.processingCSV') }
 
@@ -885,7 +871,6 @@ const submitFileUpload = async () => {
         uploadStatus.value = { type: 'error', message: error.message || t('dataSettings.uploadFailedTry') }
     } finally {
         isUploading.value = false
-        isProcessing.value = false
         setTimeout(() => { fileProcessStatus.value = null }, 3000)
     }
 } 

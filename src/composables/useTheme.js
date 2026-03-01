@@ -56,8 +56,6 @@ export function useTheme() {
     isInitialized.value = true
   }
 
-  const currentTheme = computed(() => isDarkMode.value ? 'dark' : 'light')
-
   const themeClasses = computed(() => ({
     background: isDarkMode.value ? 'bg-gray-900' : 'bg-gray-50',
     cardBackground: isDarkMode.value ? 'bg-gray-800' : 'bg-white',
@@ -68,5 +66,5 @@ export function useTheme() {
     hoverBackground: isDarkMode.value ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
   }))
 
-  return { isDarkMode, autoTheme, currentTheme, themeClasses, setTheme, toggleAutoTheme, initializeTheme }
+  return { isDarkMode, autoTheme, themeClasses, setTheme, toggleAutoTheme, initializeTheme }
 }

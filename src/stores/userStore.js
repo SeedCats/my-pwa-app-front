@@ -30,7 +30,7 @@ export const checkAuth = async (forceRefresh = false) => {
   if (!forceRefresh && state.isAuthenticated !== null && isCacheValid(state.lastAuthCheck, AUTH_CACHE_DURATION))
     return state.isAuthenticated
   try {
-    const response = await fetch('http://localhost:5000/api/user/me', { method: 'GET', credentials: 'include', headers: { 'Content-Type': 'application/json' } })
+    const response = await fetch(`${API_URL}/api/user/me`, { method: 'GET', credentials: 'include', headers: { 'Content-Type': 'application/json' } })
     if (!response.ok) { state.isAuthenticated = false; state.user = null; return false }
     const data = await response.json()
     state.isAuthenticated = !!(data.success === true && data.data?.user)
@@ -97,6 +97,6 @@ export const clearAllCaches = () => {
   } catch (e) { console.warn('Failed to clear localStorage records:', e) }
 }
 
-export const hasRole = (role) => !!(state.user?.role === role)
+export const hasRole = (role) => state.user?.role === role
 export const isAdmin = () => hasRole('admin')
 export const useUserStore = () => readonly(state)

@@ -9,13 +9,13 @@ export const uploadStressCSV = (file, { userId } = {}) => {
 }
 
 export const getStressRecords = ({ userId, ...rest } = {}) =>
-  apiRequest(stressPath(userId), { query: userId ? rest : rest })
+  apiRequest(stressPath(userId), { query: rest })
 
 export const getStressDates = ({ userId, ...rest } = {}) =>
-  apiRequest(stressPath(userId, '/dates'), { query: userId ? rest : rest })
+  apiRequest(stressPath(userId, '/dates'), { query: rest })
 
 export const getStressStats = ({ userId, ...rest } = {}) =>
-  apiRequest(stressPath(userId, '/stats'), { query: userId ? rest : rest })
+  apiRequest(stressPath(userId, '/stats'), { query: rest })
 
 export const deleteAllStressRecords = ({ userId } = {}) =>
   apiRequest(stressPath(userId), { method: 'DELETE' })

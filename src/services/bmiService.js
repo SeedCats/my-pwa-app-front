@@ -11,7 +11,7 @@ export const saveBMIData = (data, { userId } = {}) =>
   apiRequest(bmiPath(userId), { method: 'POST', body: buildBMIPayload(data) })
 
 export const getBMIRecords = ({ userId, ...rest } = {}) =>
-  apiRequest(bmiPath(userId), { query: userId ? rest : { userId, ...rest } })
+  apiRequest(bmiPath(userId), { query: rest })
 
 export const getLatestBMIRecord = async (params = {}) => {
   const res = await getBMIRecords(params)

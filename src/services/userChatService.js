@@ -77,15 +77,7 @@ const tryRequestWithNotFoundFallback = async (attempts) => {
   throw lastError || new Error('Request failed')
 }
 
-export const fetchCurrentUserProfile = async () => {
-  const response = await fetch('http://localhost:5000/api/user/me', {
-    credentials: 'include'
-  })
-  if (!response.ok) {
-    throw new Error('Failed to fetch user profile')
-  }
-  return response.json()
-}
+export const fetchCurrentUserProfile = () => apiRequest('/api/user/me')
 
 export const fetchUserChatHistory = async (currentUserId = null) => {
   const response = await apiRequest('/api/user-chat/history')
@@ -265,46 +257,27 @@ export const deleteAdminChatHistory = async (userId) => {
   })
 }
 
-export const downloadUserChatFile = async (messageId, fileName) => {
-  if (!messageId) throw new Error('Missing messageId')
-  const response = await apiRequest(`/api/user-chat/file/${messageId}`, { expectStream: true })
+const downloadChatFile = async (apiPath, fileName) => {
+  const response = await apiRequest(apiPath, { expectStream: true })
   const blob = await response.blob()
   const url = window.URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  
   let decodedFileName = fileName || 'download'
-  try {
-    decodedFileName = decodeURIComponent(escape(decodedFileName))
-  } catch (e) {
-    // Ignore
-  }
+  try { decodedFileName = decodeURIComponent(escape(decodedFileName)) } catch { /* already decoded */ }
   a.download = decodedFileName
-  
   document.body.appendChild(a)
   a.click()
   a.remove()
   window.URL.revokeObjectURL(url)
 }
 
-export const downloadAdminChatFile = async (messageId, fileName) => {
+export const downloadUserChatFile = (messageId, fileName) => {
   if (!messageId) throw new Error('Missing messageId')
-  const response = await apiRequest(`/api/admin-chat/file/${messageId}`, { expectStream: true })
-  const blob = await response.blob()
-  const url = window.URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  
-  let decodedFileName = fileName || 'download'
-  try {
-    decodedFileName = decodeURIComponent(escape(decodedFileName))
-  } catch (e) {
-    // Ignore
-  }
-  a.download = decodedFileName
-  
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  window.URL.revokeObjectURL(url)
+  return downloadChatFile(`/api/user-chat/file/${messageId}`, fileName)
+}
+
+export const downloadAdminChatFile = (messageId, fileName) => {
+  if (!messageId) throw new Error('Missing messageId')
+  return downloadChatFile(`/api/admin-chat/file/${messageId}`, fileName)
 }

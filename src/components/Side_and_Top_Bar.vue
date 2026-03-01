@@ -513,7 +513,6 @@ import {
     MoonIcon,
 } from '@heroicons/vue/24/outline'
 
-// Initialize router for navigation
 const router = useRouter()
 const route = useRoute()
 const { isDarkMode, themeClasses, setTheme } = useTheme()
@@ -627,15 +626,6 @@ const toggleNotificationPanel = async () => {
     await loadUnreadCount()
 }
 
-// Global flag to track if we just cleared notifications and prevent immediate re-fetching that would show them again
-const justClearedNotifications = ref(false)
-
-const clearUnread = (suppressMs = 0) => {
-    hasViewedNotifications.value = true
-    showNotificationPanel.value = false
-    if (suppressMs > 0) { justClearedNotifications.value = true; setTimeout(() => { justClearedNotifications.value = false }, suppressMs) }
-}
-
 const openNotificationsChat = async () => {
     if (isAdmin()) {
         showNotificationPanel.value = false
@@ -655,10 +645,6 @@ const handleGlobalClick = (event) => {
 }
 
 const loadUnreadCount = async () => {
-    // Skip loading if we just cleared notifications (to allow backend time to update read status)
-    if (justClearedNotifications.value) return
-
-    // Capture initial count BEFORE the try block so it's accessible in catch
     const initialCount = unreadCount.value
 
     try {
@@ -740,7 +726,7 @@ const handleLogOut = async () => {
 
 const loadUserData = async () => {
     try {
-        const res = await fetch('http://localhost:5000/api/user/me', { credentials: 'include' })
+        const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
         if (res.ok) {
             const json = await res.json()
             userData.value = json.data?.user || json.data || json.user || json

@@ -71,21 +71,17 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useLanguage } from '../composables/useLanguage'
 
-// Props to accept theme classes
-const props = defineProps({
+defineProps({
   themeClasses: {
     type: Object,
     default: () => ({})
   }
 })
 
-// Use language composable
 const { currentLanguage, languages, changeLanguage } = useLanguage()
 
-// Local state
 const isOpen = ref(false)
 
-// Computed properties
 const currentLangFlag = computed(() => {
   const lang = languages.find(l => l.code === currentLanguage.value)
   return lang?.flag || '🇺🇸'
@@ -96,7 +92,6 @@ const currentLangName = computed(() => {
   return lang?.name || 'English'
 })
 
-// Methods
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value
 }
@@ -106,7 +101,6 @@ const selectLanguage = (langCode) => {
   isOpen.value = false
 }
 
-// Close dropdown when clicking outside
 const handleClickOutside = (event) => {
   const dropdown = event.target.closest('.relative')
   if (!dropdown) {

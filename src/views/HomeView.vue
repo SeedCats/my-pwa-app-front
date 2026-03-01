@@ -751,7 +751,6 @@
 </template>
 
 <script setup>
-import Sidebar from '../components/Side_and_Top_Bar.vue'
 import { useTheme } from '../composables/useTheme'
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -772,7 +771,6 @@ const { isDarkMode, themeClasses } = useTheme()
 const { t, locale } = useI18n()
 
 // State
-const sidebarHidden = ref(false)
 const heartRateData = ref([])
 const chartData = ref(null)
 const selectedDate = ref('')
@@ -833,13 +831,6 @@ const hasHeartRateData = ref(false)
 // Online/offline and cache state
 const isOnline = ref(navigator.onLine)
 const showingCachedData = ref(false)
-
-// Pressure visualization state
-const isPressureLoading = ref(false)
-const hasPressureData = ref(false)
-const pressureData = ref([])
-const pressureChartData = ref(null)
-const pressureSummaryData = ref(null)
 
 // Real stress averages derived from the day's stress visualization
 const stressMean = computed(() => {
@@ -1074,8 +1065,6 @@ const overallAnalysis = computed(() => {
 
   return { score, statusKey, summary: t(`home.overallAnalysis.summary.${statusKey}`), advice, badgeClass: badgeMap[statusKey], progressClass: progressMap[statusKey] }
 })
-
-const updateSidebarState = (state) => sidebarHidden.value = state
 
 // Format date for display
 const formatDateForDisplay = (dateString) => {
@@ -1475,8 +1464,6 @@ const loadHeartRateData = async () => {
 
       hasHeartRateData.value = true
       updateChartFromAggregated(record.hourlyData)
-      // Create pressure visualization (mock) based on available heart rate data
-      generateMockPressure()
     } else {
       heartRateData.value = []
       stats.value = { min: 0, max: 0, avg: 0, resting: 0, count: 0 }
@@ -1510,7 +1497,6 @@ const loadHeartRateData = async () => {
       
       hasHeartRateData.value = true
       updateChartFromAggregated(record.hourlyData)
-      generateMockPressure()
     } else {
       heartRateData.value = []
       stats.value = { min: 0, max: 0, avg: 0, resting: 0, count: 0 }
@@ -1520,8 +1506,6 @@ const loadHeartRateData = async () => {
     isHeartRateLoading.value = false
   }
 }
-
-// Stats are now loaded directly from aggregated data in loadHeartRateData
 
 const updateChartFromAggregated = (hourlyData) => {
   if (!hourlyData || hourlyData.length === 0) {
@@ -1546,65 +1530,6 @@ const updateChartFromAggregated = (hourlyData) => {
     }]
   }
 }
-
-// Generate a simple mock pressure profile derived from heart rate presence (placeholder until backend exists)
-const generateMockPressure = (date) => {
-  if (!heartRateData.value || heartRateData.value.length === 0) {
-    pressureChartData.value = null
-    pressureSummaryData.value = null
-    hasPressureData.value = false
-    return
-  }
-
-  isPressureLoading.value = true
-
-  // Pattern matching the reference image: first hours relaxed (3), then a drop to lower level (1) and stays
-  // Optionally vary slightly by date to simulate changes
-  const base = date ? new Date(date).getDate() % 3 : 0
-  const values = Array.from({ length: 24 }, (_, i) => {
-    if (i < 4) return 3
-    // small variation using base
-    return 1 + (base === 1 ? 0 : 0)
-  })
-
-  // small delay for UX
-  setTimeout(() => {
-    pressureData.value = values
-    hasPressureData.value = true
-    updatePressureChartFromData(values)
-    updatePressureSummaryChart(values)
-    isPressureLoading.value = false
-  }, 60)
-}
-
-const updatePressureChartFromData = (values) => {
-  if (!values || values.length === 0) {
-    pressureChartData.value = null
-    return
-  }
-  pressureChartData.value = {
-    labels: Array.from({ length: values.length }, (_, i) => `${i.toString().padStart(2, '0')}:00`),
-    datasets: [{
-      label: t('home.stress.scoreLabel'),
-      data: values,
-      borderColor: '#059669',
-      backgroundColor: 'rgba(5,150,105,0.06)',
-      fill: true,
-      tension: 0.4,
-      pointRadius: 0
-    }]
-  }
-}
-
-const updatePressureSummaryChart = (values) => {
-  if (!values || values.length === 0) {
-    pressureSummaryData.value = null
-    return
-  }
-  const mean = values.reduce((s, v) => s + v, 0) / values.length
-  pressureSummaryData.value = { mean, min: Math.min(...values), max: Math.max(...values) }
-}
-
 
 // Load stress data from backend for selected date (aggregated format)
 const loadStressData = async (date) => {
@@ -1814,9 +1739,6 @@ watch(isDarkMode, () => {
   if (heartRateData.value && heartRateData.value.length > 0) {
     updateChartFromAggregated(heartRateData.value)
   }
-  if (pressureData.value && pressureData.value.length > 0) {
-    updatePressureChartFromData(pressureData.value)
-  }
   if (stressData.value && stressData.value.length > 0) {
     updateStressChartFromAggregated(stressData.value)
   }
@@ -1826,9 +1748,6 @@ watch(locale, () => {
   // Re-render charts when language changes so labels/units update
   if (heartRateData.value && heartRateData.value.length > 0) {
     updateChartFromAggregated(heartRateData.value)
-  }
-  if (pressureData.value && pressureData.value.length > 0) {
-    updatePressureChartFromData(pressureData.value)
   }
   if (stressData.value && stressData.value.length > 0) {
     updateStressChartFromAggregated(stressData.value)
@@ -2029,16 +1948,6 @@ const manualRefreshAllData = async () => {
 }
 
 // Handle online/offline events
-const handleOnline = () => {
-  isOnline.value = true
-  console.log('Connection restored - you can refresh to get latest data')
-}
-
-const handleOffline = () => {
-  isOnline.value = false
-  console.log('Connection lost - showing cached data when available')
-}
-
 watch(viewedUserId, async () => {
   // Re-initialize data when admin switches to view a specific user's home
   await loadViewedUser()

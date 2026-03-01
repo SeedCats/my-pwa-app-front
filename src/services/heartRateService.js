@@ -14,13 +14,13 @@ export const uploadAllCSV = (file, { userId } = {}) =>
   uploadCSV(file, userId ? `/api/admin/users/${userId}/uploadAll` : '/api/data/uploadAll')
 
 export const getHeartRateRecords = ({ userId, ...rest } = {}) =>
-  apiRequest(hrPath(userId), { query: userId ? rest : rest })
+  apiRequest(hrPath(userId), { query: rest })
 
 export const getHeartRateDates = ({ userId, ...rest } = {}) =>
-  apiRequest(hrPath(userId, '/dates'), { query: userId ? rest : rest })
+  apiRequest(hrPath(userId, '/dates'), { query: rest })
 
 export const getHeartRateStats = ({ userId, ...rest } = {}) =>
-  apiRequest(hrPath(userId, '/stats'), { query: userId ? rest : rest })
+  apiRequest(hrPath(userId, '/stats'), { query: rest })
 
 export const deleteAllHeartRateRecords = ({ userId } = {}) =>
   apiRequest(hrPath(userId), { method: 'DELETE' })

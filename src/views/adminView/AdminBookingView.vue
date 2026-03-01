@@ -507,9 +507,7 @@ const loadProfile = async () => {
     const profile = await fetchCurrentUserProfile()
     const userData = profile?.data?.user || profile?.data || profile?.user || profile
     adminId.value = userData?.id || userData?._id || null
-  } catch (error) {
-    console.error('Failed to load admin profile:', error)
-  }
+  } catch { }
 }
 
 const getServiceKey = (service) => {
@@ -659,7 +657,6 @@ const loadBookings = async () => {
       errorMessage.value = res?.message || 'Failed to load bookings'
     }
   } catch (error) {
-    console.error('Error loading bookings:', error)
     errorMessage.value = error.message || 'Failed to load bookings'
   } finally {
     isLoading.value = false
@@ -797,8 +794,7 @@ const calSaveSlots = async () => {
     }
     const res = await updateTimeSlots(slots)
     slotSaveMsg.value = res?.success === false ? 'error' : 'saved'
-  } catch (e) {
-    console.error('Failed to save slots:', e)
+  } catch {
     slotSaveMsg.value = 'error'
   } finally {
     isSavingSlots.value = false
@@ -817,9 +813,7 @@ const loadAvailability = async () => {
       map[s.date].push({ time: s.time, booked: !!s.booked })
     }
     availability.value = map
-  } catch (e) {
-    console.error('Failed to load time slots:', e)
-  }
+  } catch { }
 }
 
 const calHasBookedSlots = (day) =>
@@ -870,9 +864,7 @@ const updateStatus = async (id, newStatus) => {
           for (const time of times) {
             try {
               await unmarkSlotBooked(providerId, booking.date, time)
-            } catch (e) {
-              console.error('Failed to unmark slot:', e)
-            }
+            } catch { }
           }
         }
         
@@ -893,9 +885,7 @@ const updateStatus = async (id, newStatus) => {
           if (messageText) {
             try {
               await sendAdminChatMessage(userId, messageText, adminId.value)
-            } catch (chatError) {
-              console.error('Failed to send chat message:', chatError)
-            }
+            } catch { }
           }
         }
       }
@@ -906,7 +896,6 @@ const updateStatus = async (id, newStatus) => {
       alert(res?.message || 'Failed to update status')
     }
   } catch (error) {
-    console.error('Error updating status:', error)
     alert(error.message || 'Failed to update status')
   }
 }
@@ -922,7 +911,6 @@ const deleteBookingRecord = async (id) => {
       alert(res?.message || 'Failed to delete appointment')
     }
   } catch (error) {
-    console.error('Error deleting booking:', error)
     alert(error.message || 'Failed to delete appointment')
   }
 }

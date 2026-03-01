@@ -274,15 +274,15 @@
                     <!-- Selected time chips -->
                     <div v-if="form.times.length > 0" class="mt-3 flex flex-wrap gap-2">
                       <span
-                        v-for="t in form.times"
-                        :key="t"
+                        v-for="timeSlot in form.times"
+                        :key="timeSlot"
                         class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        {{ t }}
-                        <button type="button" @click="toggleTimeSlot(t)" class="ml-0.5 hover:text-red-500 transition-colors">×</button>
+                        {{ timeSlot }}
+                        <button type="button" @click="toggleTimeSlot(timeSlot)" class="ml-0.5 hover:text-red-500 transition-colors">×</button>
                       </span>
                     </div>
                   </div>
@@ -622,17 +622,6 @@ const todayKey = (() => {
 
 const pendingCount = computed(() => bookings.value.filter(b => b.status === 'pending').length)
 
-const getStatusAccentBg = (status) => {
-  switch (status) {
-    case 'confirmed': return 'bg-green-400'
-    case 'pending':   return 'bg-amber-400'
-    case 'cancelled': return 'bg-slate-400'
-    case 'rejected':  return 'bg-red-500'
-    case 'completed': return 'bg-blue-500'
-    default:          return 'bg-gray-300'
-  }
-}
-
 const getStatusDot = (status) => {
   switch (status) {
     case 'confirmed': return 'bg-green-600 dark:bg-green-400'
@@ -652,17 +641,6 @@ const getServiceBg = (service) => {
     'therapy':               'bg-green-100 dark:bg-green-900/30'
   }
   return map[service] || 'bg-gray-100 dark:bg-gray-800'
-}
-
-const getStatusAccent = (status) => {
-  switch (status) {
-    case 'confirmed': return 'bg-green-500'
-    case 'pending':   return 'bg-amber-400'
-    case 'cancelled': return 'bg-red-400'
-    case 'rejected':  return 'bg-red-500'
-    case 'completed': return 'bg-blue-500'
-    default:          return 'bg-gray-300'
-  }
 }
 
 const isSubmitting = ref(false)
@@ -763,7 +741,6 @@ const loadProviderSlots = async (providerId) => {
 }
 // ── End availability calendar ────────────────────────────────────────────
 
-const currentUser = ref(null)
 const providerName = ref('')
 const providerId = ref('')
 
@@ -889,8 +866,6 @@ const loadData = async () => {
     // Load user profile to get designated provider
     const profileRes = await fetchCurrentUserProfile()
     const userData = profileRes?.data?.user || profileRes?.data || profileRes?.user || profileRes
-    currentUser.value = userData
-    
     if (userData?.providerId) {
       providerId.value = userData.providerId
       providerName.value = userData.provider || userData.providerName || userData.assignedProvider || 'Designated Provider'
@@ -1047,12 +1022,5 @@ const cancelBooking = async (id) => {
   animation: card-in 0.3s ease both;
 }
 
-/* Hide scrollbar for filter tabs */
-.hide-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+
 </style>

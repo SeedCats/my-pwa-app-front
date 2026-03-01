@@ -1,10 +1,8 @@
-// Grok AI Service - Backend API Proxy
 import { fetchWithAuth } from '../utils/fetchWithAuth'
 import { apiRequest } from './apiClient'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
-// Helper function to handle streaming response
 const handleStreamingResponse = async (response, onChunk) => {
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
@@ -49,7 +47,6 @@ const handleStreamingResponse = async (response, onChunk) => {
     return { success: true, message: fullResponse || 'No response from Grok', toolCalls, sources, hasTools: toolCalls.length > 0 }
 }
 
-// Helper function to process response (streaming or non-streaming)
 const processGrokResponse = async (response, onChunk) => {
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: response.statusText }))
@@ -76,29 +73,6 @@ const GROK_FETCH_OPTS = {
     headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream, application/json' }
 }
 
-export const sendMessageToGrok = async (message, conversationHistory = [], onChunk, options = {}) => {
-    const response = await fetchWithAuth(`${API_URL}/api/grok/chat`, {
-        ...GROK_FETCH_OPTS,
-        body: JSON.stringify({ message, conversationHistory: conversationHistory.map(({ role, content }) => ({ role, content })), options })
-    })
-    return processGrokResponse(response, onChunk)
-}
-
-// Send a message with an attached file
-export const sendMessageToGrokWithFile = async (file, message, conversationHistory = [], onChunk, options = {}) => {
-    const fileData = file ? {
-        name: file.name,
-        content: btoa(await readFileContent(file))
-    } : null
-
-    const response = await fetchWithAuth(`${API_URL}/api/grok/chat`, {
-        ...GROK_FETCH_OPTS,
-        body: JSON.stringify({ message, conversationHistory: conversationHistory.map(({ role, content }) => ({ role, content })), options, file: fileData })
-    })
-    return processGrokResponse(response, onChunk)
-}
-
-// Helper function to read file content
 const readFileContent = async (file) => {
     const MAX_CHARS = 200000
     try {
@@ -117,7 +91,26 @@ const readFileContent = async (file) => {
     }
 }
 
-// Chat management API calls
+export const sendMessageToGrok = async (message, conversationHistory = [], onChunk, options = {}) => {
+    const response = await fetchWithAuth(`${API_URL}/api/grok/chat`, {
+        ...GROK_FETCH_OPTS,
+        body: JSON.stringify({ message, conversationHistory: conversationHistory.map(({ role, content }) => ({ role, content })), options })
+    })
+    return processGrokResponse(response, onChunk)
+}
+
+export const sendMessageToGrokWithFile = async (file, message, conversationHistory = [], onChunk, options = {}) => {
+    const fileData = file ? {
+        name: file.name,
+        content: btoa(await readFileContent(file))
+    } : null
+
+    const response = await fetchWithAuth(`${API_URL}/api/grok/chat`, {
+        ...GROK_FETCH_OPTS,
+        body: JSON.stringify({ message, conversationHistory: conversationHistory.map(({ role, content }) => ({ role, content })), options, file: fileData })
+    })
+    return processGrokResponse(response, onChunk)
+}
 
 export const fetchAichatList = async (page = 1, limit = 20) => apiRequest('/api/ai/chat', { query: { page, limit } })
 export const fetchAichatById = async (id) => apiRequest(`/api/ai/chat/${id}`)
@@ -125,6 +118,51 @@ export const createAichat = async (title = 'New Conversation', messages = []) =>
 export const appendMessagesToAichat = async (id, messages = []) => apiRequest(`/api/ai/chat/${id}`, { method: 'PUT', body: { messages, append: true } })
 export const deleteAichat = async (id) => apiRequest(`/api/ai/chat/${id}`, { method: 'DELETE' })
 export const updateAichatTitle = async (id, title) => apiRequest(`/api/ai/chat/${id}`, { method: 'PUT', body: { title } })
+
+const normalizeMessage = (lastMessage) => {
+    if (typeof lastMessage === 'string') {
+        const content = lastMessage.trim()
+        return content ? { role: 'assistant', content, timestamp: new Date().toISOString() } : null
+    }
+    if (typeof lastMessage === 'object' && lastMessage) {
+        const content = (lastMessage.content || lastMessage.text || '').toString().trim()
+        if (!content) return null
+        return {
+            role: lastMessage.role || 'assistant',
+            content,
+            timestamp: lastMessage.timestamp instanceof Date
+                ? lastMessage.timestamp.toISOString()
+                : new Date(lastMessage.timestamp || Date.now()).toISOString()
+        }
+    }
+    return null
+}
+
+const parseErrorResponse = async (res) => {
+    let raw
+    try { raw = await res.json() } catch { try { raw = await res.text() } catch { raw = res.statusText } }
+    const message = raw?.message || (typeof raw === 'string' ? raw : res.statusText || 'Failed to update chat lastMessage')
+    return { message, raw }
+}
+
+const retryWithSanitizedContent = async (id, msgObj) => {
+    try {
+        const sanitize = (s) => s.toString().replace(/[\u0000-\u001F\u007F]/g, '').trim()
+        const short = sanitize(msgObj.content).slice(0, 1000)
+        if (!short || short === msgObj.content) return null
+
+        const retryRes = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
+            method: 'PUT', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: [{ ...msgObj, content: short }], append: true })
+        })
+        if (retryRes.ok) return { success: true, data: await retryRes.json(), retried: true }
+        return { status: retryRes.status, body: (await parseErrorResponse(retryRes)).raw }
+    } catch (err) {
+        console.warn('Retry updateAichatLastMessage failed:', err)
+        return null
+    }
+}
 
 export const updateAichatLastMessage = async (id, lastMessage = null) => {
     if (!id) return { success: false, message: 'Missing chat id' }
@@ -151,53 +189,3 @@ export const updateAichatLastMessage = async (id, lastMessage = null) => {
         return { success: false, message: error.message || 'Failed to update chat lastMessage' }
     }
 }
-
-// Helper function to normalize message object
-const normalizeMessage = (lastMessage) => {
-    if (typeof lastMessage === 'string') {
-        const content = lastMessage.trim()
-        return content ? { role: 'assistant', content, timestamp: new Date().toISOString() } : null
-    }
-    if (typeof lastMessage === 'object' && lastMessage) {
-        const content = (lastMessage.content || lastMessage.text || '').toString().trim()
-        if (!content) return null
-        return {
-            role: lastMessage.role || 'assistant',
-            content,
-            timestamp: lastMessage.timestamp instanceof Date
-                ? lastMessage.timestamp.toISOString()
-                : new Date(lastMessage.timestamp || Date.now()).toISOString()
-        }
-    }
-    return null
-}
-
-// Helper function to parse error response
-const parseErrorResponse = async (res) => {
-    let raw
-    try { raw = await res.json() } catch { try { raw = await res.text() } catch { raw = res.statusText } }
-    const message = raw?.message || (typeof raw === 'string' ? raw : res.statusText || 'Failed to update chat lastMessage')
-    return { message, raw }
-}
-
-// Helper function to retry with sanitized content
-const retryWithSanitizedContent = async (id, msgObj) => {
-    try {
-        const sanitize = (s) => s.toString().replace(/[\u0000-\u001F\u007F]/g, '').trim()
-        const short = sanitize(msgObj.content).slice(0, 1000)
-        if (!short || short === msgObj.content) return null
-
-        const retryRes = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
-            method: 'PUT', credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ messages: [{ ...msgObj, content: short }], append: true })
-        })
-        if (retryRes.ok) return { success: true, data: await retryRes.json(), retried: true }
-        return { status: retryRes.status, body: (await parseErrorResponse(retryRes)).raw }
-    } catch (err) {
-        console.warn('Retry updateAichatLastMessage failed:', err)
-        return null
-    }
-}
-
-

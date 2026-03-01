@@ -304,10 +304,7 @@ const barOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    legend: {
-      display: false,
-      labels: { color: axisColor.value }
-    },
+    legend: { display: false },
     tooltip: {
       callbacks: {
         label: (context) => ` ${context.parsed.y}`

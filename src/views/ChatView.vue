@@ -2,17 +2,17 @@
     <div class="h-full flex flex-col overflow-hidden" :class="themeClasses.background">
 
         <!-- ── Chat Header ─────────────────────────────────────────────── -->
-        <div class="px-4 sm:px-6 lg:px-8 py-3.5 border-b shrink-0 backdrop-blur-md z-10 flex items-center gap-4"
+        <div class="px-4 sm:px-6 lg:px-8 py-2 border-b shrink-0 backdrop-blur-md z-10 flex items-center gap-3"
              :class="[isDarkMode ? 'bg-gray-900/80 border-gray-700/60' : 'bg-white/80 border-gray-200/60']">
 
             <!-- Provider avatar -->
             <div class="relative shrink-0 group cursor-default">
                 <img v-if="receiverIcon" :src="receiverIcon" alt="Provider Icon"
-                     class="w-11 h-11 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-800" />
+                     class="w-8 h-8 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-800" />
                 <div v-else
-                     class="w-11 h-11 rounded-full flex items-center justify-center shadow-sm ring-2 ring-white dark:ring-gray-800"
+                     class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm ring-2 ring-white dark:ring-gray-800"
                      :class="isDarkMode ? 'bg-gradient-to-br from-blue-500 to-blue-700' : 'bg-gradient-to-br from-blue-400 to-blue-600'">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
@@ -22,7 +22,7 @@
 
             <!-- Name / subtitle -->
             <div class="flex-1 min-w-0">
-                <h1 class="text-[15px] font-bold truncate tracking-tight leading-tight" :class="themeClasses.textPrimary">
+                <h1 class="text-[13px] font-bold truncate tracking-tight leading-tight" :class="themeClasses.textPrimary">
                     {{ providerName || t('chat.healthcareProvider') }}
                 </h1>
             </div>
@@ -178,7 +178,7 @@
 
                                         <!-- Time -->
                                         <div class="flex items-center justify-end gap-1 mt-1 select-none"
-                                             :class="message.isUser ? 'text-blue-100' : (isDarkMode ? 'text-gray-400' : 'text-gray-400')">
+                                             :class="message.isUser ? 'text-blue-100' : 'text-gray-400'">
                                             <span class="text-[10px] font-medium">{{ formatMsgTime(message.time) }}</span>
                                         </div>
                                     </div>
