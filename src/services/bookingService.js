@@ -35,6 +35,13 @@ export const markSlotBooked = async (providerId, date, time, booked = true) => {
   })
 }
 
+export const unmarkSlotBooked = async (providerId, date, time) => {
+  return apiRequest('/api/bookingTimeSlot/unmark-booked', {
+    method: 'PATCH',
+    body: { providerId, date, time }
+  })
+}
+
 export const updateTimeSlots = async (slots) => {
   return apiRequest('/api/bookingTimeSlot', {
     method: 'POST',

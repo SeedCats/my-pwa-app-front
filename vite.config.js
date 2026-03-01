@@ -21,6 +21,13 @@ export default defineConfig({
         ]
       },
       manifest: {
+        name: 'My PWA App',
+        short_name: 'PWA App',
+        description: 'My Progressive Web Application',
+        theme_color: '#2563eb',
+        background_color: '#ffffff',
+        display: 'standalone',
+        start_url: '/',
         icons: [
           {
             src: 'icon192.png',

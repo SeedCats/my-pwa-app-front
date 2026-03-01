@@ -15,8 +15,8 @@
       <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 xl:gap-8 items-start">
 
         <!-- ══════════════════════════════════════════════════════════
-             LEFT COLUMN  — Booking Form  (xl: 2/5 width)
-        ═══════════════════════════════════════════════════════════ -->
+             LEFT COLUMN  …Booking Form  (xl: 2/5 width)
+        ═══════════════════════════════════════════════════════════-->
         <div class="xl:col-span-2">
           <div class="rounded-2xl shadow-sm border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
 
@@ -32,7 +32,7 @@
 
             <form @submit.prevent="submitBooking" class="p-6 space-y-5">
 
-              <!-- ① Service -->
+              <!-- ①Service -->
               <div>
                 <label class="block text-xs font-semibold uppercase tracking-wide mb-2" :class="themeClasses.textSecondary">
                   {{ $t('booking.service') }}
@@ -57,7 +57,7 @@
                 </div>
               </div>
 
-              <!-- ② Provider -->
+              <!-- ②Provider -->
               <div>
                 <label class="block text-xs font-semibold uppercase tracking-wide mb-2" :class="themeClasses.textSecondary">
                   {{ $t('booking.provider') }}
@@ -89,7 +89,7 @@
                 </select>
               </div>
 
-              <!-- ③ Date & Time ── slot-aware ── -->
+              <!-- ③Date & Time ── slot-aware ── -->
               <div>
                 <label class="block text-xs font-semibold uppercase tracking-wide mb-2" :class="themeClasses.textSecondary">
                   {{ $t('booking.date') }} &amp; {{ $t('booking.time') }}
@@ -189,18 +189,23 @@
                     <div v-else class="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
                       <button
                         v-for="slot in bookTimeSlotsForDate"
-                        :key="slot"
+                        :key="slot.time"
                         type="button"
-                        @click="toggleTimeSlot(slot)"
-                        :disabled="!form.times.includes(slot) && form.times.length >= 2"
-                        class="py-2 rounded-xl text-xs font-medium border transition-all"
-                        :class="form.times.includes(slot)
-                          ? 'bg-blue-600 border-blue-600 text-white shadow-sm scale-[1.03]'
-                          : form.times.length >= 2
-                            ? ['opacity-35 cursor-not-allowed', themeClasses.inputBackground, themeClasses.border, themeClasses.textSecondary]
-                            : [themeClasses.inputBackground, themeClasses.border, themeClasses.textPrimary, themeClasses.hoverBackground]
+                        @click="!slot.booked && toggleTimeSlot(slot.time)"
+                        :disabled="slot.booked || (!form.times.includes(slot.time) && form.times.length >= 2)"
+                        class="py-2 rounded-xl text-xs font-medium border transition-all flex flex-col items-center justify-center leading-tight"
+                        :class="slot.booked
+                          ? ['opacity-50 cursor-not-allowed line-through', themeClasses.inputBackground, themeClasses.border, themeClasses.textSecondary]
+                          : form.times.includes(slot.time)
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-sm scale-[1.03]'
+                            : form.times.length >= 2
+                              ? ['opacity-35 cursor-not-allowed', themeClasses.inputBackground, themeClasses.border, themeClasses.textSecondary]
+                              : [themeClasses.inputBackground, themeClasses.border, themeClasses.textPrimary, themeClasses.hoverBackground]
                         "
-                      >{{ slot }}</button>
+                      >
+                        <span>{{ slot.time }}</span>
+                        <span v-if="slot.booked" class="text-[9px] font-semibold uppercase tracking-wide mt-0.5 opacity-70">{{ $t('booking.slotBooked') }}</span>
+                      </button>
                     </div>
 
                     <!-- Selected time chips -->
@@ -226,7 +231,7 @@
                 </template>
               </div>
 
-              <!-- ④ Notes -->
+              <!-- ④Notes -->
               <div>
                 <label class="block text-xs font-semibold uppercase tracking-wide mb-2" :class="themeClasses.textSecondary">
                   {{ $t('booking.notes') }}
@@ -278,8 +283,8 @@
         </div>
 
         <!-- ══════════════════════════════════════════════════════════
-             RIGHT COLUMN  — Appointments  (xl: 3/5 width)
-        ═══════════════════════════════════════════════════════════ -->
+             RIGHT COLUMN  …Appointments  (xl: 3/5 width)
+        ═══════════════════════════════════════════════════════════-->
         <div class="xl:col-span-3 flex flex-col gap-4">
 
           <!-- Section header + filters -->
@@ -555,7 +560,7 @@ const bookDateAvailable = (day) => {
   const d = new Date(bookCalYear.value, bookCalMonth.value, day)
   if (d < today) return false
   const key = bookDateKey(day)
-  return (providerAvailability.value[key] || []).length > 0
+  return (providerAvailability.value[key] || []).some(s => !s.booked)
 }
 
 const form = ref({
@@ -605,7 +610,7 @@ const loadProviderSlots = async (providerId) => {
     const map   = {}
     for (const s of slots) {
       if (!map[s.date]) map[s.date] = []
-      map[s.date].push(s.time)
+      map[s.date].push({ time: s.time, booked: !!s.booked })
     }
     providerAvailability.value = map
   } catch (e) {
@@ -803,13 +808,10 @@ const submitBooking = async () => {
     if (res?.success) {
       bookings.value.unshift(res.booking)
 
-      // Mark the booked time slot(s) as taken so other users can't select them
-      await markSlotBooked(
-        form.value.provider,
-        form.value.date,
-        form.value.times.join(', '),
-        true
-      )
+      // Mark each booked time slot as taken so other users can't select them
+      for (const time of form.value.times) {
+        await markSlotBooked(form.value.provider, form.value.date, time, true)
+      }
 
       // Refresh provider slots after booking
       await loadProviderSlots(form.value.provider)

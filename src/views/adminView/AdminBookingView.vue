@@ -7,6 +7,67 @@
           <p :class="themeClasses.textSecondary">{{ $t('booking.adminDesc') }}</p>
         </div>
 
+        <!-- ── Stats Overview ──────────────────────────────────────── -->
+        <div class="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <!-- Today -->
+          <div class="rounded-xl border shadow-sm overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="flex items-center gap-2.5 px-4 py-3 border-b" :class="themeClasses.border">
+              <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13l-.87.5M4.21 17.5l-.87.5M20.66 17.5l-.87-.5M4.21 6.5l-.87-.5M21 12h-1M4 12H3" />
+                  <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" fill="none" />
+                </svg>
+              </div>
+              <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('booking.statsToday') }}</span>
+              <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">{{ statsToday.total }} {{ $t('booking.statsTotal') }}</span>
+            </div>
+            <div class="grid grid-cols-3 divide-x" :class="themeClasses.border">
+              <div class="flex flex-col items-center py-4 gap-1">
+                <span class="text-2xl font-bold text-amber-500">{{ statsToday.pending }}</span>
+                <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.pending') }}</span>
+              </div>
+              <div class="flex flex-col items-center py-4 gap-1">
+                <span class="text-2xl font-bold text-green-500">{{ statsToday.confirmed }}</span>
+                <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.confirmed') }}</span>
+              </div>
+              <div class="flex flex-col items-center py-4 gap-1">
+                <span class="text-2xl font-bold text-blue-500">{{ statsToday.completed }}</span>
+                <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.completed') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- This Month -->
+          <div class="rounded-xl border shadow-sm overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="flex items-center gap-2.5 px-4 py-3 border-b" :class="themeClasses.border">
+              <div class="w-7 h-7 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('booking.statsThisMonth') }}</span>
+              <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">{{ statsMonth.total }} {{ $t('booking.statsTotal') }}</span>
+            </div>
+            <div class="grid grid-cols-3 divide-x" :class="themeClasses.border">
+              <div class="flex flex-col items-center py-4 gap-1">
+                <span class="text-2xl font-bold text-amber-500">{{ statsMonth.pending }}</span>
+                <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.pending') }}</span>
+              </div>
+              <div class="flex flex-col items-center py-4 gap-1">
+                <span class="text-2xl font-bold text-green-500">{{ statsMonth.confirmed }}</span>
+                <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.confirmed') }}</span>
+              </div>
+              <div class="flex flex-col items-center py-4 gap-1">
+                <span class="text-2xl font-bold text-blue-500">{{ statsMonth.completed }}</span>
+                <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.completed') }}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- ── End Stats Overview ──────────────────────────────────── -->
+
         <!-- ── Availability Calendar ─────────────────────────────────── -->
         <div class="mb-8 rounded-lg shadow-md border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
           <!-- Header -->
@@ -103,12 +164,21 @@
                       :disabled="calIsPast(cell)"
                     >
                       {{ cell }}
-                      <!-- green dot: has slots -->
+                      <!-- dots row: green = has slots, orange = has booked -->
                       <span
                         v-if="calHasSlots(cell)"
-                        class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full"
-                        :class="calIsSelected(cell) ? 'bg-white' : 'bg-green-500'"
-                      />
+                        class="absolute bottom-0.5 left-1/2 -translate-x-1/2 flex items-center gap-0.5"
+                      >
+                        <span
+                          class="w-1.5 h-1.5 rounded-full"
+                          :class="calIsSelected(cell) ? 'bg-white' : 'bg-green-500'"
+                        />
+                        <span
+                          v-if="calHasBookedSlots(cell)"
+                          class="w-1.5 h-1.5 rounded-full"
+                          :class="calIsSelected(cell) ? 'bg-orange-300' : 'bg-orange-500'"
+                        />
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -117,6 +187,9 @@
                 <div class="mt-3 flex items-center gap-4 text-xs flex-wrap" :class="themeClasses.textSecondary">
                   <span class="flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-green-500 inline-block" /> {{ $t('booking.hasSlots') }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-orange-500 inline-block" /> {{ $t('booking.slotBooked') }}
                   </span>
                   <span class="flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-blue-600 inline-block" /> {{ $t('booking.selectedDate') }}
@@ -145,14 +218,28 @@
                       v-for="slot in CAL_TIME_SLOTS"
                       :key="slot"
                       @click="calToggleSlot(slot)"
-                      class="py-2 rounded-lg text-xs font-medium border transition-all"
-                      :class="calIsSlotActive(slot)
-                        ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
-                        : [themeClasses.inputBackground, themeClasses.border, themeClasses.textPrimary, themeClasses.hoverBackground]
+                      :disabled="calIsSlotBooked(slot)"
+                      class="py-2 rounded-lg text-xs font-medium border transition-all flex flex-col items-center justify-center leading-tight"
+                      :class="calIsSlotBooked(slot)
+                        ? 'bg-amber-500 border-amber-500 text-white shadow-sm opacity-60 cursor-not-allowed'
+                        : calIsSlotActive(slot)
+                          ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                          : [themeClasses.inputBackground, themeClasses.border, themeClasses.textPrimary, themeClasses.hoverBackground]
                       "
+                      :title="calIsSlotBooked(slot)
+                        ? ($t('booking.slotBooked') + (getSlotBooker(slot) ? ': ' + getSlotBooker(slot) : ''))
+                        : calIsSlotActive(slot) ? $t('booking.clickToRemove') : $t('booking.clickToAdd')"
                     >
-                      {{ slot }}
+                      <span>{{ slot }}</span>
+                      <span v-if="calIsSlotBooked(slot)" class="text-[9px] font-semibold uppercase tracking-wide mt-0.5 opacity-90">{{ $t('booking.slotBooked') }}</span>
                     </button>
+                  </div>
+
+                  <!-- Slot legend -->
+                  <div class="mt-3 flex items-center gap-4 text-xs flex-wrap" :class="themeClasses.textSecondary">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-600 inline-block" /> {{ $t('booking.available') }}</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-500 inline-block" /> {{ $t('booking.slotBooked') }}</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded border inline-block" :class="[themeClasses.border, themeClasses.inputBackground]" /> {{ $t('booking.inactive') }}</span>
                   </div>
 
                   <!-- Save -->
@@ -365,7 +452,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useTheme } from '../../composables/useTheme'
 import { useI18n } from 'vue-i18n'
-import { fetchBookings, updateBooking, deleteBooking, fetchTimeSlots, updateTimeSlots } from '../../services/bookingService'
+import { fetchBookings, updateBooking, deleteBooking, fetchTimeSlots, updateTimeSlots, unmarkSlotBooked } from '../../services/bookingService'
 import { sendAdminChatMessage, fetchCurrentUserProfile } from '../../services/userChatService'
 
 const { themeClasses } = useTheme()
@@ -395,6 +482,31 @@ const getServiceKey = (service) => {
 }
 
 const bookings = ref([])
+
+// ── Stats ────────────────────────────────────────────────────────────────
+const statsToday = computed(() => {
+  const today = new Date().toISOString().slice(0, 10)
+  const todays = bookings.value.filter(b => b.date === today)
+  return {
+    pending:   todays.filter(b => b.status === 'pending').length,
+    confirmed: todays.filter(b => b.status === 'confirmed').length,
+    completed: todays.filter(b => b.status === 'completed').length,
+    total:     todays.length
+  }
+})
+
+const statsMonth = computed(() => {
+  const now    = new Date()
+  const prefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  const monthly = bookings.value.filter(b => b.date && b.date.startsWith(prefix))
+  return {
+    pending:   monthly.filter(b => b.status === 'pending').length,
+    confirmed: monthly.filter(b => b.status === 'confirmed').length,
+    completed: monthly.filter(b => b.status === 'completed').length,
+    total:     monthly.length
+  }
+})
+// ── End Stats ─────────────────────────────────────────────────────────────
 const isLoading = ref(true)
 const errorMessage = ref('')
 
@@ -575,26 +687,61 @@ const selectCalDate = (day) => {
 }
 
 const calIsSlotActive = (slot) =>
-  (availability.value[selectedCalDate.value] || []).includes(slot)
+  (availability.value[selectedCalDate.value] || []).some(s => s.time === slot)
 
+const calIsSlotBooked = (slot) =>
+  (availability.value[selectedCalDate.value] || []).some(s => s.time === slot && s.booked)
+
+// Returns the patient name + email for a booked slot, or null
+const getSlotBooker = (slot) => {
+  if (!selectedCalDate.value) return null
+  const booking = bookings.value.find(b => {
+    if (b.date !== selectedCalDate.value) return false
+    // time field may be a single slot or comma-separated (e.g. "08:00, 09:00")
+    const times = (b.time || '').split(',').map(t => t.trim())
+    return times.includes(slot) && b.status !== 'cancelled' && b.status !== 'rejected'
+  })
+  if (!booking) return null
+  const name  = booking.name || booking.patientName || ''
+  const email = booking.email || booking.patientEmail || ''
+  return name ? `${name} (${email})` : email
+}
+
+// Smart toggle:
+//   booked  → unbook (keep active, clear booked flag)
+//   active  → remove from availability
+//   inactive → add as available
 const calToggleSlot = (slot) => {
   if (!selectedCalDate.value) return
   const key     = selectedCalDate.value
   const current = [...(availability.value[key] || [])]
-  const idx     = current.indexOf(slot)
-  if (idx >= 0) current.splice(idx, 1)
-  else current.push(slot)
-  current.sort()
+  const idx     = current.findIndex(s => s.time === slot)
+  if (idx >= 0) {
+    if (current[idx].booked) {
+      current[idx] = { ...current[idx], booked: false }
+    } else {
+      current.splice(idx, 1)
+    }
+  } else {
+    current.push({ time: slot, booked: false })
+    current.sort((a, b) => a.time.localeCompare(b.time))
+  }
   availability.value = { ...availability.value, [key]: current }
 }
 
 const calToggleAll = () => {
   if (!selectedCalDate.value) return
-  const key     = selectedCalDate.value
-  const current = availability.value[key] || []
+  const key        = selectedCalDate.value
+  const current    = availability.value[key] || []
+  const bookedSlots = current.filter(s => s.booked)
+  // "all active" = every time slot has an entry (booked or not)
+  const allActive  = CAL_TIME_SLOTS.every(t => current.some(s => s.time === t))
   availability.value = {
     ...availability.value,
-    [key]: current.length === CAL_TIME_SLOTS.length ? [] : [...CAL_TIME_SLOTS]
+    // toggle off → keep booked slots only; toggle on → fill all, preserving existing state
+    [key]: allActive
+      ? bookedSlots
+      : CAL_TIME_SLOTS.map(t => current.find(s => s.time === t) || { time: t, booked: false })
   }
 }
 
@@ -603,8 +750,8 @@ const calSaveSlots = async () => {
   slotSaveMsg.value   = ''
   try {
     const slots = []
-    for (const [date, times] of Object.entries(availability.value)) {
-      for (const time of times) slots.push({ date, time })
+    for (const [date, slotObjs] of Object.entries(availability.value)) {
+      for (const s of slotObjs) slots.push({ date, time: s.time, booked: s.booked })
     }
     const res = await updateTimeSlots(slots)
     slotSaveMsg.value = res?.success === false ? 'error' : 'saved'
@@ -625,13 +772,16 @@ const loadAvailability = async () => {
     const map   = {}
     for (const s of slots) {
       if (!map[s.date]) map[s.date] = []
-      map[s.date].push(s.time)
+      map[s.date].push({ time: s.time, booked: !!s.booked })
     }
     availability.value = map
   } catch (e) {
     console.error('Failed to load time slots:', e)
   }
 }
+
+const calHasBookedSlots = (day) =>
+  (availability.value[calDateKey(day)] || []).some(s => s.booked)
 
 const refreshAvailability = async () => {
   isRefreshingCal.value = true
@@ -670,6 +820,19 @@ const updateStatus = async (id, newStatus) => {
       const booking = bookings.value.find(b => b._id === id || b.id === id)
       if (booking) {
         booking.status = newStatus
+
+        // Unblock the time slot(s) when a booking is rejected
+        if (newStatus === 'rejected') {
+          const providerId = booking.providerID || booking.providerId
+          const times = (booking.time || '').split(',').map(t => t.trim()).filter(Boolean)
+          for (const time of times) {
+            try {
+              await unmarkSlotBooked(providerId, booking.date, time)
+            } catch (e) {
+              console.error('Failed to unmark slot:', e)
+            }
+          }
+        }
         
         // Send chat message
         const userId = booking.userId || booking.patientId || booking.patientID
@@ -694,6 +857,9 @@ const updateStatus = async (id, newStatus) => {
           }
         }
       }
+      // Refresh the bookings list and availability calendar
+      await loadBookings()
+      await loadAvailability()
     } else {
       alert(res?.message || 'Failed to update status')
     }
@@ -709,7 +875,7 @@ const deleteBookingRecord = async (id) => {
   try {
     const res = await deleteBooking(id)
     if (res?.success) {
-      bookings.value = bookings.value.filter(b => b._id !== id && b.id !== id)
+      await loadBookings()
     } else {
       alert(res?.message || 'Failed to delete appointment')
     }

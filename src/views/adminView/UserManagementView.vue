@@ -4,6 +4,34 @@
         <div class="py-6">
           <h1 class="text-2xl font-bold mb-4" :class="themeClasses.textPrimary">{{ $t('admin.userManagementTitle') }}</h1>
 
+          <div class="mb-4 rounded-lg border shadow-sm p-4" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-sm font-semibold" :class="themeClasses.textPrimary">{{ $t('admin.patientStatusSummary') }}</h2>
+              <span :class="['text-xs', themeClasses.textSecondary]">{{ $t('admin.userCount', { count: total }) }}</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="rounded-lg border p-3" :class="[themeClasses.inputBackground, themeClasses.border]">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-medium" :class="themeClasses.textSecondary">{{ $t('admin.statusOnGoing') }}</span>
+                  <span :class="['inline-block px-2 py-1 rounded text-xs font-semibold', isDarkMode ? 'bg-yellow-700 text-white' : 'bg-yellow-100 text-yellow-800']">
+                    {{ $t('admin.patientsLabel') }}
+                  </span>
+                </div>
+                <p class="text-2xl font-bold mt-2" :class="themeClasses.textPrimary">{{ patientStatusStats.ongoing }}</p>
+              </div>
+
+              <div class="rounded-lg border p-3" :class="[themeClasses.inputBackground, themeClasses.border]">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-medium" :class="themeClasses.textSecondary">{{ $t('admin.statusCompleted') }}</span>
+                  <span :class="['inline-block px-2 py-1 rounded text-xs font-semibold', isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800']">
+                    {{ $t('admin.patientsLabel') }}
+                  </span>
+                </div>
+                <p class="text-2xl font-bold mt-2" :class="themeClasses.textPrimary">{{ patientStatusStats.completed }}</p>
+              </div>
+            </div>
+          </div>
+
           <div class="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div class="w-full sm:w-auto">
               <input 
@@ -193,6 +221,12 @@ const filteredUsers = computed(() => {
     (u.name && u.name.toLowerCase().includes(query)) || 
     (u.email && u.email.toLowerCase().includes(query))
   )
+})
+
+const patientStatusStats = computed(() => {
+  const completed = users.value.filter(u => u.serviceStatusKey === 'completed').length
+  const ongoing = users.value.filter(u => u.serviceStatusKey !== 'completed').length
+  return { ongoing, completed }
 })
 
 const loadUsers = async () => {
