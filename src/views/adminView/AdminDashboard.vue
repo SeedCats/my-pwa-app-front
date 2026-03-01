@@ -167,24 +167,55 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <router-link to="/admin/users" class="p-4 rounded-xl border hover:shadow-sm transition-all" :class="[themeClasses.cardBackground, themeClasses.border]">
-            <h3 class="font-semibold" :class="themeClasses.textPrimary">{{ $t('admin.userManagementTitle') }}</h3>
-            <p class="text-sm mt-1" :class="themeClasses.textSecondary">{{ $t('admin.manageUsersCard') }}</p>
+        <p class="text-xs font-semibold uppercase tracking-widest mb-3" :class="themeClasses.textSecondary">Quick Access</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <router-link to="/admin/users" class="group p-4 rounded-xl border hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex items-start gap-3.5" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-900/30 group-hover:scale-110 transition-transform duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <h3 class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('admin.userManagementTitle') }}</h3>
+              <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('admin.manageUsersCard') }}</p>
+            </div>
+            <svg class="w-4 h-4 ml-auto mt-0.5 flex-shrink-0 opacity-0 group-hover:opacity-60 transition-opacity" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
           </router-link>
           
-          <router-link to="/admin/chats" class="p-4 rounded-xl border hover:shadow-sm transition-all" :class="[themeClasses.cardBackground, themeClasses.border]">
-            <h3 class="font-semibold" :class="themeClasses.textPrimary">{{ $t('admin.patientMessagesTitle') }}</h3>
-            <p class="text-sm mt-1" :class="themeClasses.textSecondary">{{ $t('admin.patientMessagesDesc') }}</p>
+          <router-link to="/admin/chats" class="group p-4 rounded-xl border hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex items-start gap-3.5" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-purple-50 dark:bg-purple-900/30 group-hover:scale-110 transition-transform duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <h3 class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('admin.patientMessagesTitle') }}</h3>
+              <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('admin.patientMessagesDesc') }}</p>
+            </div>
+            <svg class="w-4 h-4 ml-auto mt-0.5 flex-shrink-0 opacity-0 group-hover:opacity-60 transition-opacity" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
           </router-link>
 
-          <router-link to="/admin/bookings" class="p-4 rounded-xl border hover:shadow-sm transition-all" :class="[themeClasses.cardBackground, themeClasses.border]">
-            <h3 class="font-semibold" :class="themeClasses.textPrimary">{{ $t('booking.adminTitle') }}</h3>
-            <p class="text-sm mt-1" :class="themeClasses.textSecondary">{{ $t('booking.adminDesc') }}</p>
+          <router-link to="/admin/bookings" class="group p-4 rounded-xl border hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex items-start gap-3.5" :class="[themeClasses.cardBackground, themeClasses.border]">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-green-50 dark:bg-green-900/30 group-hover:scale-110 transition-transform duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <h3 class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('booking.adminTitle') }}</h3>
+              <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('booking.adminDesc') }}</p>
+            </div>
+            <svg class="w-4 h-4 ml-auto mt-0.5 flex-shrink-0 opacity-0 group-hover:opacity-60 transition-opacity" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
           </router-link>
         </div>
 
-        <p v-if="errorMessage" class="mt-4 text-sm text-red-500">{{ errorMessage }}</p>
+        <p v-if="errorMessage" class="mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">{{ errorMessage }}</p>
       </div>
     </main>
   </div>

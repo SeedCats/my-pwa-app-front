@@ -370,9 +370,7 @@
     "profileIcon": "Profile Icon",
     "profileIconDesc": "Upload a picture to personalize your profile.",
     "removeIcon": "Remove Icon",
-    "cropImage": "Crop Image",
-    "address": "Address",
-    "addressPlaceholder": "Enter your address"
+    "cropImage": "Crop Image"
   },
   "aiSupport": {
     "title": "AI Support Chat",

@@ -95,16 +95,6 @@
               </div>
             </div>
 
-            <!-- Address (admin only) -->
-            <div v-if="showAddressField">
-              <label for="address" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{
-                $t('userSettings.address') }}</label>
-              <input type="text" id="address" v-model="profileForm.address" :class="[
-                'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
-                isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
-              ]" :placeholder="$t('userSettings.addressPlaceholder')" />
-            </div>
-
             <div class="flex justify-end pt-4">
               <button type="submit" :disabled="profileLoading"
                 class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105">
@@ -309,7 +299,7 @@ const { isDarkMode, themeClasses } = useTheme()
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 // State
-const profileForm = ref({ name: '', email: '', icon: '', address: '' })
+const profileForm = ref({ name: '', email: '', icon: '' })
 const targetUserId = ref(null)
 const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
 
@@ -340,14 +330,6 @@ const displayedUserEmail = computed(() => {
 })
 
 // Computed property to check if viewing another user (similar to HomeView)
-const isCurrentUserAdmin = computed(() => userState.user?.role === 'admin')
-const viewedUserIsAdmin = computed(() => viewedUserData.value?.role === 'admin')
-// Show address field only for admins: when viewing self (is admin) or viewing another admin user
-const showAddressField = computed(() => {
-  if (!isCurrentUserAdmin.value) return false
-  if (!isViewingOtherUser.value) return true   // admin editing own profile
-  return viewedUserIsAdmin.value                // admin editing another admin
-})
 const currentUserId = computed(() => userState.user?.id || null)
 const viewedUserId = computed(() => route.query.userId || null)
 const viewedUserEmail = computed(() => route.query.userEmail || null)
@@ -394,7 +376,7 @@ const loadUserData = async () => {
 
     if (user) {
       // populate profile form
-      profileForm.value = { name: user.name || '', email: user.email || '', icon: user.icon || '', address: user.address || '' }
+      profileForm.value = { name: user.name || '', email: user.email || '', icon: user.icon || '' }
       // If no explicit targetUserId set above, set it to the current user's id
       if (!targetUserId.value && user.id) targetUserId.value = user.id
 
@@ -433,7 +415,7 @@ const updateProfile = async () => {
         const updatedUser = data?.data?.user || data?.user || data
         if (updatedUser) {
           viewedUserData.value = updatedUser
-          profileForm.value = { name: updatedUser.name || '', email: updatedUser.email || '', icon: updatedUser.icon || '', address: updatedUser.address || '' }
+          profileForm.value = { name: updatedUser.name || '', email: updatedUser.email || '', icon: updatedUser.icon || '' }
         }
         successMessage.value = data.message || 'Profile updated successfully!'
       } else {
@@ -455,7 +437,6 @@ const updateProfile = async () => {
 
     if (response.ok && data.success) {
       const updatedUser = data.data?.user || data.data || data
-      if (updatedUser) profileForm.value = { name: updatedUser.name || '', email: updatedUser.email || '', icon: updatedUser.icon || '', address: updatedUser.address || '' }
       window.dispatchEvent(new CustomEvent('userUpdated', { detail: data.data.user }))
       successMessage.value = data.message || 'Profile updated successfully!'
     } else {

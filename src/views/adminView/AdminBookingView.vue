@@ -277,49 +277,61 @@
         </div>
         <!-- ── End Availability Calendar ──────────────────────────────── -->
 
-        <div class="flex flex-col sm:flex-row justify-end gap-2 flex-wrap mb-4">
-          <button 
-            @click="toggleSort('date')"
-            class="w-full sm:w-auto px-3 py-2 rounded-lg border flex items-center justify-center gap-1 transition-colors flex-shrink-0"
-            :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground]"
-            :title="$t('common.sort') || 'Sort by Date'"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span v-if="sortKey === 'date' && sortOrder === 'asc'">↑</span>
-            <span v-else-if="sortKey === 'date'">↓</span>
-          </button>
-          <select 
-            v-model="serviceFilter"
-            class="w-full sm:w-auto px-2 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors flex-shrink-0"
-            :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
-          >
-            <option value="">{{ $t('booking.allServices') || 'All Services' }}</option>
-            <option value="GeneralCheckup">{{ $t('booking.generalCheckup') }}</option>
-            <option value="Health Status Checkup">{{ $t('booking.healthStatusCheckup') }}</option>
-            <option value="Health Consultation">{{ $t('booking.healthConsultation') }}</option>
-            <option value="therapy">{{ $t('booking.therapy') }}</option>
-          </select>
-          <select 
-            v-model="statusFilter"
-            class="w-full sm:w-auto px-2 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors flex-shrink-0"
-            :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
-          >
-            <option value="">{{ $t('booking.allStatus') || 'All Status' }}</option>
-            <option value="pending">{{ $t('booking.pending') }}</option>
-            <option value="confirmed">{{ $t('booking.confirmed') }}</option>
-            <option value="completed">{{ $t('booking.completed') }}</option>
-            <option value="rejected">{{ $t('booking.rejected') }}</option>
-            <option value="cancelled">{{ $t('booking.cancelled') }}</option>
-          </select>
-          <input 
-            type="text" 
-            v-model="searchQuery" 
-            :placeholder="$t('common.search') || 'Search...'" 
-            class="w-full sm:w-64 md:w-80 px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
-            :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
-          />
+        <!-- Filter Bar -->
+        <div class="rounded-xl border shadow-sm p-3 mb-4" :class="[themeClasses.cardBackground, themeClasses.border]">
+          <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+            <!-- Search -->
+            <div class="relative flex-1 min-w-0">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" :class="themeClasses.textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
+              </svg>
+              <input 
+                type="text" 
+                v-model="searchQuery" 
+                :placeholder="$t('common.search') || 'Search...'" 
+                class="w-full pl-10 pr-4 py-2 text-sm rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
+              />
+            </div>
+            <!-- Filters -->
+            <div class="flex gap-2 flex-wrap sm:flex-nowrap">
+              <button 
+                @click="toggleSort('date')"
+                class="px-3 py-2 rounded-lg border flex items-center justify-center gap-1.5 transition-all duration-150 text-sm font-medium flex-shrink-0"
+                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground, sortKey === 'date' ? 'ring-2 ring-blue-500/40' : '']"
+                :title="$t('common.sort') || 'Sort by Date'"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span v-if="sortKey === 'date' && sortOrder === 'asc'" class="text-xs">↑</span>
+                <span v-else-if="sortKey === 'date'" class="text-xs">↓</span>
+              </button>
+              <select 
+                v-model="serviceFilter"
+                class="px-3 py-2 rounded-lg border text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all flex-shrink-0"
+                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
+              >
+                <option value="">{{ $t('booking.allServices') || 'All Services' }}</option>
+                <option value="GeneralCheckup">{{ $t('booking.generalCheckup') }}</option>
+                <option value="Health Status Checkup">{{ $t('booking.healthStatusCheckup') }}</option>
+                <option value="Health Consultation">{{ $t('booking.healthConsultation') }}</option>
+                <option value="therapy">{{ $t('booking.therapy') }}</option>
+              </select>
+              <select 
+                v-model="statusFilter"
+                class="px-3 py-2 rounded-lg border text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all flex-shrink-0"
+                :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
+              >
+                <option value="">{{ $t('booking.allStatus') || 'All Status' }}</option>
+                <option value="pending">{{ $t('booking.pending') }}</option>
+                <option value="confirmed">{{ $t('booking.confirmed') }}</option>
+                <option value="completed">{{ $t('booking.completed') }}</option>
+                <option value="rejected">{{ $t('booking.rejected') }}</option>
+                <option value="cancelled">{{ $t('booking.cancelled') }}</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <div class="rounded-lg shadow-md border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
@@ -353,64 +365,94 @@
               </thead>
               <tbody>
                 <tr v-if="isLoading">
-                  <td colspan="6" class="p-8 text-center" :class="themeClasses.textSecondary">
-                    {{ $t('common.loading') || 'Loading...' }}
+                  <td colspan="6" class="p-8">
+                    <div class="flex flex-col items-center justify-center gap-3">
+                      <svg class="w-6 h-6 animate-spin" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      </svg>
+                      <span class="text-sm" :class="themeClasses.textSecondary">{{ $t('common.loading') || 'Loading...' }}</span>
+                    </div>
                   </td>
                 </tr>
                 <tr v-else-if="bookings.length === 0">
-                  <td colspan="6" class="p-8 text-center" :class="themeClasses.textSecondary">
-                    {{ $t('common.noResults') }}
+                  <td colspan="6" class="p-12">
+                    <div class="flex flex-col items-center justify-center text-center">
+                      <div class="w-14 h-14 rounded-full flex items-center justify-center mb-3" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-100'">
+                        <svg class="w-7 h-7 opacity-40" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <p class="text-sm font-medium" :class="themeClasses.textPrimary">{{ $t('common.noResults') }}</p>
+                      <p class="text-xs mt-1" :class="themeClasses.textSecondary">{{ searchQuery ? 'Try adjusting your filters' : '' }}</p>
+                    </div>
                   </td>
                 </tr>
-                <tr v-for="booking in paginatedBookings" :key="booking._id || booking.id" class="border-b last:border-0 hover:bg-opacity-50" :class="[themeClasses.border, themeClasses.hoverBackground]">
+                <tr v-for="booking in paginatedBookings" :key="booking._id || booking.id" class="border-b last:border-0 transition-colors duration-150" :class="[themeClasses.border, themeClasses.hoverBackground]">
                   <td class="p-4">
-                    <div class="font-medium" :class="themeClasses.textPrimary">{{ booking.name || booking.patientName }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">{{ booking.email || booking.patientEmail }}</div>
+                    <div class="min-w-0">
+                      <div class="text-sm font-semibold truncate" :class="themeClasses.textPrimary">{{ booking.name || booking.patientName }}</div>
+                      <div class="text-xs truncate" :class="themeClasses.textSecondary">{{ booking.email || booking.patientEmail }}</div>
+                    </div>
                   </td>
-                  <td class="p-4" :class="themeClasses.textPrimary">
-                    {{ $t(`booking.${getServiceKey(booking.service)}`) }}
+                  <td class="p-4">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium" :class="isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'">
+                      {{ $t(`booking.${getServiceKey(booking.service)}`) }}
+                    </span>
                   </td>
                   <td class="p-4 whitespace-nowrap">
-                    <div :class="themeClasses.textPrimary">{{ booking.date }}</div>
-                    <div class="text-sm" :class="themeClasses.textSecondary">{{ booking.time }}</div>
+                    <div class="text-sm font-medium" :class="themeClasses.textPrimary">{{ booking.date }}</div>
+                    <div class="text-xs" :class="themeClasses.textSecondary">{{ booking.time }}</div>
                   </td>
                   <td class="p-4">
-                    <div class="text-sm max-w-[150px] whitespace-normal break-words" :class="themeClasses.textSecondary" :title="booking.notes">
+                    <div class="text-xs max-w-[150px] whitespace-normal break-words" :class="themeClasses.textSecondary" :title="booking.notes">
                       {{ booking.notes || '-' }}
                     </div>
                   </td>
                   <td class="p-4">
-                    <span :class="getStatusClass(booking.status)" class="inline-block w-24 text-center px-3 py-1 rounded-full text-xs font-medium">
+                    <span :class="getStatusClass(booking.status)" class="inline-flex items-center gap-1.5 w-24 justify-center px-2.5 py-1 rounded-full text-xs font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full" :class="{
+                        'bg-yellow-500': booking.status === 'pending',
+                        'bg-green-500': booking.status === 'confirmed',
+                        'bg-blue-500': booking.status === 'completed',
+                        'bg-red-500': booking.status === 'cancelled' || booking.status === 'rejected',
+                        'bg-gray-500': !['pending','confirmed','completed','cancelled','rejected'].includes(booking.status)
+                      }" />
                       {{ $t(`booking.${booking.status}`) }}
                     </span>
                   </td>
-                  <td class="p-2">
-                    <div class="flex flex-col sm:flex-row flex-wrap justify-end gap-2 items-center">
+                  <td class="p-3">
+                    <div class="flex flex-col sm:flex-row flex-wrap justify-end gap-1.5 items-center">
                       <button 
                         v-if="booking.status === 'pending'"
                         @click="updateStatus(booking._id || booking.id, 'confirmed')"
-                        class="w-full sm:w-22 text-center px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors shadow-sm whitespace-nowrap"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-all duration-150 hover:shadow-sm whitespace-nowrap"
                       >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                         {{ $t('booking.approve') }}
                       </button>
                       <button 
                         v-if="booking.status === 'pending'"
                         @click="updateStatus(booking._id || booking.id, 'rejected')"
-                        class="w-full sm:w-22 text-center px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors shadow-sm whitespace-nowrap"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-all duration-150 hover:shadow-sm whitespace-nowrap"
                       >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         {{ $t('booking.reject') }}
                       </button>
                       <button 
                         v-if="booking.status === 'confirmed'"
                         @click="updateStatus(booking._id || booking.id, 'completed')"
-                        class="w-full sm:w-22 text-center px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors shadow-sm whitespace-nowrap"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-all duration-150 hover:shadow-sm whitespace-nowrap"
                       >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         {{ $t('booking.complete') || 'Complete' }}
                       </button>
                       <button 
                         @click="deleteBookingRecord(booking._id || booking.id)"
-                        class="w-full sm:w-22 text-center px-2 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-sm rounded transition-colors duration-200 whitespace-nowrap"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 py-1.5 border text-xs font-medium rounded-lg transition-all duration-200 whitespace-nowrap"
+                        :class="isDarkMode ? 'border-red-700 text-red-400 hover:bg-red-900/30' : 'border-red-300 text-red-600 hover:bg-red-50'"
                       >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         {{ $t('booking.delete') || 'Delete' }}
                       </button>
                     </div>

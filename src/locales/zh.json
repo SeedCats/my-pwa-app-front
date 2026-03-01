@@ -374,9 +374,7 @@
     "profileIcon": "個人頭像",
     "profileIconDesc": "上傳並裁剪您的個人頭像",
     "removeIcon": "移除頭像",
-    "cropImage": "裁剪圖片",
-    "address": "地址",
-    "addressPlaceholder": "請輸入您的地址"
+    "cropImage": "裁剪圖片"
   },
   "aiSupport": {
     "title": "AI 支援聊天",
