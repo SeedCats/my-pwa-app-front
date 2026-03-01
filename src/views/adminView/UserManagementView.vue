@@ -13,9 +13,6 @@
               <div class="rounded-lg border p-3" :class="[themeClasses.inputBackground, themeClasses.border]">
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-medium" :class="themeClasses.textSecondary">{{ $t('admin.statusOnGoing') }}</span>
-                  <span :class="['inline-block px-2 py-1 rounded text-xs font-semibold', isDarkMode ? 'bg-yellow-700 text-white' : 'bg-yellow-100 text-yellow-800']">
-                    {{ $t('admin.patientsLabel') }}
-                  </span>
                 </div>
                 <p class="text-2xl font-bold mt-2" :class="themeClasses.textPrimary">{{ patientStatusStats.ongoing }}</p>
               </div>
@@ -23,9 +20,6 @@
               <div class="rounded-lg border p-3" :class="[themeClasses.inputBackground, themeClasses.border]">
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-medium" :class="themeClasses.textSecondary">{{ $t('admin.statusCompleted') }}</span>
-                  <span :class="['inline-block px-2 py-1 rounded text-xs font-semibold', isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800']">
-                    {{ $t('admin.patientsLabel') }}
-                  </span>
                 </div>
                 <p class="text-2xl font-bold mt-2" :class="themeClasses.textPrimary">{{ patientStatusStats.completed }}</p>
               </div>
