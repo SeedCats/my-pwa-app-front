@@ -366,11 +366,13 @@
     "enterPasswordToConfirmDeletion": "Enter your password to confirm deletion",
     "confirmDelete": "Confirm Deletion",
     "deleting": "Deleting...",
-    "adminCannotDeleteSelf": "Admins cannot delete their own account. Please contact another administrator or system owner.",
+    "adminCannotDeleteSelf": "Admins cannot delete their own account. Please contact system owner.",
     "profileIcon": "Profile Icon",
     "profileIconDesc": "Upload a picture to personalize your profile.",
     "removeIcon": "Remove Icon",
-    "cropImage": "Crop Image"
+    "cropImage": "Crop Image",
+    "address": "Address",
+    "addressPlaceholder": "Enter your address"
   },
   "aiSupport": {
     "title": "AI Support Chat",
