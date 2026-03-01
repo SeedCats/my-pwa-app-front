@@ -497,7 +497,7 @@ import { useI18n } from 'vue-i18n'
 import { fetchBookings, updateBooking, deleteBooking, fetchTimeSlots, updateTimeSlots, unmarkSlotBooked } from '../../services/bookingService'
 import { sendAdminChatMessage, fetchCurrentUserProfile } from '../../services/userChatService'
 
-const { themeClasses } = useTheme()
+const { themeClasses, isDarkMode } = useTheme()
 const { t } = useI18n()
 
 const adminId = ref(null)
@@ -623,8 +623,8 @@ const filteredBookings = computed(() => {
       valA = (a.name || a.patientName || '').toLowerCase()
       valB = (b.name || b.patientName || '').toLowerCase()
     } else if (sortKey.value === 'date') {
-      valA = new Date(`${a.date}T${a.time || '00:00'}`).getTime()
-      valB = new Date(`${b.date}T${b.time || '00:00'}`).getTime()
+      valA = `${a.date || ''}T${(a.time || '').split(',')[0].trim() || '00:00'}`
+      valB = `${b.date || ''}T${(b.time || '').split(',')[0].trim() || '00:00'}`
     } else if (sortKey.value === 'service') {
       valA = (t(`booking.${getServiceKey(a.service)}`) || '').toLowerCase()
       valB = (t(`booking.${getServiceKey(b.service)}`) || '').toLowerCase()

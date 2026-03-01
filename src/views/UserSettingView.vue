@@ -367,7 +367,7 @@ const loadUserData = async () => {
 
     // If no target user loaded, load current user
     if (!user) {
-      const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
+      const res = await fetch('http://localhost:5000/api/user/me', { credentials: 'include' })
       if (res.ok) {
         const data = await res.json()
         user = data.data?.user || data.user || data.data || data

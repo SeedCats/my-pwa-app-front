@@ -9,7 +9,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',  // Automatically updates the service worker
-      devOptions: { enabled: true },  // Enables PWA in development mode for testing
+      devOptions: { enabled: false },  // Disabled in dev to prevent service worker from serving stale cached chunks
       workbox: {
         clientsClaim: true,
         skipWaiting: true,

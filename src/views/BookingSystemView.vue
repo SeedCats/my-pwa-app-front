@@ -695,8 +695,8 @@ const filteredBookings = computed(() => {
       return sortOrder.value === 'asc' ? pa - pb : pb - pa
     }
 
-    const valA = new Date(`${a.date}T${a.time || '00:00'}`).getTime()
-    const valB = new Date(`${b.date}T${b.time || '00:00'}`).getTime()
+    const valA = `${a.date || ''}T${(a.time || '').split(',')[0].trim() || '00:00'}`
+    const valB = `${b.date || ''}T${(b.time || '').split(',')[0].trim() || '00:00'}`
     if (valA < valB) return sortOrder.value === 'asc' ? -1 : 1
     if (valA > valB) return sortOrder.value === 'asc' ? 1 : -1
     return 0

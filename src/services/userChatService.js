@@ -78,7 +78,13 @@ const tryRequestWithNotFoundFallback = async (attempts) => {
 }
 
 export const fetchCurrentUserProfile = async () => {
-  return apiRequest('/api/user/me')
+  const response = await fetch('http://localhost:5000/api/user/me', {
+    credentials: 'include'
+  })
+  if (!response.ok) {
+    throw new Error('Failed to fetch user profile')
+  }
+  return response.json()
 }
 
 export const fetchUserChatHistory = async (currentUserId = null) => {

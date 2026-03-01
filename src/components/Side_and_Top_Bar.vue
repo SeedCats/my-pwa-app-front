@@ -28,25 +28,38 @@
                                 </div>
                             </TransitionChild>
                             <!-- Mobile Sidebar content -->
-                            <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4"
+                            <div class="flex grow flex-col gap-y-5 overflow-y-auto pb-4"
                                 :class="themeClasses.cardBackground">
-                                <div class="flex h-16 shrink-0 items-center">
-                                    <h1 class="text-xl font-bold" :class="themeClasses.textPrimary">{{ $t('nav.title') }}</h1>
+                                <!-- Header -->
+                                <div class="flex h-16 shrink-0 items-center px-6 border-b" :class="themeClasses.border">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 shadow-md shadow-indigo-500/30 shrink-0">
+                                            <ShieldCheckIcon v-if="isAdmin()" class="h-5 w-5 text-white" />
+                                            <BookOpenIcon v-else class="h-5 w-5 text-white" />
+                                        </div>
+                                        <h1 class="text-base font-bold tracking-tight" :class="themeClasses.textPrimary">{{ $t('nav.title') }}</h1>
+                                    </div>
                                 </div>
-                                <nav class="flex flex-1 flex-col">
-                                    <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                                <nav class="flex flex-1 flex-col px-4">
+                                    <ul role="list" class="flex flex-1 flex-col gap-y-6">
                                         <li>
-                                            <ul role="list" class="-mx-2 space-y-2">
+                                            <p class="px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">Menu</p>
+                                            <ul role="list" class="space-y-1">
                                                 <li v-for="item in navigation" :key="item.name">
                                                     <router-link :to="item.to" :class="[
-                                                        'text-gray-400 hover:bg-gray-800 hover:text-white',
-                                                        'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95'
+                                                        isActiveRoute(item.to)
+                                                            ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
+                                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent',
+                                                        'group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95'
                                                     ]" @click="sidebarOpen = false">
                                                         <div class="relative shrink-0">
-                                                            <component :is="item.icon" class="size-6" aria-hidden="true" />
+                                                            <component :is="item.icon" :class="[
+                                                                'size-5 transition-colors duration-150',
+                                                                isActiveRoute(item.to) ? 'text-indigo-400' : 'text-gray-400 group-hover:text-white'
+                                                            ]" aria-hidden="true" />
                                                             <span
                                                                 v-if="unreadCount > 0 && (item.to === '/chat' || item.to === '/admin/chats')"
-                                                                class="absolute -top-1 -left-1 flex h-2.5 w-2.5"
+                                                                class="absolute -top-1 -right-1 flex h-2.5 w-2.5"
                                                             >
                                                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                                                 <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
@@ -57,25 +70,30 @@
                                                 </li>
                                             </ul>
                                         </li>
-                                        <li class="mt-auto">
-
-                                            <router-link to="/setting"
-                                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
-                                                :class="isActiveRoute('/setting')
-                                                    ? 'bg-gray-800 text-white'
-                                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'" @click="sidebarOpen = false">
-                                                <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                                                {{ t('nav.formatSettings') }}
-                                            </router-link>
-
-                                            <router-link to="/user"
-                                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95"
-                                                :class="isActiveRoute('/user')
-                                                    ? 'bg-gray-800 text-white'
-                                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'" @click="sidebarOpen = false">
-                                                <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
-                                                {{ t('nav.userSettings') }}
-                                            </router-link>
+                                        <li class="mt-auto border-t pt-4" :class="themeClasses.border">
+                                            <p class="px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">Settings</p>
+                                            <ul class="space-y-1">
+                                                <li>
+                                                    <router-link to="/setting"
+                                                        class="group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95"
+                                                        :class="isActiveRoute('/setting')
+                                                            ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
+                                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent'" @click="sidebarOpen = false">
+                                                        <Cog6ToothIcon class="size-5 shrink-0" aria-hidden="true" />
+                                                        {{ t('nav.formatSettings') }}
+                                                    </router-link>
+                                                </li>
+                                                <li>
+                                                    <router-link to="/user"
+                                                        class="group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95"
+                                                        :class="isActiveRoute('/user')
+                                                            ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
+                                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent'" @click="sidebarOpen = false">
+                                                        <UsersIcon class="size-5 shrink-0" aria-hidden="true" />
+                                                        {{ t('nav.userSettings') }}
+                                                    </router-link>
+                                                </li>
+                                            </ul>
                                         </li>
                                     </ul>
                                 </nav>
@@ -91,28 +109,43 @@
             'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col transition-transform duration-300 ease-in-out',
             isDesktopSidebarHidden ? '-translate-x-full' : 'translate-x-0'
         ]">
-            <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r px-6 pb-4"
+            <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r pb-4"
                 :class="[themeClasses.cardBackground, themeClasses.border]">
-                <div class="flex h-16 shrink-0 items-center">
-                    <h1 class="text-xl font-bold mt-8 mb-2" :class="themeClasses.textPrimary">{{ $t('nav.title') }}
-                    </h1>
+                <!-- Sidebar header -->
+                <div class="flex h-16 shrink-0 items-center px-5 border-b" :class="themeClasses.border">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 shadow-md shadow-indigo-500/30 shrink-0">
+                            <ShieldCheckIcon v-if="isAdmin()" class="h-5 w-5 text-white" />
+                            <BookOpenIcon v-else class="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                            <h1 class="text-sm font-bold tracking-tight leading-tight" :class="themeClasses.textPrimary">{{ $t('nav.title') }}</h1>
+                            <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full" :class="isAdmin() ? 'bg-rose-500/15 text-rose-400' : 'bg-indigo-500/15 text-indigo-400'">
+                                {{ isAdmin() ? 'Admin' : 'User' }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <nav class="flex flex-1 flex-col">
-                    <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                <nav class="flex flex-1 flex-col px-4">
+                    <ul role="list" class="flex flex-1 flex-col gap-y-6">
                         <li>
-                            <ul role="list" class="-mx-2 space-y-2">
+                            <p class="px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">Menu</p>
+                            <ul role="list" class="space-y-1">
                                 <li v-for="item in navigation" :key="item.name">
                                     <router-link :to="item.to" :class="[
                                         isActiveRoute(item.to)
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-400 hover:bg-gray-800 hover:text-white',
-                                        'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95'
+                                            ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
+                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent',
+                                        'group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95'
                                     ]">
                                         <div class="relative shrink-0">
-                                            <component :is="item.icon" class="size-6" aria-hidden="true" />
+                                            <component :is="item.icon" :class="[
+                                                'size-5 transition-colors duration-150',
+                                                isActiveRoute(item.to) ? 'text-indigo-400' : 'text-gray-400 group-hover:text-white'
+                                            ]" aria-hidden="true" />
                                             <span
                                                 v-if="unreadCount > 0 && (item.to === '/chat' || item.to === '/admin/chats')"
-                                                class="absolute -top-1 -left-1 flex h-2.5 w-2.5"
+                                                class="absolute -top-1 -right-1 flex h-2.5 w-2.5"
                                             >
                                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                                 <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
@@ -123,18 +156,30 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="mt-auto">
-                            <router-link to="/setting"
-                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95 text-gray-400 hover:bg-gray-800 hover:text-white">
-                                <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                                {{ t('nav.formatSettings') }}
-                            </router-link>
-
-                            <router-link to="/user"
-                                class="group -mx-2 flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold items-center transition-all duration-150 ease-in-out transform active:scale-95 text-gray-400 hover:bg-gray-800 hover:text-white">
-                                <UsersIcon class="size-6 shrink-0" aria-hidden="true" />
-                                {{ t('nav.userSettings') }}
-                            </router-link>
+                        <li class="mt-auto border-t pt-4" :class="themeClasses.border">
+                            <p class="px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">Settings</p>
+                            <ul class="space-y-1">
+                                <li>
+                                    <router-link to="/setting"
+                                        class="group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95"
+                                        :class="isActiveRoute('/setting')
+                                            ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
+                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent'">
+                                        <Cog6ToothIcon class="size-5 shrink-0" aria-hidden="true" />
+                                        {{ t('nav.formatSettings') }}
+                                    </router-link>
+                                </li>
+                                <li>
+                                    <router-link to="/user"
+                                        class="group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95"
+                                        :class="isActiveRoute('/user')
+                                            ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
+                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent'">
+                                        <UsersIcon class="size-5 shrink-0" aria-hidden="true" />
+                                        {{ t('nav.userSettings') }}
+                                    </router-link>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </nav>
@@ -166,8 +211,13 @@
             </button>
 
             <!-- Separator -->
-            <div class="h-6 w-px bg-gray-900/10 lg:block" :class="isDarkMode ? 'bg-gray-600' : 'bg-gray-900/10'"
+            <div class="h-6 w-px" :class="isDarkMode ? 'bg-gray-600' : 'bg-gray-900/10'"
                 aria-hidden="true" />
+
+            <!-- Current page title -->
+            <div v-if="currentPageTitle" class="hidden sm:flex items-center gap-2">
+                <span class="text-sm font-semibold" :class="themeClasses.textPrimary">{{ currentPageTitle }}</span>
+            </div>
 
             <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
                 <!-- Provider Name (for user role group only) -->
@@ -395,6 +445,14 @@ import {
     UsersIcon,
     Cog6ToothIcon,
     BellIcon,
+    CircleStackIcon,
+    SparklesIcon,
+    ChatBubbleLeftRightIcon,
+    CalendarDaysIcon,
+    ChartPieIcon,
+    ChatBubbleOvalLeftEllipsisIcon,
+    ShieldCheckIcon,
+    BookOpenIcon,
 } from '@heroicons/vue/24/outline'
 
 // Initialize router for navigation
@@ -411,21 +469,39 @@ const navigation = computed(() => {
     // If Admin, show only admin navigation
     if (isAdmin()) {
         return [
-            { name: t('nav.admin'), to: '/admin', icon: HomeIcon },
+            { name: t('nav.admin'), to: '/admin', icon: ChartPieIcon },
             { name: t('nav.userManagement'), to: '/admin/users', icon: UsersIcon },
-            { name: t('admin.patientMessagesTitle'), to: '/admin/chats', icon: HomeIcon },
-            { name: t('booking.adminTitle'), to: '/admin/bookings', icon: HomeIcon }
+            { name: t('admin.patientMessagesTitle'), to: '/admin/chats', icon: ChatBubbleOvalLeftEllipsisIcon },
+            { name: t('booking.adminTitle'), to: '/admin/bookings', icon: CalendarDaysIcon }
         ]
     }
 
     // Regular user navigation
     return [
         { name: t('nav.home'), to: '/home', icon: HomeIcon },
-        { name: t('nav.dataSettings'), to: '/data-setting', icon: HomeIcon },
-        { name: t('nav.aiSupport'), to: '/ai-support', icon: HomeIcon },
-        { name: t('nav.chat'), to: '/chat', icon: HomeIcon },
-        { name: t('nav.bookingSystem'), to: '/booking-system', icon: HomeIcon }
+        { name: t('nav.dataSettings'), to: '/data-setting', icon: CircleStackIcon },
+        { name: t('nav.aiSupport'), to: '/ai-support', icon: SparklesIcon },
+        { name: t('nav.chat'), to: '/chat', icon: ChatBubbleLeftRightIcon },
+        { name: t('nav.bookingSystem'), to: '/booking-system', icon: CalendarDaysIcon }
     ]
+})
+
+// Map routes to page titles for topbar breadcrumb
+const currentPageTitle = computed(() => {
+    const map = {
+        '/home': t('nav.home'),
+        '/data-setting': t('nav.dataSettings'),
+        '/ai-support': t('nav.aiSupport'),
+        '/chat': t('nav.chat'),
+        '/booking-system': t('nav.bookingSystem'),
+        '/setting': t('nav.formatSettings'),
+        '/user': t('nav.userSettings'),
+        '/admin': t('nav.admin'),
+        '/admin/users': t('nav.userManagement'),
+        '/admin/chats': t('admin.patientMessagesTitle'),
+        '/admin/bookings': t('booking.adminTitle'),
+    }
+    return map[route.path] || ''
 })
 
 // State
@@ -589,7 +665,7 @@ const handleLogOut = async () => {
 
 const loadUserData = async () => {
     try {
-        const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
+        const res = await fetch('http://localhost:5000/api/user/me', { credentials: 'include' })
         if (res.ok) {
             const json = await res.json()
             userData.value = json.data?.user || json.data || json.user || json
