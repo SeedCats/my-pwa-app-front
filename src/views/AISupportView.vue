@@ -4,7 +4,7 @@
             <!-- Header -->
             <div class="shrink-0 mb-2 pt-3 pb-1 flex items-center justify-between flex-wrap gap-2">
                 <div>
-                    <h1 class="text-xl font-bold bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent">{{ $t('aiSupport.title') }}</h1>
+                    <h1 class="text-xl font-bold bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent">{{ $t('aiSupport.title') }}</h1>
                     <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('aiSupport.subtitle') }}</p>
                 </div>
             </div>
@@ -16,7 +16,7 @@
                         <div v-if="showTitle" class="text-base sm:text-lg font-semibold truncate"
                             :class="[themeClasses.textPrimary, isDarkMode ? 'text-white' : 'text-gray-900']">{{
                             currentTitle }}</div>
-                        <div class="flex items-center space-x-1 sm:space-x-2 flex-shrink-0"
+                        <div class="flex items-center space-x-1 sm:space-x-2 shrink-0"
                             :class="showTitle ? '' : 'ml-auto'">
                             <button @click.prevent="showSettings = !showSettings" :disabled="isChatBusy"
                                 :aria-disabled="isChatBusy"
@@ -53,7 +53,7 @@
                             <div v-if="visibleMessages.length === 0" class="flex items-center justify-center h-full">
                                 <div class="text-center py-8 max-w-2xl mx-auto">
                                     <div
-                                        class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                        class="w-16 h-16 mx-auto mb-4 rounded-full bg-linear-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                                         <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                                             <path
                                                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
@@ -72,7 +72,7 @@
                                                 class="group text-left p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105 hover:shadow-md"
                                                 :class="isDarkMode ? 'bg-gray-800 border-gray-700 hover:border-blue-500 hover:bg-gray-750' : 'bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50'">
                                                 <div class="flex items-start">
-                                                    <svg class="w-5 h-5 mt-0.5 mr-2 flex-shrink-0"
+                                                    <svg class="w-5 h-5 mt-0.5 mr-2 shrink-0"
                                                         :class="isDarkMode ? 'text-blue-400' : 'text-blue-600'"
                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -94,8 +94,8 @@
                                 :class="message && message.role === 'user' ? 'justify-end' : 'justify-start'">
 
                                 <!-- AI Avatar -->
-                                <div v-if="message.role === 'assistant'" class="flex-shrink-0 mt-auto mb-1">
-                                    <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
+                                <div v-if="message.role === 'assistant'" class="shrink-0 mt-auto mb-1">
+                                    <div class="w-7 h-7 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
                                         <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                                         </svg>
@@ -105,13 +105,13 @@
                                 <div :class="[
                                     'max-w-[85%] sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl px-3.5 sm:px-4 py-2.5 shadow-sm',
                                     message.role === 'user'
-                                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl rounded-br-sm'
+                                        ? 'bg-linear-to-br from-blue-500 to-blue-600 text-white rounded-2xl rounded-br-sm'
                                         : (isDarkMode ? 'bg-gray-800 border border-gray-700 text-white rounded-2xl rounded-bl-sm' : 'bg-white border border-gray-200 text-gray-800 rounded-2xl rounded-bl-sm shadow-sm'),
                                 ]">
                                     <!-- File attachment indicator for user messages -->
                                     <div v-if="message.role === 'user' && message.fileName"
                                         class="mb-2 pb-2 border-b border-blue-400 flex items-center">
-                                        <svg class="w-4 h-4 mr-1.5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+                                        <svg class="w-4 h-4 mr-1.5 shrink-0" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

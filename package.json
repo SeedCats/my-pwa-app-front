@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "preview:prod": "vite preview --host",
-    "start": "serve -s dist"
+    "start": "vite preview"
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
@@ -22,9 +22,11 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
-    "serve": "^14.2.5",
     "tailwindcss": "^4.1.13",
     "vite": "^7.1.2",
-    "vite-plugin-pwa": "^0.19.8"
+    "vite-plugin-pwa": "^1.2.0"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.3"
   }
 }
