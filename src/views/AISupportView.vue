@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <div class="h-full lg:h-auto flex flex-col overflow-hidden lg:overflow-visible" :class="themeClasses.background">
         <main class="flex-1 lg:flex-none flex flex-col overflow-hidden lg:overflow-visible px-3 sm:px-4 md:px-6 lg:px-8">
             <!-- Header -->
@@ -115,17 +115,17 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        <span class="text-xs font-medium truncate">📎 {{ message.fileName }}</span>
+                                        <span class="text-xs font-medium truncate">馃搸 {{ message.fileName }}</span>
                                     </div>
                                     <p
-                                        :class="['text-sm whitespace-pre-wrap', message.role === 'user' ? 'break-words' : 'break-normal', (message.role !== 'user' && isDarkMode) ? 'text-white' : '']">
+                                        :class="['text-sm whitespace-pre-wrap', message.role === 'user' ? 'wrap-break-word' : 'break-normal', (message.role !== 'user' && isDarkMode) ? 'text-white' : '']">
                                         {{
                                             cleanContent(message.content) || (message.role === 'assistant' ? '...' : '')
                                         }}</p>
 
                                     <!-- Streaming indicator -->
                                     <div v-if="message && message.isStreaming" class="inline-flex items-center ml-1">
-                                        <span class="animate-pulse text-gray-500">▊</span>
+                                        <span class="animate-pulse text-gray-500">鈻?/span>
                                     </div>
 
                                     <!-- Sources / Citations (shown separately, not as main content) -->
@@ -143,15 +143,15 @@
                                         </div>
                                         <ul class="space-y-1.5">
                                             <li v-for="(source, si) in message.sources" :key="si"
-                                                class="flex items-start break-words">
-                                                <span class="text-xs mr-1.5 mt-0.5 flex-shrink-0"
-                                                    :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'">•</span>
+                                                class="flex items-start wrap-break-word">
+                                                <span class="text-xs mr-1.5 mt-0.5 shrink-0"
+                                                    :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'">鈥?/span>
                                                 <a :href="source.url || source" target="_blank"
                                                     rel="noopener noreferrer"
                                                     class="text-xs underline hover:no-underline flex-1 break-all overflow-wrap-anywhere"
                                                     :class="isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'"
                                                     style="word-break: break-word; overflow-wrap: anywhere;">
-                                                    <span v-if="source.title" class="break-words">{{ source.title
+                                                    <span v-if="source.title" class="wrap-break-word">{{ source.title
                                                         }}</span>
                                                     <span v-else class="break-all">{{ source.url || source }}</span>
                                                     <span v-if="source.title && source.url"
@@ -177,8 +177,8 @@
 
                             <!-- Typing Indicator -->
                             <div v-if="isTyping" class="flex justify-start gap-2 msg-appear">
-                                <div class="flex-shrink-0 mt-auto mb-1">
-                                    <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
+                                <div class="shrink-0 mt-auto mb-1">
+                                    <div class="w-7 h-7 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-sm">
                                         <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M12 2 L13.5 10.5 L22 12 L13.5 13.5 L12 22 L10.5 13.5 L2 12 L10.5 10.5 Z" />
                                         </svg>
@@ -205,7 +205,7 @@
                             <!-- Error Message -->
                             <div v-if="errorMessage"
                                 class="mb-3 p-3 rounded-xl text-sm flex items-center gap-2 bg-red-50 text-red-700 border border-red-200">
-                                <svg class="w-4 h-4 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg class="w-4 h-4 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                                 </svg>
                                 {{ errorMessage }}
@@ -217,16 +217,16 @@
                             <form @submit.prevent="sendMessage" class="flex flex-col gap-2">
                                 <!-- File chip -->
                                 <div v-if="selectedFile">
-                                    <div class="inline-flex items-center max-w-[180px] sm:max-w-xs rounded-full px-3 py-1.5 text-xs border gap-1.5"
+                                    <div class="inline-flex items-center max-w-45 sm:max-w-xs rounded-full px-3 py-1.5 text-xs border gap-1.5"
                                         :class="isDarkMode ? 'bg-blue-900/40 border-blue-700 text-blue-200' : 'bg-blue-50 border-blue-200 text-blue-700'">
-                                        <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none"
+                                        <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="1.8">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M21.44 11.05l-8.49 8.49a5 5 0 01-7.07-7.07l8.49-8.49a3.5 3.5 0 014.95 4.95L10.83 17.83a2 2 0 01-2.83-2.83l8.49-8.49" />
                                         </svg>
                                         <span class="truncate">{{ selectedFile.name }}</span>
                                         <button type="button" @click.prevent="removeSelectedFile"
-                                            class="flex-shrink-0 hover:text-red-500 transition-colors">✕</button>
+                                            class="shrink-0 hover:text-red-500 transition-colors">鉁?/button>
                                     </div>
                                 </div>
 
@@ -246,7 +246,7 @@
                                     <button type="button" @click.prevent="openFilePicker"
                                         :aria-label="$t('aiSupport.attachFile')"
                                         :class="[
-                                            'flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30',
+                                            'shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30',
                                             isDarkMode
                                                 ? 'bg-gray-800 border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-700'
                                                 : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
@@ -259,9 +259,9 @@
                                     </button>
 
                                     <button type="submit" :disabled="!newMessage.trim() || isTyping"
-                                        class="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 sm:w-auto sm:px-5 sm:py-2.5 rounded-xl font-medium text-white transition-all duration-200"
+                                        class="shrink-0 inline-flex items-center justify-center w-10 h-10 sm:w-auto sm:px-5 sm:py-2.5 rounded-xl font-medium text-white transition-all duration-200"
                                         :class="newMessage.trim() && !isTyping
-                                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-md shadow-blue-500/30 hover:shadow-blue-500/50 active:scale-95'
+                                            ? 'bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-md shadow-blue-500/30 hover:shadow-blue-500/50 active:scale-95'
                                             : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'">
                                         <svg v-if="isTyping" class="animate-spin h-5 w-5"
                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -562,8 +562,8 @@ const usePrompt = async (prompt) => {
     if (isChatBusy.value) return
 
     // Determine if this is a heart rate prompt, stress prompt, or BMI prompt
-    const heartRateKeywords = ['heart rate', 'cardiovascular', 'resting heart', '心率', '靜止心率', '心跳']
-    const stressKeywords = ['stress', 'stress score', 'pressure', 'tension', '壓力', '壓力指數']
+    const heartRateKeywords = ['heart rate', 'cardiovascular', 'resting heart', '蹇冪巼', '闈滄蹇冪巼', '蹇冭烦']
+    const stressKeywords = ['stress', 'stress score', 'pressure', 'tension', '澹撳姏', '澹撳姏鎸囨暩']
     const isHeartRatePrompt = heartRateKeywords.some(keyword =>
         prompt.toLowerCase().includes(keyword) || prompt.includes(keyword)
     )
@@ -1045,8 +1045,8 @@ const cleanContent = (content) => {
     // Remove spaces before punctuation (comma, period, exclamation, question, colon, semicolon)
     t = t.replace(/\s+([,.!?:;])/g, '$1')
 
-    // Fix spacing around degree symbols (e.g. "19 °C" -> "19°C")
-    t = t.replace(/\s*(°)\s*/g, '$1')
+    // Fix spacing around degree symbols (e.g. "19 掳C" -> "19掳C")
+    t = t.replace(/\s*(掳)\s*/g, '$1')
 
     // Remove spaces inside numbers (e.g. "202 6" -> "2026")
     t = t.replace(/(\d)\s+(\d)/g, '$1$2')

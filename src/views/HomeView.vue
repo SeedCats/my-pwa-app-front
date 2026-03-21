@@ -7,7 +7,7 @@
         class="mt-4 mb-4 rounded-xl border-l-4 border-indigo-500 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
         :class="isDarkMode ? 'bg-indigo-900/20 text-indigo-200' : 'bg-indigo-50 text-indigo-900'">
         <div class="flex items-start gap-3">
-          <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+          <div class="mt-0.5 shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
             :class="isDarkMode ? 'bg-indigo-700' : 'bg-indigo-100'">
             <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -35,7 +35,7 @@
             </div>
           </div>
         </div>
-        <div class="flex items-center gap-3 flex-shrink-0">
+        <div class="flex items-center gap-3 shrink-0">
           <template v-if="viewedUser && viewedUser.serviceStatusKey === 'completed'">
             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
               :class="isDarkMode ? 'bg-green-700 text-white' : 'bg-green-100 text-green-800'">
@@ -54,7 +54,7 @@
         class="mb-4 rounded-xl border-l-4 border-orange-500 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shadow-sm"
         :class="isDarkMode ? 'bg-orange-900/20 text-orange-200' : 'bg-orange-50 text-orange-900'">
         <div class="flex items-center gap-2.5">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3"></path>
           </svg>
           <div>
@@ -74,7 +74,7 @@
         class="mb-4 rounded-xl border-l-4 border-blue-400 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shadow-sm"
         :class="isDarkMode ? 'bg-blue-900/20 text-blue-200' : 'bg-blue-50 text-blue-900'">
         <div class="flex items-center gap-2.5">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
           </svg>
           <div>
@@ -126,7 +126,7 @@
           <!-- Body -->
           <div class="p-5 flex flex-col md:flex-row md:items-start gap-6">
             <!-- Score ring column -->
-            <div class="flex flex-col items-center justify-center gap-2 md:w-44 flex-shrink-0">
+            <div class="flex flex-col items-center justify-center gap-2 md:w-44 shrink-0">
               <div class="relative w-32 h-32">
                 <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
                   <circle cx="60" cy="60" r="50" fill="none" stroke-width="12"
@@ -155,7 +155,7 @@
               <ul class="space-y-2">
                 <li v-for="(a, i) in overallAnalysis.advice" :key="i"
                   class="flex items-start gap-2 text-sm" :class="themeClasses.textSecondary">
-                  <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
                   <span>{{ a }}</span>
@@ -230,7 +230,7 @@
 
             <!-- BMI Gradient Slider -->
             <div class="mb-6">
-              <div class="relative h-3 bg-gradient-to-r from-blue-400 via-green-400 to-orange-500 rounded-full mb-3 shadow-inner">
+              <div class="relative h-3 bg-linear-to-r from-blue-400 via-green-400 to-orange-500 rounded-full mb-3 shadow-inner">
                 <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 bg-white border-[3px] border-gray-700 dark:border-gray-200 rounded-full shadow-lg transition-all duration-500"
                   :style="{ left: bmiSliderPosition + '%' }"></div>
               </div>
@@ -243,7 +243,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
               <div class="flex items-center gap-2 p-2 rounded-xl border"
                 :class="[themeClasses.border, bmiCategoryKey === 'underweight' ? (isDarkMode ? 'ring-1 ring-blue-400' : 'ring-1 ring-blue-400') : '']">
-                <div class="w-3 h-3 rounded-full flex-shrink-0 bg-blue-400"
+                <div class="w-3 h-3 rounded-full shrink-0 bg-blue-400"
                   :class="bmiCategoryKey === 'underweight' ? 'ring-2 ring-offset-1 ring-blue-400' : ''"></div>
                 <span class="text-xs" :class="[themeClasses.textSecondary, bmiCategoryKey === 'underweight' ? 'font-bold' : '']">
                   {{ $t('home.bmi.categories.underweight') }}
@@ -251,7 +251,7 @@
               </div>
               <div class="flex items-center gap-2 p-2 rounded-xl border"
                 :class="[themeClasses.border, bmiCategoryKey === 'normal' ? (isDarkMode ? 'ring-1 ring-green-400' : 'ring-1 ring-green-400') : '']">
-                <div class="w-3 h-3 rounded-full flex-shrink-0 bg-green-400"
+                <div class="w-3 h-3 rounded-full shrink-0 bg-green-400"
                   :class="bmiCategoryKey === 'normal' ? 'ring-2 ring-offset-1 ring-green-400' : ''"></div>
                 <span class="text-xs" :class="[themeClasses.textSecondary, bmiCategoryKey === 'normal' ? 'font-bold' : '']">
                   {{ $t('home.bmi.categories.normal') }}
@@ -259,7 +259,7 @@
               </div>
               <div class="flex items-center gap-2 p-2 rounded-xl border"
                 :class="[themeClasses.border, bmiCategoryKey === 'overweight' ? (isDarkMode ? 'ring-1 ring-yellow-400' : 'ring-1 ring-yellow-400') : '']">
-                <div class="w-3 h-3 rounded-full flex-shrink-0 bg-yellow-400"
+                <div class="w-3 h-3 rounded-full shrink-0 bg-yellow-400"
                   :class="bmiCategoryKey === 'overweight' ? 'ring-2 ring-offset-1 ring-yellow-400' : ''"></div>
                 <span class="text-xs" :class="[themeClasses.textSecondary, bmiCategoryKey === 'overweight' ? 'font-bold' : '']">
                   {{ $t('home.bmi.categories.overweight') }}
@@ -267,7 +267,7 @@
               </div>
               <div class="flex items-center gap-2 p-2 rounded-xl border"
                 :class="[themeClasses.border, bmiCategoryKey === 'obese' ? (isDarkMode ? 'ring-1 ring-orange-500' : 'ring-1 ring-orange-500') : '']">
-                <div class="w-3 h-3 rounded-full flex-shrink-0 bg-orange-500"
+                <div class="w-3 h-3 rounded-full shrink-0 bg-orange-500"
                   :class="bmiCategoryKey === 'obese' ? 'ring-2 ring-offset-1 ring-orange-500' : ''"></div>
                 <span class="text-xs" :class="[themeClasses.textSecondary, bmiCategoryKey === 'obese' ? 'font-bold' : '']">
                   {{ $t('home.bmi.categories.obese') }}
@@ -327,7 +327,7 @@
 
               <div class="relative">
                 <button @click="showDatePicker = !showDatePicker"
-                  class="px-4 py-2 rounded-xl border flex items-center gap-2 min-w-[200px] sm:min-w-[220px] justify-between transition-all duration-150 hover:scale-105 active:scale-95 hover:shadow-md font-medium text-sm"
+                  class="px-4 py-2 rounded-xl border flex items-center gap-2 min-w-50 sm:min-w-55 justify-between transition-all duration-150 hover:scale-105 active:scale-95 hover:shadow-md font-medium text-sm"
                   :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']">
                   <span class="flex-1 text-center">{{ currentDate || $t('home.selectDate') }}</span>
                   <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -461,16 +461,16 @@
               <h4 class="text-xs font-semibold mb-3" :class="themeClasses.textPrimary">{{ $t('home.heartRate.rangeTitle') }}</h4>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
-                  <span class="w-2.5 h-2.5 rounded-full bg-blue-400 flex-shrink-0"></span>{{ $t('home.heartRate.range.low') }}
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-400 shrink-0"></span>{{ $t('home.heartRate.range.low') }}
                 </div>
                 <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
-                  <span class="w-2.5 h-2.5 rounded-full bg-green-400 flex-shrink-0"></span>{{ $t('home.heartRate.range.normal') }}
+                  <span class="w-2.5 h-2.5 rounded-full bg-green-400 shrink-0"></span>{{ $t('home.heartRate.range.normal') }}
                 </div>
                 <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
-                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 flex-shrink-0"></span>{{ $t('home.heartRate.range.elevated') }}
+                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 shrink-0"></span>{{ $t('home.heartRate.range.elevated') }}
                 </div>
                 <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
-                  <span class="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0"></span>{{ $t('home.heartRate.range.high') }}
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0"></span>{{ $t('home.heartRate.range.high') }}
                 </div>
               </div>
             </div>
@@ -504,7 +504,7 @@
 
             <div class="relative">
               <button @click="showStressDatePicker = !showStressDatePicker"
-                class="px-4 py-2 rounded-xl border flex items-center gap-2 min-w-[200px] sm:min-w-[220px] justify-between transition-all duration-150 hover:scale-105 active:scale-95 hover:shadow-md font-medium text-sm"
+                class="px-4 py-2 rounded-xl border flex items-center gap-2 min-w-50 sm:min-w-55 justify-between transition-all duration-150 hover:scale-105 active:scale-95 hover:shadow-md font-medium text-sm"
                 :class="[themeClasses.cardBackground, themeClasses.border, isDarkMode ? 'text-white' : 'text-gray-800']">
                 <span class="flex-1 text-center">{{ currentStressDate || $t('home.selectDate') }}</span>
                 <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -638,16 +638,16 @@
             <h4 class="text-xs font-semibold mb-3" :class="themeClasses.textPrimary">{{ $t('home.stress.rangeTitle') }}</h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
-                <span class="w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0"></span>{{ $t('home.stress.range.relaxed') }}
+                <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shrink-0"></span>{{ $t('home.stress.range.relaxed') }}
               </div>
               <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
-                <span class="w-2.5 h-2.5 rounded-full bg-green-400 flex-shrink-0"></span>{{ $t('home.stress.range.light') }}
+                <span class="w-2.5 h-2.5 rounded-full bg-green-400 shrink-0"></span>{{ $t('home.stress.range.light') }}
               </div>
               <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
-                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 flex-shrink-0"></span>{{ $t('home.stress.range.moderate') }}
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 shrink-0"></span>{{ $t('home.stress.range.moderate') }}
               </div>
               <div class="flex items-center gap-2 text-xs" :class="themeClasses.textSecondary">
-                <span class="w-2.5 h-2.5 rounded-full bg-orange-500 flex-shrink-0"></span>{{ $t('home.stress.range.severe') }}
+                <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shrink-0"></span>{{ $t('home.stress.range.severe') }}
               </div>
             </div>
           </div>
@@ -672,7 +672,7 @@
             <div class="rounded-2xl shadow-sm border h-full flex flex-col p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
               :class="[themeClasses.cardBackground, themeClasses.border]">
               <div class="flex items-center gap-3 mb-3">
-                <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
                   :class="isDarkMode ? 'bg-blue-900/40' : 'bg-blue-100'">
                   <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -683,7 +683,7 @@
                   <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('home.quickAdd') }}</p>
                 </div>
               </div>
-              <p class="text-xs leading-relaxed flex-grow mb-4" :class="themeClasses.textSecondary">{{ $t('home.recordData') }}</p>
+              <p class="text-xs leading-relaxed grow mb-4" :class="themeClasses.textSecondary">{{ $t('home.recordData') }}</p>
               <div class="flex items-center text-blue-500 text-xs font-semibold gap-1 mt-auto">
                 <span>{{ $t('home.addRecord') }}</span>
                 <svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -698,7 +698,7 @@
             <div class="rounded-2xl shadow-sm border h-full flex flex-col p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
               :class="[themeClasses.cardBackground, themeClasses.border]">
               <div class="flex items-center gap-3 mb-3">
-                <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
                   :class="isDarkMode ? 'bg-purple-900/40' : 'bg-purple-100'">
                   <svg class="h-6 w-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
@@ -709,7 +709,7 @@
                   <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('home.availableAlways') }}</p>
                 </div>
               </div>
-              <p class="text-xs leading-relaxed flex-grow mb-4" :class="themeClasses.textSecondary">{{ $t('home.getAdvice') }}</p>
+              <p class="text-xs leading-relaxed grow mb-4" :class="themeClasses.textSecondary">{{ $t('home.getAdvice') }}</p>
               <div class="flex items-center text-purple-500 text-xs font-semibold gap-1 mt-auto">
                 <span>{{ $t('home.getAdviceButton') }}</span>
                 <svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -724,7 +724,7 @@
             <div class="rounded-2xl shadow-sm border h-full flex flex-col p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
               :class="[themeClasses.cardBackground, themeClasses.border]">
               <div class="flex items-center gap-3 mb-3">
-                <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
                   :class="isDarkMode ? 'bg-green-900/40' : 'bg-green-100'">
                   <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
@@ -735,7 +735,7 @@
                   <p class="text-xs mt-0.5" :class="themeClasses.textSecondary">{{ $t('home.chat.available') }}</p>
                 </div>
               </div>
-              <p class="text-xs leading-relaxed flex-grow mb-4" :class="themeClasses.textSecondary">{{ $t('home.chat.description') }}</p>
+              <p class="text-xs leading-relaxed grow mb-4" :class="themeClasses.textSecondary">{{ $t('home.chat.description') }}</p>
               <div class="flex items-center text-green-500 text-xs font-semibold gap-1 mt-auto">
                 <span>{{ $t('home.chat.openChat') }}</span>
                 <svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

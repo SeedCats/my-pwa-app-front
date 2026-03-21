@@ -315,7 +315,7 @@
         ]">
             <!-- Mobile menu button -->
             <button type="button" @click="sidebarOpen = true"
-                class="flex-shrink-0 -m-1.5 p-2 lg:hidden rounded-xl transition-all duration-200 ease-in-out active:scale-90"
+                class="shrink-0 -m-1.5 p-2 lg:hidden rounded-xl transition-all duration-200 ease-in-out active:scale-90"
                 :class="[isDarkMode ? 'hover:bg-gray-700/80 text-gray-300 hover:text-white' : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900']">
                 <span class="sr-only">Open sidebar</span>
                 <Bars3Icon class="h-5 w-5" aria-hidden="true" />
@@ -323,7 +323,7 @@
 
             <!-- Desktop sidebar toggle -->
             <button type="button" @click="toggleDesktopSidebar"
-                class="hidden lg:flex flex-shrink-0 -m-1.5 items-center justify-center p-2 rounded-xl transition-all duration-200 ease-in-out active:scale-90"
+                class="hidden lg:flex shrink-0 -m-1.5 items-center justify-center p-2 rounded-xl transition-all duration-200 ease-in-out active:scale-90"
                 :class="[isDarkMode ? 'hover:bg-gray-700/80 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900']">
                 <span class="sr-only">Toggle sidebar</span>
                 <Bars3Icon v-if="isDesktopSidebarHidden" class="h-5 w-5" aria-hidden="true" />
@@ -331,11 +331,11 @@
             </button>
 
             <!-- Separator -->
-            <div class="h-6 w-px flex-shrink-0" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'" aria-hidden="true" />
+            <div class="h-6 w-px shrink-0" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'" aria-hidden="true" />
 
             <!-- Breadcrumb: page icon + title -->
             <div v-if="currentPageTitle" class="flex items-center gap-2 min-w-0">
-                <div class="hidden sm:flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg"
+                <div class="hidden sm:flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
                     :class="isDarkMode ? 'bg-indigo-500/20' : 'bg-indigo-50'">
                     <component :is="currentPageIcon" class="h-4 w-4 text-indigo-500" aria-hidden="true" />
                 </div>
@@ -346,9 +346,9 @@
             <div class="flex flex-1 items-center justify-end gap-x-1 sm:gap-x-2 min-w-0">
 
                 <!-- Assigned Provider (for user role only) -->
-                <div v-if="!isAdmin() && providerName" class="hidden md:flex items-center gap-2 mr-1 min-w-0 px-3 py-1.5 rounded-xl border flex-shrink-0"
+                <div v-if="!isAdmin() && providerName" class="hidden md:flex items-center gap-2 mr-1 min-w-0 px-3 py-1.5 rounded-xl border shrink-0"
                     :class="isDarkMode ? 'border-gray-700/60 bg-gray-800/60' : 'border-gray-200 bg-gray-50'">
-                    <svg class="w-3.5 h-3.5 flex-shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3.5 h-3.5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     <div class="flex flex-col min-w-0 leading-tight">
@@ -363,7 +363,7 @@
                 <button
                     type="button"
                     @click="setTheme(isDarkMode ? 'light' : 'dark')"
-                    class="flex-shrink-0 -m-1 p-2 rounded-xl transition-all duration-200 ease-in-out active:scale-90"
+                    class="shrink-0 -m-1 p-2 rounded-xl transition-all duration-200 ease-in-out active:scale-90"
                     :class="isDarkMode ? 'hover:bg-gray-700/80 text-gray-400 hover:text-yellow-400' : 'hover:bg-gray-100 text-gray-500 hover:text-indigo-600'"
                     :title="isDarkMode ? t('nav.switchToLight') : t('nav.switchToDark')"
                 >
@@ -372,10 +372,10 @@
                 </button>
 
                 <!-- Thin separator -->
-                <div class="h-5 w-px flex-shrink-0" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'" aria-hidden="true" />
+                <div class="h-5 w-px shrink-0" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'" aria-hidden="true" />
 
                 <!-- Notification Button -->
-                <div ref="notificationPanelRef" class="relative flex-shrink-0">
+                <div ref="notificationPanelRef" class="relative shrink-0">
                     <button
                         type="button"
                         @click.stop="toggleNotificationPanel"
@@ -433,9 +433,9 @@
                                     class="w-full flex items-start gap-3 p-3 rounded-xl transition-all duration-150 text-left group"
                                     :class="isDarkMode ? 'hover:bg-gray-700/60 bg-gray-700/30' : 'hover:bg-gray-50 bg-blue-50/60'"
                                 >
-                                    <div class="flex-shrink-0 relative">
+                                    <div class="shrink-0 relative">
                                         <img v-if="unreadIcon" :src="unreadIcon" alt="Sender" class="w-10 h-10 rounded-full object-cover ring-2 ring-blue-500/30" />
-                                        <div v-else class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center ring-2 ring-blue-500/20 flex-shrink-0">
+                                        <div v-else class="w-10 h-10 rounded-full bg-linear-to-br from-blue-400 to-indigo-600 flex items-center justify-center ring-2 ring-blue-500/20 shrink-0">
                                             <span class="text-white font-bold text-sm">{{ (unreadSender || 'S').charAt(0).toUpperCase() }}</span>
                                         </div>
                                         <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-400 border-2" :class="isDarkMode ? 'border-gray-800' : 'border-white'"></span>
@@ -445,7 +445,7 @@
                                             <p class="font-semibold text-sm truncate" :class="themeClasses.textPrimary">
                                                 {{ unreadSender || (isAdmin() ? 'Patient' : (providerName || t('chat.healthcareProvider'))) }}
                                             </p>
-                                            <p v-if="unreadTimeText" class="text-[10px] flex-shrink-0" :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'">
+                                            <p v-if="unreadTimeText" class="text-[10px] shrink-0" :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'">
                                                 {{ unreadTimeText }}
                                             </p>
                                         </div>
@@ -453,7 +453,7 @@
                                             {{ unreadLastText || t('chat.noMessages') }}
                                         </p>
                                     </div>
-                                    <svg class="w-4 h-4 flex-shrink-0 mt-2 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 shrink-0 mt-2 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                     </svg>
                                 </button>
@@ -480,7 +480,7 @@
                 </div>
 
                 <!-- Language Switcher -->
-                <Menu as="div" class="relative flex-shrink-0">
+                <Menu as="div" class="relative shrink-0">
                     <MenuButton
                         class="-m-1 flex items-center p-2 rounded-xl transition-all duration-200 ease-in-out active:scale-90"
                         :class="isDarkMode ? 'hover:bg-gray-700/80 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'"
@@ -521,17 +521,17 @@
                 </Menu>
 
                 <!-- Thin separator -->
-                <div class="h-5 w-px flex-shrink-0" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'" aria-hidden="true" />
+                <div class="h-5 w-px shrink-0" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'" aria-hidden="true" />
 
                 <!-- Profile Dropdown -->
-                <Menu as="div" class="relative flex-shrink-0">
+                <Menu as="div" class="relative shrink-0">
                     <MenuButton
                         class="-m-1 flex items-center gap-2 p-1.5 rounded-xl transition-all duration-200 ease-in-out active:scale-90 group"
                         :class="isDarkMode ? 'hover:bg-gray-700/80' : 'hover:bg-gray-100'">
                         <!-- Avatar -->
                         <div class="relative">
                             <img v-if="userData?.icon" :src="userData.icon" alt="User" class="w-8 h-8 rounded-full object-cover ring-2" :class="isDarkMode ? 'ring-gray-600' : 'ring-gray-200'" />
-                            <div v-else class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center ring-2" :class="isDarkMode ? 'ring-gray-600' : 'ring-gray-200'">
+                            <div v-else class="w-8 h-8 rounded-full bg-linear-to-br from-indigo-400 to-purple-600 flex items-center justify-center ring-2" :class="isDarkMode ? 'ring-gray-600' : 'ring-gray-200'">
                                 <span class="text-white font-bold text-sm">{{ userName.charAt(0).toUpperCase() }}</span>
                             </div>
 
@@ -543,7 +543,7 @@
                                 {{ isAdmin() ? t('nav.roleAdmin') : t('nav.roleUser') }}
                             </span>
                         </div>
-                        <ChevronDownIcon class="h-3.5 w-3.5 hidden sm:block transition-transform duration-150 ui-open:rotate-180 flex-shrink-0" :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'" aria-hidden="true" />
+                        <ChevronDownIcon class="h-3.5 w-3.5 hidden sm:block transition-transform duration-150 ui-open:rotate-180 shrink-0" :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'" aria-hidden="true" />
                     </MenuButton>
 
                     <transition
@@ -560,9 +560,9 @@
                             <!-- User info header -->
                             <div class="px-4 py-3 border-b" :class="isDarkMode ? 'border-gray-700/60' : 'border-gray-100'">
                                 <div class="flex items-center gap-3">
-                                    <div class="relative flex-shrink-0">
+                                    <div class="relative shrink-0">
                                         <img v-if="userData?.icon" :src="userData.icon" alt="User" class="w-9 h-9 rounded-full object-cover" />
-                                        <div v-else class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center">
+                                        <div v-else class="w-9 h-9 rounded-full bg-linear-to-br from-indigo-400 to-purple-600 flex items-center justify-center">
                                             <span class="text-white font-bold">{{ userName.charAt(0).toUpperCase() }}</span>
                                         </div>
                                     </div>
@@ -583,7 +583,7 @@
                                         active ? (isDarkMode ? 'bg-red-900/20 text-red-400' : 'bg-red-50 text-red-600') : themeClasses.textPrimary,
                                         'flex items-center w-full gap-2.5 px-4 py-2.5 text-sm font-medium transition-all duration-150'
                                     ]">
-                                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                                         </svg>
                                         {{ t('auth.logout') }}
