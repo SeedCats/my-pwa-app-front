@@ -451,6 +451,8 @@
     "ai": "AI",
     "typingPlaceholder": "在此輸入您的訊息...",
     "conversationHistory": "對話紀錄",
+    "today": "今天",
+    "earlier": "較早",
     "deleteAll": "刪除全部",
     "deleteAllConfirm": "您確定要刪除所有對話嗎？此操作無法復原。",
     "hide": "隱藏",

@@ -457,6 +457,8 @@
     "ai": "AI",
     "typingPlaceholder": "Type your message here...",
     "conversationHistory": "Conversation History",
+    "today": "Today",
+    "earlier": "Earlier",
     "deleteAll": "Delete All",
     "deleteAllConfirm": "Are you sure you want to DELETE ALL conversations? This cannot be undone.",
     "deleteConversationConfirm": "Delete this conversation? This action cannot be undone.",

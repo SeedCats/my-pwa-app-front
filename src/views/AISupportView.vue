@@ -69,18 +69,17 @@
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             <button v-for="(prompt, idx) in suggestedPrompts" :key="idx"
                                                 @click="usePrompt(prompt)"
-                                                class="group text-left p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105 hover:shadow-md"
-                                                :class="isDarkMode ? 'bg-gray-800 border-gray-700 hover:border-blue-500 hover:bg-gray-750' : 'bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50'">
+                                                class="group text-left p-4 rounded-xl border transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
+                                                :class="isDarkMode ? 'bg-gray-800/80 border-gray-700 hover:border-indigo-500 hover:bg-gray-800' : 'bg-white border-gray-200 hover:border-indigo-400 hover:bg-indigo-50/30'">
                                                 <div class="flex items-start">
-                                                    <svg class="w-5 h-5 mt-0.5 mr-2 shrink-0"
-                                                        :class="isDarkMode ? 'text-blue-400' : 'text-blue-600'"
+                                                    <svg class="w-5 h-5 mt-0.5 mr-2.5 shrink-0 opacity-70 group-hover:opacity-100 transition-opacity"
+                                                        :class="isDarkMode ? 'text-indigo-400' : 'text-indigo-600'"
                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                                     </svg>
-                                                    <span class="text-sm"
-                                                        :class="isDarkMode ? 'text-gray-200 group-hover:text-white' : 'text-gray-700 group-hover:text-gray-900'">{{
-                                                        prompt }}</span>
+                                                    <span class="text-sm font-medium leading-snug"
+                                                        :class="isDarkMode ? 'text-gray-300 group-hover:text-white' : 'text-gray-600 group-hover:text-gray-900'">{{ prompt }}</span>
                                                 </div>
                                             </button>
                                         </div>
@@ -398,197 +397,6 @@
                 </div>
             </div>
 
-            <!-- Conversation History Card -->
-            <div class="shrink-0 mt-2 max-h-[28vh] lg:max-h-none overflow-y-auto lg:overflow-visible max-w-7xl mx-auto w-full pb-2">
-                <div class="rounded-lg shadow-sm border p-4"
-                    :class="[themeClasses.cardBackground, themeClasses.border]">
-                    <div class="flex items-center justify-between mb-3">
-                        <h2 class="text-lg font-semibold" :class="themeClasses.textPrimary">{{
-                            $t('aiSupport.conversationHistory') }}
-                        </h2>
-                        <div class="flex items-center space-x-2">
-                            <!-- prettier delete-all with label and inline confirmation -->
-                            <div class="relative">
-                                <button @click.prevent="confirmDeleteAll = !confirmDeleteAll"
-                                    :disabled="historyLoading || chatList.length === 0 || isChatBusy"
-                                    :aria-disabled="historyLoading || chatList.length === 0 || isChatBusy"
-                                    :title="isChatBusy ? $t('aiSupport.waitForResponse') : $t('aiSupport.deleteAll')"
-                                    class="inline-flex items-center px-3 py-1 text-sm rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:from-red-600 hover:to-red-700 transition-transform transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="1.6">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M3 6h18M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6M10 6V4a2 2 0 012-2h0a2 2 0 012 2v2" />
-                                    </svg>
-                                    <span class="ml-2 hidden sm:inline font-medium">{{ $t('aiSupport.deleteAll')
-                                        }}</span>
-                                </button>
-
-                                <!-- Backdrop for click-outside -->
-                                <div v-if="confirmDeleteAll" @click.self="confirmDeleteAll = false"
-                                    class="fixed inset-0 z-40" style="background: transparent;"></div>
-
-                                <div v-if="confirmDeleteAll" @click.stop
-                                    class="absolute right-0 mt-2 w-64 p-3 rounded-lg shadow-lg z-50"
-                                    :class="[themeClasses.cardBackground, themeClasses.border]">
-                                    <div class="text-sm mb-2" :class="isDarkMode ? 'text-gray-200' : 'text-gray-800'">
-                                        {{ $t('aiSupport.deleteAllConfirm') }}
-                                    </div>
-                                    <div class="flex justify-end space-x-2">
-                                        <button @click.prevent="confirmDeleteAll = false"
-                                            class="px-3 py-1 text-sm rounded bg-gray-100 hover:bg-gray-200">{{
-                                            $t('common.cancel') }}</button>
-                                        <button @click.prevent="deleteAllChats(true)"
-                                            class="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700">{{
-                                            $t('aiSupport.yesDelete') }}</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button @click="toggleHistoryPanel"
-                                class="inline-flex items-center px-3 py-1 text-sm rounded-full transition-transform duration-150 ease-out transform active:scale-95 focus:outline-none btn-ux-fancy"
-                                :class="isDarkMode ? ['bg-white text-gray-900', themeClasses.border] : ['bg-blue-600 text-white', themeClasses.border]"
-                                aria-label="Toggle History">
-                                <svg v-if="showHistoryPanel" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                    <circle cx="12" cy="12" r="3" />
-                                    <path d="M3 3l18 18" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="1.8">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                    <circle cx="12" cy="12" r="3" />
-                                </svg>
-                                <span class="ml-2 font-medium">{{ showHistoryPanel ? $t('aiSupport.hide') :
-                                    $t('aiSupport.show') }}</span>
-                            </button>
-
-
-                        </div>
-                    </div>
-
-                    <div v-if="showHistoryPanel">
-                        <div v-if="historyLoading" class="text-sm text-gray-500">{{ $t('common.loading') }}</div>
-                        <div v-if="historyError" class="text-sm text-red-500">{{ historyError }}</div>
-                        <div v-if="!historyLoading && chatList.length === 0" class="text-sm text-gray-500">{{
-                            $t('aiSupport.noPastConversations') }}</div>
-                        <ul class="space-y-2">
-                            <li v-for="(chat, index) in chatList" :key="chat._id"
-                                class="group flex flex-col sm:flex-row sm:items-center gap-2 p-3 rounded-xl border transition-all duration-200 hover:shadow-md"
-                                :data-editing-id="parseId(chat._id || chat.id)"
-                                :class="[isDarkMode ? 'bg-gray-800/60 border-gray-700 hover:border-gray-600 hover:bg-gray-800' : 'bg-gray-50 border-gray-200 hover:border-blue-200 hover:bg-white']">
-                                <div class="flex-1 min-w-0">
-                                    <div class="font-medium truncate">
-                                        <template v-if="editingId === parseId(chat._id || chat.id)">
-                                            <input ref="titleInput" v-model="editTitle"
-                                                @keydown.enter.prevent="saveEdit(chat)"
-                                                @keydown.esc.prevent="cancelEdit" @click.stop
-                                                :class="[isDarkMode ? 'text-white bg-gray-700 border-gray-600' : 'text-gray-800 bg-white border-gray-200', 'w-full px-2 py-1 rounded border text-sm']" />
-                                        </template>
-                                        <template v-else>
-                                            <span @dblclick="startEditing(chat)"
-                                                :class="[isDarkMode ? 'text-white' : 'text-gray-900', 'cursor-text']">{{
-                                                chat.title || 'Untitled' }}</span>
-                                        </template>
-                                    </div>
-                                    <div class="text-xs text-gray-500">{{ formatTime(chat.updatedAt ||
-                                        chat.createdAt) }}</div>
-                                    <div class="text-xs truncate" :class="isDarkMode ? 'text-white' : 'text-gray-600'">
-                                        {{ chatPreviews[index] || '' }}</div>
-                                </div>
-                                <div class="flex-shrink-0 flex flex-wrap items-center gap-1.5 sm:ml-3">
-                                    <button @click.prevent="startEditing(chat)" :title="$t('aiSupport.rename')"
-                                        class="px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all duration-200"
-                                        :class="isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white border border-gray-600' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'">{{ $t('aiSupport.rename') }}</button>
-                                    <button @click.prevent="loadChatIntoConversation(chat._id)" :disabled="isChatBusy"
-                                        :aria-disabled="isChatBusy"
-                                        :title="isChatBusy ? 'Finish current response before loading another chat' : 'Load'"
-                                        :class="isChatBusy ? 'px-2.5 py-1.5 text-xs font-medium rounded-lg bg-blue-300 text-white cursor-not-allowed' : 'px-2.5 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors'">{{ $t('aiSupport.load') }}</button>
-                                    <div class="relative">
-                                        <button
-                                            @click.prevent="confirmDeleteId = confirmDeleteId === parseId(chat._id || chat.id) ? null : parseId(chat._id || chat.id)"
-                                            :disabled="isChatBusy" :aria-disabled="isChatBusy"
-                                            :title="isChatBusy ? $t('aiSupport.waitForResponse') : $t('common.delete')"
-                                            :class="isChatBusy ? 'p-1.5 rounded-lg bg-red-50 text-red-300 cursor-not-allowed border border-red-100 opacity-50' : 'p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 border border-red-100 transition-colors'">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-
-                                        <!-- Backdrop for click-outside -->
-                                        <div v-if="confirmDeleteId === parseId(chat._id || chat.id)"
-                                            @click.self="confirmDeleteId = null" class="fixed inset-0 z-40"
-                                            style="background: transparent;"></div>
-
-                                        <!-- Confirmation popup for single delete -->
-                                        <div v-if="confirmDeleteId === parseId(chat._id || chat.id)" @click.stop
-                                            class="absolute right-0 top-full mt-2 w-64 p-3 rounded-lg shadow-lg z-50"
-                                            :class="[themeClasses.cardBackground, themeClasses.border]">
-                                            <div class="text-sm mb-2"
-                                                :class="isDarkMode ? 'text-gray-200' : 'text-gray-800'">
-                                                {{ $t('aiSupport.deleteConversationConfirm') }}
-                                            </div>
-                                            <div class="flex justify-end space-x-2">
-                                                <button @click.prevent="confirmDeleteId = null"
-                                                    class="px-3 py-1 text-sm rounded"
-                                                    :class="isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'">{{
-                                                    $t('common.cancel') }}</button>
-                                                <button @click.prevent="deleteChat(chat._id, true)"
-                                                    class="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700">{{
-                                                    $t('aiSupport.delete')
-                                                    }}</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-
-                        <div v-if="showPagination" class="mt-3 flex items-center justify-between text-sm">
-                            <div class="text-gray-500">{{ $t('aiSupport.showingPage', {
-                                page: historyPage, total:
-                                totalPages }) }}</div>
-                            <div class="flex items-center space-x-2">
-                                <button :disabled="historyPage <= 1" @click.prevent="loadChatList(historyPage - 1)"
-                                    class="inline-flex items-center px-3 py-1 rounded border transition-transform duration-200 transform hover:-translate-x-1 hover:scale-105 active:scale-95 focus:outline-none"
-                                    :class="[isDarkMode ? 'bg-gray-700 text-white border-gray-600 focus:ring-gray-400' : 'bg-white text-gray-900 border-gray-200 focus:ring-blue-200', historyPage <= 1 ? 'opacity-50 cursor-not-allowed' : '']"
-                                    :aria-label="$t('aiSupport.prev')">
-                                    <svg class="h-4 w-4 mr-2 transition-transform duration-200" viewBox="0 0 20 20"
-                                        fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd"
-                                            d="M12.707 14.707a1 1 0 01-1.414 0L7.586 11l3.707-3.707a1 1 0 011.414 1.414L10.414 11l2.293 2.293a1 1 0 010 1.414z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                    {{ $t('aiSupport.prev') }}
-                                </button>
-                                <select v-model.number="historyPage" @change.prevent="loadChatList(historyPage)"
-                                    :class="isDarkMode ? 'px-2 py-1 border rounded bg-gray-700 text-white border-gray-600' : 'px-2 py-1 border rounded bg-white text-gray-800 border-gray-200'">
-                                    <option v-for="p in historyPageOptions" :key="p" :value="p">{{
-                                        $t('aiSupport.pageLabel', { p }) }}</option>
-                                </select>
-                                <button :disabled="historyPage >= totalPages"
-                                    @click.prevent="loadChatList(historyPage + 1)"
-                                    class="inline-flex items-center px-3 py-1 rounded border transition-transform duration-200 transform hover:translate-x-1 hover:scale-105 active:scale-95 focus:outline-none"
-                                    :class="[isDarkMode ? 'bg-gray-700 text-white border-gray-600 focus:ring-gray-400' : 'bg-white text-gray-900 border-gray-200 focus:ring-blue-200', historyPage >= totalPages ? 'opacity-50 cursor-not-allowed' : '']"
-                                    :aria-label="$t('aiSupport.next')">
-                                    {{ $t('aiSupport.next') }}
-                                    <svg class="h-4 w-4 ml-2 transition-transform duration-200" viewBox="0 0 20 20"
-                                        fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd"
-                                            d="M7.293 5.293a1 1 0 011.414 0L12.414 9l-3.707 3.707a1 1 0 01-1.414-1.414L9.586 9 7.293 6.707a1 1 0 010-1.414z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </main>
     </div>
 </template>
@@ -598,6 +406,7 @@ import { ref, nextTick, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { sendMessageToGrok, sendMessageToGrokWithFile, fetchAichatList, fetchAichatById, createAichat, appendMessagesToAichat, deleteAichat, updateAichatTitle, updateAichatLastMessage } from '../services/grokService'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import { getCachedBmiData, getCachedHeartRateDates, getCachedStressDates, setCachedBmiData, setCachedHeartRateDates, setCachedStressDates } from '../stores/userStore'
 import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
 import { getStressStats } from '../services/stressService'
@@ -605,6 +414,7 @@ import { getLatestBMIRecord } from '../services/bmiService'
 
 const { isDarkMode, themeClasses } = useTheme()
 const { t } = useI18n()
+const route = useRoute()
 
 // State
 const sidebarHidden = ref(false)
@@ -1798,12 +1608,25 @@ onMounted(() => {
     if (showHistoryPanel.value) {
         loadChatList(1).catch(e => console.warn('Failed to load chat history on mount:', e))
     }
+
+    // Load chat requested from sidebar history panel.
+    const requestedId = parseId(route.query.chatId)
+    if (requestedId) {
+        loadChatIntoConversation(requestedId).catch(e => console.warn('Failed to load requested chat:', e))
+    }
 })
 
 onBeforeUnmount(() => {
     window.removeEventListener('stressDataUpdated', forceReloadStressDates)
     window.removeEventListener('heartRateDataUpdated', loadHealthData)
     window.removeEventListener('bmiDataUpdated', loadHealthData)
+})
+
+watch(() => route.query.chatId, (newId) => {
+    const parsed = parseId(newId)
+    if (!parsed) return
+    if (parseId(chatId.value) === parsed) return
+    loadChatIntoConversation(parsed).catch(e => console.warn('Failed to load requested chat:', e))
 })
 </script>
 
