@@ -156,6 +156,101 @@
                                 </li>
                             </ul>
                         </li>
+                        <li v-if="isAiSupportRoute && !isAdmin()" class="min-h-0">
+                            <div class="mx-1 rounded-xl border p-2.5" :class="isDarkMode ? 'border-gray-700 bg-gray-800/40' : 'border-gray-200 bg-white/70'">
+                                <div class="flex items-center justify-between gap-2 mb-2">
+                                    <h3 class="text-[11px] font-semibold uppercase tracking-widest" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{ t('aiSupport.conversationHistory') }}</h3>
+                                    <div class="flex items-center gap-1">
+                                        <button @click.prevent="toggleAiHistoryPanel"
+                                            class="inline-flex items-center justify-center h-7 w-7 rounded-lg text-xs"
+                                            :class="isDarkMode ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                                            :title="aiShowHistoryPanel ? t('aiSupport.hide') : t('aiSupport.show')">
+                                            <svg v-if="aiShowHistoryPanel" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round" stroke-linejoin="round" />
+                                                <circle cx="12" cy="12" r="3" />
+                                                <path d="M3 3l18 18" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round" stroke-linejoin="round" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                        </button>
+                                        <div class="relative">
+                                            <button @click.prevent="aiConfirmDeleteAll = !aiConfirmDeleteAll"
+                                                :disabled="aiHistoryLoading || aiChatList.length === 0"
+                                                :class="aiHistoryLoading || aiChatList.length === 0
+                                                    ? 'inline-flex items-center justify-center h-7 w-7 rounded-lg bg-red-400/50 text-white cursor-not-allowed'
+                                                    : 'inline-flex items-center justify-center h-7 w-7 rounded-lg bg-red-600 text-white hover:bg-red-700'"
+                                                :title="t('aiSupport.deleteAll')">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6M10 6V4a2 2 0 012-2h0a2 2 0 012 2v2" />
+                                                </svg>
+                                            </button>
+                                            <div v-if="aiConfirmDeleteAll" @click.self="aiConfirmDeleteAll = false" class="fixed inset-0 z-40" style="background: transparent;"></div>
+                                            <div v-if="aiConfirmDeleteAll" class="absolute right-0 mt-2 w-56 p-2.5 rounded-lg shadow-lg z-50"
+                                                :class="[themeClasses.cardBackground, themeClasses.border]">
+                                                <div class="text-xs mb-2" :class="themeClasses.textPrimary">{{ t('aiSupport.deleteAllConfirm') }}</div>
+                                                <div class="flex justify-end gap-1.5">
+                                                    <button @click.prevent="aiConfirmDeleteAll = false" class="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200 text-gray-800">{{ t('common.cancel') }}</button>
+                                                    <button @click.prevent="deleteAllAiChats(true)" class="px-2 py-1 text-xs rounded bg-red-600 text-white hover:bg-red-700">{{ t('aiSupport.yesDelete') }}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-if="aiShowHistoryPanel" class="flex flex-col min-h-0">
+                                    <div v-if="aiHistoryLoading" class="text-xs text-gray-500 mb-2">{{ t('common.loading') }}</div>
+                                    <div v-if="aiHistoryError" class="text-xs text-red-500 mb-2">{{ aiHistoryError }}</div>
+                                    <div v-if="!aiHistoryLoading && aiChatList.length === 0" class="text-xs text-gray-500 mb-2">{{ t('aiSupport.noPastConversations') }}</div>
+
+                                    <div class="max-h-70 overflow-y-auto pr-1 ai-sidebar-scroll">
+                                        <ul class="space-y-1.5">
+                                            <li v-for="(chat, idx) in aiChatList" :key="chat._id || chat.id"
+                                                class="rounded-lg border p-2"
+                                                :class="isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'">
+                                                <button @click.prevent="openAiChat(chat)" class="w-full text-left">
+                                                    <div class="text-xs font-semibold truncate" :class="themeClasses.textPrimary">{{ chat.title || 'Untitled' }}</div>
+                                                    <div class="text-[10px] mt-0.5" :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'">{{ formatAiTime(chat.updatedAt || chat.createdAt) }}</div>
+                                                    <div class="text-[11px] mt-1 truncate" :class="isDarkMode ? 'text-gray-300' : 'text-gray-600'">{{ aiChatPreviews[idx] || '' }}</div>
+                                                </button>
+                                                <div class="mt-2 flex items-center justify-end gap-1.5">
+                                                    <button @click.prevent="openAiChat(chat)" class="px-2 py-1 text-[10px] rounded bg-blue-600 text-white hover:bg-blue-700">{{ t('aiSupport.load') }}</button>
+                                                    <div class="relative">
+                                                        <button
+                                                            @click.prevent="aiConfirmDeleteId = aiConfirmDeleteId === parseAiId(chat._id || chat.id) ? null : parseAiId(chat._id || chat.id)"
+                                                            class="p-1.5 rounded bg-red-50 text-red-500 hover:bg-red-100 border border-red-100">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </button>
+                                                        <div v-if="aiConfirmDeleteId === parseAiId(chat._id || chat.id)" @click.self="aiConfirmDeleteId = null" class="fixed inset-0 z-40" style="background: transparent;"></div>
+                                                        <div v-if="aiConfirmDeleteId === parseAiId(chat._id || chat.id)" class="absolute right-0 top-full mt-2 w-56 p-2.5 rounded-lg shadow-lg z-50"
+                                                            :class="[themeClasses.cardBackground, themeClasses.border]">
+                                                            <div class="text-xs mb-2" :class="themeClasses.textPrimary">{{ t('aiSupport.deleteConversationConfirm') }}</div>
+                                                            <div class="flex justify-end gap-1.5">
+                                                                <button @click.prevent="aiConfirmDeleteId = null" class="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200 text-gray-800">{{ t('common.cancel') }}</button>
+                                                                <button @click.prevent="deleteAiChat(chat, true)" class="px-2 py-1 text-xs rounded bg-red-600 text-white hover:bg-red-700">{{ t('aiSupport.delete') }}</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div v-if="aiShowPagination" class="mt-2 flex items-center justify-between gap-2">
+                                        <button :disabled="aiHistoryPage <= 1" @click.prevent="loadAiChatList(aiHistoryPage - 1)"
+                                            class="px-2 py-1 text-[10px] rounded border"
+                                            :class="[isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-900 border-gray-200', aiHistoryPage <= 1 ? 'opacity-50 cursor-not-allowed' : '']">{{ t('aiSupport.prev') }}</button>
+                                        <span class="text-[10px]" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{ aiHistoryPage }}/{{ aiTotalPages }}</span>
+                                        <button :disabled="aiHistoryPage >= aiTotalPages" @click.prevent="loadAiChatList(aiHistoryPage + 1)"
+                                            class="px-2 py-1 text-[10px] rounded border"
+                                            :class="[isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-900 border-gray-200', aiHistoryPage >= aiTotalPages ? 'opacity-50 cursor-not-allowed' : '']">{{ t('aiSupport.next') }}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
                         <li class="mt-auto border-t pt-4" :class="themeClasses.border">
                             <p class="px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">{{ t('nav.settingsSection') }}</p>
                             <ul class="space-y-1">
@@ -478,11 +573,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import { useLanguage } from '../composables/useLanguage'
 import { clearAllCaches, useUserStore, isAdmin } from '../stores/userStore'
+import { fetchAichatList, deleteAichat } from '../services/grokService'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import {
     Dialog,
@@ -611,6 +707,149 @@ const unreadTimeText = computed(() => {
     return Number.isNaN(parsed.getTime()) ? '' : parsed.toLocaleString()
 })
 
+const isAiSupportRoute = computed(() => route.path === '/ai-support')
+
+const aiShowHistoryPanel = ref(true)
+const aiConfirmDeleteAll = ref(false)
+const aiConfirmDeleteId = ref(null)
+const aiChatList = ref([])
+const aiHistoryLoading = ref(false)
+const aiHistoryError = ref('')
+const aiHistoryPage = ref(1)
+const aiHistoryPerPage = ref(5)
+const aiHistoryTotal = ref(0)
+
+const aiTotalPages = computed(() => {
+    const total = aiHistoryTotal.value || 0
+    const perPage = aiHistoryPerPage.value || 5
+    return Math.max(1, Math.ceil(total / perPage))
+})
+
+const aiShowPagination = computed(() => aiTotalPages.value > 1)
+
+const parseAiId = (idCandidate) => {
+    if (!idCandidate) return null
+    if (typeof idCandidate === 'string') return idCandidate
+    try {
+        if (idCandidate.toString && typeof idCandidate.toString === 'function') return idCandidate.toString()
+    } catch (e) { }
+    if (idCandidate && typeof idCandidate === 'object' && idCandidate.$oid) return idCandidate.$oid
+    return null
+}
+
+const formatAiTime = (timestamp) => {
+    if (!timestamp) return ''
+    const d = (timestamp instanceof Date) ? timestamp : new Date(timestamp)
+    if (isNaN(d.getTime())) return ''
+    const pad = (n) => (n < 10 ? '0' + n : '' + n)
+    return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+const getAiChatPreview = (chat) => {
+    if (!chat) return ''
+    let msg = ''
+    if (chat.lastMessage) {
+        if (typeof chat.lastMessage === 'string') msg = chat.lastMessage
+        else msg = chat.lastMessage.content || chat.lastMessage.text || ''
+    } else if (Array.isArray(chat.messages) && chat.messages.length > 0) {
+        const last = chat.messages[chat.messages.length - 1]
+        msg = last?.content || ''
+    }
+    msg = (msg || '').toString().replace(/[ \t]+/g, ' ').trim()
+    return msg.length > 80 ? msg.slice(0, 80) : msg
+}
+
+const aiChatPreviews = computed(() => (aiChatList.value || []).map(c => getAiChatPreview(c)))
+
+const toggleAiHistoryPanel = async () => {
+    aiShowHistoryPanel.value = !aiShowHistoryPanel.value
+    if (aiShowHistoryPanel.value && aiChatList.value.length === 0) {
+        await loadAiChatList(1)
+    }
+}
+
+const loadAiChatList = async (page = 1) => {
+    if (!isAiSupportRoute.value || isAdmin()) return
+    aiHistoryLoading.value = true
+    aiHistoryError.value = ''
+    try {
+        const res = await fetchAichatList(page, aiHistoryPerPage.value)
+        if (res && res.success) {
+            aiChatList.value = res.data.chats || []
+            aiHistoryPage.value = res.data.pagination.currentPage || 1
+            aiHistoryPerPage.value = res.data.pagination.perPage || aiHistoryPerPage.value
+            aiHistoryTotal.value = res.data.pagination.total || 0
+        } else {
+            aiHistoryError.value = res?.message || 'Failed to load chats'
+        }
+    } catch (e) {
+        aiHistoryError.value = e.message || 'Failed to load chats'
+    } finally {
+        aiHistoryLoading.value = false
+    }
+}
+
+const openAiChat = async (chat) => {
+    const id = parseAiId(chat?._id || chat?.id)
+    if (!id) return
+    await router.push({ path: '/ai-support', query: { chatId: id, _t: Date.now().toString() } })
+}
+
+const deleteAiChat = async (chat, skipConfirm = false) => {
+    const id = parseAiId(chat?._id || chat?.id)
+    if (!id) return
+    if (!skipConfirm) return
+    aiConfirmDeleteId.value = null
+    aiHistoryLoading.value = true
+    aiHistoryError.value = ''
+    try {
+        const res = await deleteAichat(id)
+        if (res && res.success) {
+            aiHistoryTotal.value = Math.max(0, (aiHistoryTotal.value || 0) - 1)
+            aiChatList.value = (aiChatList.value || []).filter(c => parseAiId(c._id || c.id) !== id)
+            if (aiChatList.value.length === 0 && aiHistoryPage.value > 1) aiHistoryPage.value = aiHistoryPage.value - 1
+            await loadAiChatList(aiHistoryPage.value)
+        } else {
+            aiHistoryError.value = res?.message || 'Failed to delete chat'
+        }
+    } catch (e) {
+        aiHistoryError.value = e.message || 'Failed to delete chat'
+    } finally {
+        aiHistoryLoading.value = false
+    }
+}
+
+const deleteAllAiChats = async (skipConfirm = false) => {
+    if (!skipConfirm) return
+    aiConfirmDeleteAll.value = false
+    aiHistoryLoading.value = true
+    aiHistoryError.value = ''
+    try {
+        if (!(aiHistoryTotal.value > 0)) await loadAiChatList(1)
+        const per = Math.max(1, aiHistoryPerPage.value)
+        const pages = Math.ceil((aiHistoryTotal.value || 0) / per) || 1
+        const ids = []
+        for (let p = 1; p <= pages; p++) {
+            const res = await fetchAichatList(p, per)
+            if (res && res.success && Array.isArray(res.data.chats)) {
+                res.data.chats.forEach(c => {
+                    const id = parseAiId(c._id || c.id)
+                    if (id) ids.push(id)
+                })
+            }
+        }
+        if (ids.length > 0) await Promise.allSettled(ids.map(id => deleteAichat(id)))
+        aiChatList.value = []
+        aiHistoryTotal.value = 0
+        aiHistoryPage.value = 1
+        await loadAiChatList(1)
+    } catch (e) {
+        aiHistoryError.value = e.message || 'Failed to delete chats'
+    } finally {
+        aiHistoryLoading.value = false
+    }
+}
+
 // Helper to check active route for styling
 const isActiveRoute = (path) => route.path === path
 
@@ -737,6 +976,7 @@ const loadUserData = async () => {
 onMounted(() => {
     loadUserData()
     loadUnreadCount()
+    if (isAiSupportRoute.value && !isAdmin()) loadAiChatList(1)
     unreadPollTimer = window.setInterval(loadUnreadCount, 30000)
     window.addEventListener('mousedown', handleGlobalClick)
     window.addEventListener('messagesRead', loadUnreadCount)
@@ -753,4 +993,30 @@ onUnmounted(() => {
     window.removeEventListener('mousedown', handleGlobalClick)
     window.removeEventListener('messagesRead', loadUnreadCount)
 })
+
+watch(() => route.path, (newPath) => {
+    if (newPath === '/ai-support' && !isAdmin()) {
+        loadAiChatList(1)
+    }
+})
 </script>
+
+<style scoped>
+.ai-sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.25) transparent;
+}
+.ai-sidebar-scroll::-webkit-scrollbar {
+    width: 5px;
+}
+.ai-sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+.ai-sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.3);
+    border-radius: 99px;
+}
+.ai-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.55);
+}
+</style>
