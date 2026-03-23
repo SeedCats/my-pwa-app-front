@@ -15,7 +15,10 @@ export const getBMIRecords = ({ userId, ...rest } = {}) =>
 
 export const getLatestBMIRecord = async (params = {}) => {
   const res = await getBMIRecords(params)
-  return { success: true, data: res.success && res.data?.records?.length ? res.data.records[0] : null }
+  if (!res.success) {
+    return { success: false, message: res.message || 'Failed' }
+  }
+  return { success: true, data: res.data?.records?.length ? res.data.records[0] : null }
 }
 
 export const getBMIRecordById = (id, { userId } = {}) => apiRequest(bmiPath(userId, `/${id}`))

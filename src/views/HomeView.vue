@@ -898,10 +898,11 @@ const calendarYear = ref(new Date().getFullYear())
 
 const loadBMIData = async () => {
   const userId = viewedUserId.value
-  // Use cache only when viewing current user
-  if (!userId) {
+  // Use cache immediately if offline
+  if (!userId && (!navigator.onLine || showOfflineBanner.value)) {
     const cached = getCachedBmiData()
     if (cached) {
+      showingCachedData.value = true
       bmiData.value = cached
       return
     }
@@ -910,7 +911,9 @@ const loadBMIData = async () => {
   isBMILoading.value = true
   try {
     const { success, data } = await getLatestBMIRecord({ userId })
-    const result = success && data ? {
+    if (!success) throw new Error('Failed to load BMI data from server')
+
+    const result = data ? {
       bmi: data.bmi,
       category: data.category,
       height: data.height,
@@ -921,8 +924,8 @@ const loadBMIData = async () => {
     } : { bmi: null, category: '', height: null, weight: null, age: null }
 
     bmiData.value = result
-    if (!userId) setCachedBmiData(result)  // Cache only for current user
-    if (success && data && data.bmi) showingCachedData.value = false
+    if (!userId && result.bmi) setCachedBmiData(result)  // Cache only for current user when valid
+    if (data && data.bmi) showingCachedData.value = false
   } catch (error) {
     console.error('Failed to load BMI data:', error)
     
@@ -1253,10 +1256,11 @@ const selectDate = (day) => {
 // Load available dates from backend
 const loadAvailableDates = async () => {
   const userId = viewedUserId.value
-  // Use cache only when viewing current user
-  if (!userId) {
+  // Use cache immediately if offline
+  if (!userId && (!navigator.onLine || showOfflineBanner.value)) {
     const cached = getCachedHeartRateDates()
     if (cached) {
+      showingCachedData.value = true
       availableDates.value = cached
       hasHeartRateData.value = cached.length > 0
       if (cached.length > 0) {
@@ -1273,16 +1277,6 @@ const loadAvailableDates = async () => {
       return false
     }
   }
-
-  // offline banner check removed to allow ServiceWorker or catch block to handle offline cache
-  /* if (showOfflineBanner.value) {
-    hasHeartRateData.value = availableDates.value.length > 0
-    if (!hasHeartRateData.value) {
-      selectedDate.value = new Date().toISOString().split('T')[0]
-      currentDate.value = formatDateForDisplay(selectedDate.value)
-    }
-    return hasHeartRateData.value
-  } */
 
   try {
     const response = await getHeartRateDates({ userId })
@@ -1892,7 +1886,9 @@ const forceReloadBMIData = async () => {
   isBMILoading.value = true
   try {
     const { success, data } = await getLatestBMIRecord({ userId })
-    const result = success && data ? {
+    if (!success) throw new Error('Failed to force reload BMI data')
+
+    const result = data ? {
       bmi: data.bmi,
       category: data.category,
       height: data.height,
@@ -1903,10 +1899,16 @@ const forceReloadBMIData = async () => {
     } : { bmi: null, category: '', height: null, weight: null, age: null }
 
     bmiData.value = result
-    if (!userId) setCachedBmiData(result)
+    if (!userId && result.bmi) setCachedBmiData(result)
   } catch (error) {
-    console.error('Failed to load BMI data:', error)
-    bmiData.value = { bmi: null, category: '', height: null, weight: null, age: null }
+    console.error('Failed to force load BMI data:', error)
+    const cached = getCachedBmiData()
+    if (cached && cached.bmi) {
+      showingCachedData.value = true
+      bmiData.value = cached
+    } else {
+      bmiData.value = { bmi: null, category: '', height: null, weight: null, age: null }
+    }
   } finally {
     isBMILoading.value = false
   }
