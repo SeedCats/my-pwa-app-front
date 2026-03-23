@@ -757,6 +757,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import { useI18n } from 'vue-i18n'
+import { prefetchHealthDataForOffline } from '../services/offlinePrefetchService'
 import { getLatestBMIRecord } from '../services/bmiService'
 import { getHeartRateRecords, getHeartRateDates } from '../services/heartRateService'
 import { getStressRecords, getStressDates } from '../services/stressService'
@@ -1273,14 +1274,15 @@ const loadAvailableDates = async () => {
     }
   }
 
-  if (showOfflineBanner.value) {
+  // offline banner check removed to allow ServiceWorker or catch block to handle offline cache
+  /* if (showOfflineBanner.value) {
     hasHeartRateData.value = availableDates.value.length > 0
     if (!hasHeartRateData.value) {
       selectedDate.value = new Date().toISOString().split('T')[0]
       currentDate.value = formatDateForDisplay(selectedDate.value)
     }
     return hasHeartRateData.value
-  }
+  } */
 
   try {
     const response = await getHeartRateDates({ userId })
@@ -1349,10 +1351,11 @@ const loadAvailableStressDates = async () => {
     return false
   }
 
-  if (showOfflineBanner.value) {
+  // offline banner check removed
+  /* if (showOfflineBanner.value) {
     hasStressData.value = availableStressDates.value.length > 0
     return hasStressData.value
-  }
+  } */
 
   try {
     const userId = viewedUserId.value
@@ -1401,10 +1404,10 @@ const loadHeartRateData = async () => {
   if (!selectedDate.value) return
   const userId = viewedUserId.value
 
-  if (showOfflineBanner.value) {
+  /* if (showOfflineBanner.value) {
     isHeartRateLoading.value = false
     return
-  }
+  } */
 
   isHeartRateLoading.value = true
   try {
@@ -1537,10 +1540,10 @@ const loadStressData = async (date) => {
   const useDate = date || selectedStressDate.value || selectedDate.value
   if (!useDate) return
 
-  if (showOfflineBanner.value) {
+  /* if (showOfflineBanner.value) {
     isStressLoading.value = false
     return
-  }
+  } */
 
   isStressLoading.value = true
   try {
@@ -1961,6 +1964,10 @@ onMounted(() => {
   loadBMIData()
   // Also attempt to load stress dates (if stress-only CSV was uploaded)
   forceReloadStressData()
+
+  // Trigger aggressive background prefetching whenever the dashboard is loaded 
+  // so you don't have to manually click through the calendar dates to cache them.
+  setTimeout(() => prefetchHealthDataForOffline({ force: true }), 3000)
 
   // Ensure initial viewed user is loaded if needed
   if (viewedUserId.value) loadViewedUser()

@@ -112,7 +112,7 @@
                                                 <div v-if="aiHistoryError" class="text-xs px-2 text-red-500 mb-2">{{ aiHistoryError }}</div>
                                                 <div v-if="!aiHistoryLoading && aiChatList.length === 0" class="text-xs px-2 text-gray-500 mb-2">{{ t('aiSupport.noPastConversations') }}</div>
                 
-                                                <div class="max-h-72 lg:max-h-[300px] overflow-y-auto ai-sidebar-scroll pb-2">
+                                                <div class="max-h-72 lg:max-h-75 overflow-y-auto ai-sidebar-scroll pb-2">
                                                     <div class="space-y-0.5">
                                                         <template v-for="(chat, idx) in aiChatList" :key="chat._id || chat.id">
                                                             <!-- Group Headers -->
@@ -319,7 +319,7 @@
                                 <div v-if="aiHistoryError" class="text-xs px-2 text-red-500 mb-2">{{ aiHistoryError }}</div>
                                 <div v-if="!aiHistoryLoading && aiChatList.length === 0" class="text-xs px-2 text-gray-500 mb-2">{{ t('aiSupport.noPastConversations') }}</div>
 
-                                <div class="max-h-72 lg:max-h-[300px] overflow-y-auto ai-sidebar-scroll pb-2">
+                                <div class="max-h-72 lg:max-h-75 overflow-y-auto ai-sidebar-scroll pb-2">
                                     <div class="space-y-0.5">
                                         <template v-for="(chat, idx) in aiChatList" :key="chat._id || chat.id">
                                             <!-- Group Headers -->
