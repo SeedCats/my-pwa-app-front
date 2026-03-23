@@ -1,4 +1,4 @@
-﻿<template>
+<template>
     <div class="h-full lg:h-auto flex flex-col overflow-hidden lg:overflow-visible" :class="themeClasses.background">
         <main class="flex-1 lg:flex-none flex flex-col overflow-hidden lg:overflow-visible px-3 sm:px-4 md:px-6 lg:px-8">
             <!-- Header -->
@@ -115,7 +115,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        <span class="text-xs font-medium truncate">馃搸 {{ message.fileName }}</span>
+                                        <span class="text-xs font-medium truncate">📎 {{ message.fileName }}</span>
                                     </div>
                                     <p
                                         :class="['text-sm whitespace-pre-wrap', message.role === 'user' ? 'wrap-break-word' : 'break-normal', (message.role !== 'user' && isDarkMode) ? 'text-white' : '']">
@@ -125,7 +125,7 @@
 
                                     <!-- Streaming indicator -->
                                     <div v-if="message && message.isStreaming" class="inline-flex items-center ml-1">
-                                        <span class="animate-pulse text-gray-500">鈻?/span>
+                                        <span class="animate-pulse text-gray-500">▊</span>
                                     </div>
 
                                     <!-- Sources / Citations (shown separately, not as main content) -->
@@ -145,7 +145,7 @@
                                             <li v-for="(source, si) in message.sources" :key="si"
                                                 class="flex items-start wrap-break-word">
                                                 <span class="text-xs mr-1.5 mt-0.5 shrink-0"
-                                                    :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'">鈥?/span>
+                                                    :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'">•</span>
                                                 <a :href="source.url || source" target="_blank"
                                                     rel="noopener noreferrer"
                                                     class="text-xs underline hover:no-underline flex-1 break-all overflow-wrap-anywhere"
@@ -226,7 +226,7 @@
                                         </svg>
                                         <span class="truncate">{{ selectedFile.name }}</span>
                                         <button type="button" @click.prevent="removeSelectedFile"
-                                            class="shrink-0 hover:text-red-500 transition-colors">鉁?/button>
+                                            class="shrink-0 hover:text-red-500 transition-colors">✕</button>
                                     </div>
                                 </div>
 
@@ -562,8 +562,8 @@ const usePrompt = async (prompt) => {
     if (isChatBusy.value) return
 
     // Determine if this is a heart rate prompt, stress prompt, or BMI prompt
-    const heartRateKeywords = ['heart rate', 'cardiovascular', 'resting heart', '蹇冪巼', '闈滄蹇冪巼', '蹇冭烦']
-    const stressKeywords = ['stress', 'stress score', 'pressure', 'tension', '澹撳姏', '澹撳姏鎸囨暩']
+    const heartRateKeywords = ['heart rate', 'cardiovascular', 'resting heart', '心率', '靜止心率', '心跳']
+    const stressKeywords = ['stress', 'stress score', 'pressure', 'tension', '壓力', '壓力指數']
     const isHeartRatePrompt = heartRateKeywords.some(keyword =>
         prompt.toLowerCase().includes(keyword) || prompt.includes(keyword)
     )
@@ -1043,28 +1043,28 @@ const cleanContent = (content) => {
     t = t.replace(/[ \t]+/g, ' ')
 
     // Remove spaces before punctuation (comma, period, exclamation, question, colon, semicolon)
-    t = t.replace(/\s+([,.!?:;])/g, '$1')
+    t = t.replace(/[ \t]+([,.!?:;])/g, '$1')
 
-    // Fix spacing around degree symbols (e.g. "19 掳C" -> "19掳C")
-    t = t.replace(/\s*(掳)\s*/g, '$1')
+    // Fix spacing around degree symbols (e.g. "19 °C" -> "19°C")
+    t = t.replace(/[ \t]*(°)[ \t]*/g, '$1')
 
     // Remove spaces inside numbers (e.g. "202 6" -> "2026")
-    t = t.replace(/(\d)\s+(\d)/g, '$1$2')
+    t = t.replace(/(\d)[ \t]+(\d)/g, '$1$2')
 
     // Fix hyphens with spaces (e.g. "real -time" -> "real-time", "10 - 20" -> "10-20")
-    t = t.replace(/\s+-\s+/g, '-')
-    t = t.replace(/(\w)\s+-/g, '$1-')
-    t = t.replace(/-\s+(\w)/g, '-$1')
+    t = t.replace(/(?<=\w)[ \t]+-[ \t]+(?=\w)/g, '-')
+    t = t.replace(/(?<=\w)[ \t]+-(?=\w)/g, '-')
+    t = t.replace(/(?<=\w)-[ \t]+(?=\w)/g, '-')
 
     // Remove spaces around slashes (e.g. "km /h" -> "km/h")
-    t = t.replace(/\s*\/\s*/g, '/')
+    t = t.replace(/[ \t]*\/[ \t]*/g, '/')
 
     // Fix common domain spacing issues (e.g. "h ko.gov.hk" -> "hko.gov.hk")
-    t = t.replace(/\b([a-z])\s+([a-z]{1,3})\.(gov|com|org|net|edu)/gi, '$1$2.$3')
+    t = t.replace(/\b([a-z])[ \t]+([a-z]{1,3})\.(gov|com|org|net|edu)/gi, '$1$2.$3')
 
     // Fix possessive apostrophes with spaces (e.g. "Hong Kong 's" -> "Hong Kong's")
-    t = t.replace(/\s+'/g, "'")
-    t = t.replace(/'\s+([st])\b/g, "'$1")
+    t = t.replace(/[ \t]+'/g, "'")
+    t = t.replace(/'[ \t]+([st])\b/g, "'$1")
 
     // Trim leading/trailing spaces on each line while preserving line breaks
     t = t.split('\n').map(line => line.trim()).join('\n')
@@ -1087,21 +1087,18 @@ const scrollToBottom = async () => {
 const stripCitations = (text) => {
     if (typeof text !== 'string') return text
     // Replace citations with a single space to preserve separation between tokens
-    let t = text.replace(/\[\[\d+\]\]\([^)]*\)/g, ' ')
-    t = t.replace(/\[\d+\]\([^)]*\)/g, ' ')
+    let t = text.replace(/\[\[\d+\]\]\([^)]*\)/g, '')
+    t = t.replace(/\[\d+\]\([^)]*\)/g, '')
     // Remove leftover numeric bracket markers like [[1]] or [1]
-    t = t.replace(/\[\[?\d+\]?\]/g, ' ')
+    t = t.replace(/\[\[?\d+\]?\]/g, '')
 
-    // Normalize multiple spaces/tabs to single space, but keep newlines intact
-    t = t.replace(/[ \t]{2,}/g, ' ')
-
-    // Trim spaces at start/end of each line while preserving line breaks
-    t = t.split('\n').map(line => line.trim()).join('\n')
+    // Fix jammed bullet points from LLM output by forcing a line break before hyphen
+    t = t.replace(/(?<!^)(?<!\n)[ \t]*-(?=[ \t]*\*\*|[ \t]*:|[ \t]*[A-Z])/g, '\n- ')
 
     return t
 }
 
-// Append text to aiMessage content safely, inserting a space if needed
+// Append text to aiMessage content directly
 const appendChunkContent = (aiMessage, text) => {
     if (!text) return
     // Deduplicate: normalize (remove punctuation, collapse whitespace) and skip if this chunk already appears
@@ -1112,12 +1109,6 @@ const appendChunkContent = (aiMessage, text) => {
         if (existing.endsWith(incoming) || existing.includes(incoming)) return
     }
 
-    // If there's no whitespace between the last char and the first char, insert a space
-    const lastChar = (aiMessage.content || '').slice(-1)
-    const firstChar = (text || '').charAt(0)
-    const needSpace = lastChar && firstChar && !/\s/.test(lastChar) && !/\s/.test(firstChar)
-
-    if (needSpace) aiMessage.content += ' '
     aiMessage.content += text
 }
 
