@@ -18,6 +18,18 @@
                             currentTitle }}</div>
                         <div class="flex items-center space-x-1 sm:space-x-2 shrink-0"
                             :class="showTitle ? '' : 'ml-auto'">
+                            
+                            <!-- History Mobile Button -->
+                            <button @click.prevent="openMobileHistory" :disabled="isChatBusy"
+                                class="lg:hidden inline-flex items-center justify-center p-2 rounded-full text-sm transition-shadow duration-200 transform focus:outline-none focus:ring-2"
+                                :class="isChatBusy ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : (isDarkMode ? 'bg-white text-gray-900 hover:shadow-md focus:ring-gray-300' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 focus:ring-indigo-300')"
+                                :title="$t('aiSupport.conversationHistory', 'History')"
+                                :aria-label="$t('aiSupport.conversationHistory', 'History')" role="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-current transform transition-transform duration-200 hover:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </button>
+
                             <button @click.prevent="showSettings = !showSettings" :disabled="isChatBusy"
                                 :aria-disabled="isChatBusy"
                                 :title="isChatBusy ? $t('aiSupport.settingsDisabled') : $t('aiSupport.settings')"
@@ -697,6 +709,10 @@ watch(historyTotal, () => {
 
 // Methods
 const updateSidebarState = (state) => sidebarHidden.value = state
+
+const openMobileHistory = () => {
+    window.dispatchEvent(new CustomEvent('open-mobile-sidebar'))
+}
 
 const getDomain = (url) => {
     try {

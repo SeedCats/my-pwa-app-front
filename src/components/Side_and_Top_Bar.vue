@@ -112,7 +112,7 @@
                                                 <div v-if="aiHistoryError" class="text-xs px-2 text-red-500 mb-2">{{ aiHistoryError }}</div>
                                                 <div v-if="!aiHistoryLoading && aiChatList.length === 0" class="text-xs px-2 text-gray-500 mb-2">{{ t('aiSupport.noPastConversations') }}</div>
                 
-                                                <div class="max-h-70 overflow-y-auto ai-sidebar-scroll pb-2">
+                                                <div class="max-h-72 lg:max-h-[300px] overflow-y-auto ai-sidebar-scroll pb-2">
                                                     <div class="space-y-0.5">
                                                         <template v-for="(chat, idx) in aiChatList" :key="chat._id || chat.id">
                                                             <!-- Group Headers -->
@@ -319,7 +319,7 @@
                                 <div v-if="aiHistoryError" class="text-xs px-2 text-red-500 mb-2">{{ aiHistoryError }}</div>
                                 <div v-if="!aiHistoryLoading && aiChatList.length === 0" class="text-xs px-2 text-gray-500 mb-2">{{ t('aiSupport.noPastConversations') }}</div>
 
-                                <div class="max-h-70 overflow-y-auto ai-sidebar-scroll pb-2">
+                                <div class="max-h-72 lg:max-h-[300px] overflow-y-auto ai-sidebar-scroll pb-2">
                                     <div class="space-y-0.5">
                                         <template v-for="(chat, idx) in aiChatList" :key="chat._id || chat.id">
                                             <!-- Group Headers -->
@@ -1031,6 +1031,14 @@ const handleGlobalClick = (event) => {
     }
 }
 
+const openMobileSidebarEvent = () => {
+    sidebarOpen.value = true
+    // Ensure the AI history panel is expanded if we are on the AI support route
+    if (isAiSupportRoute.value && !isAdmin() && !aiShowHistoryPanel.value) {
+        toggleAiHistoryPanel()
+    }
+}
+
 const loadUnreadCount = async () => {
     const initialCount = unreadCount.value
 
@@ -1128,6 +1136,7 @@ onMounted(() => {
     unreadPollTimer = window.setInterval(loadUnreadCount, 30000)
     window.addEventListener('mousedown', handleGlobalClick)
     window.addEventListener('messagesRead', loadUnreadCount)
+    window.addEventListener('open-mobile-sidebar', openMobileSidebarEvent)
     window.addEventListener('userUpdated', (e) => {
         const updated = e?.detail || {}
         const currentId = userStore.user?.id || userStore.user?._id || userData.value?.id || userData.value?._id
@@ -1140,6 +1149,7 @@ onUnmounted(() => {
     if (unreadPollTimer) { clearInterval(unreadPollTimer); unreadPollTimer = null }
     window.removeEventListener('mousedown', handleGlobalClick)
     window.removeEventListener('messagesRead', loadUnreadCount)
+    window.removeEventListener('open-mobile-sidebar', openMobileSidebarEvent)
 })
 
 watch(() => route.path, (newPath) => {
