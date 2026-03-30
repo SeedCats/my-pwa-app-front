@@ -1,11 +1,11 @@
 <template>
   <!-- Chat App Container -->
-  <main class="h-full w-full flex flex-col md:flex-row overflow-hidden transition-all duration-300"
+  <main class="absolute inset-0 flex flex-col md:flex-row overflow-hidden transition-all duration-300"
        :class="[themeClasses.cardBackground]">
 
       <!-- ── Left panel: patient list ─────────────────────────────── -->
         <aside
-          class="flex flex-col w-full md:w-60 lg:w-72 border-r shrink-0 transition-all duration-300 relative z-10"
+          class="flex flex-col flex-1 md:flex-none w-full md:w-60 lg:w-72 border-r shrink-0 transition-all duration-300 relative z-10"
           :class="[themeClasses.border, selectedUser ? 'hidden md:flex' : 'flex', isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50']"
         >
           <!-- Header -->
@@ -13,7 +13,7 @@
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-xl flex items-center justify-center shadow-sm"
-                     :class="isDarkMode ? 'bg-gradient-to-br from-blue-500 to-blue-700' : 'bg-gradient-to-br from-blue-400 to-blue-600'">
+                     :class="isDarkMode ? 'bg-linear-to-br from-blue-500 to-blue-700' : 'bg-linear-to-br from-blue-400 to-blue-600'">
                   <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -107,7 +107,7 @@
                     </div>
                     <span
                       v-if="user.unreadCount > 0"
-                      class="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center shadow-md animate-bounce-short ring-2"
+                      class="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center shadow-md animate-bounce-short ring-2"
                       :class="isDarkMode ? 'ring-gray-900' : 'ring-white'"
                     >
                       {{ user.unreadCount > 99 ? '99+' : user.unreadCount }}
@@ -197,7 +197,7 @@
             <div ref="messagesContainer" class="absolute inset-0 overflow-y-auto px-4 sm:px-6 py-6 space-y-4 custom-scrollbar">
               
               <!-- Loading -->
-              <div v-if="messagesLoading" class="flex flex-col gap-6 w-full max-w-4xl mx-auto">
+              <div v-if="messagesLoading" class="flex flex-col gap-6 w-full">
                 <div v-for="n in 5" :key="n"
                      class="flex"
                      :class="n % 2 === 0 ? 'justify-end' : 'justify-start'">
@@ -237,7 +237,7 @@
 
               <!-- Messages -->
               <template v-else>
-                <div class="w-full max-w-4xl mx-auto flex flex-col gap-2 relative z-10">
+                <div class="w-full flex flex-col gap-2 relative z-10 lg:px-4">
                   <template
                     v-for="(message, index) in messages"
                     :key="message.id"
@@ -366,7 +366,7 @@
               </div>
             </transition>
 
-            <form @submit.prevent="sendMessage" class="flex items-end gap-2.5 max-w-4xl mx-auto">
+            <form @submit.prevent="sendMessage" class="flex items-end gap-2.5 w-full lg:px-4">
               <!-- File attach -->
               <input ref="fileInputRef" type="file" class="hidden" @change="onFileSelected" />
               <button type="button" @click="triggerFilePicker"
@@ -412,7 +412,7 @@
               </button>
             </form>
 
-            <div class="flex items-center justify-between mt-2 max-w-4xl mx-auto px-1">
+            <div class="flex items-center justify-between mt-2 w-full px-1 lg:px-5">
               <p class="text-[11px] font-medium" :class="isDarkMode ? 'text-gray-500' : 'text-gray-400'">Press Enter to send, Shift + Enter for new line</p>
               <p v-if="errorMessage" class="text-xs text-red-500 font-medium bg-red-50 px-2 py-0.5 rounded">{{ errorMessage }}</p>
             </div>

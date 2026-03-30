@@ -1,13 +1,13 @@
 <template>
   <div
-    class="flex min-h-[100dvh] flex-1 items-center justify-center px-3 py-8 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    class="flex min-h-dvh flex-1 items-center justify-center px-3 py-8 sm:px-6 lg:px-8 bg-linear-to-br from-slate-50 via-blue-50 to-indigo-100">
 
     <div class="w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl space-y-6">
 
       <!-- Header -->
       <div class="text-center space-y-3">
         <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white/80 px-4 py-1.5 shadow-sm backdrop-blur-sm">
-          <span class="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600">
+          <span class="flex h-5 w-5 items-center justify-center rounded-full bg-linear-to-br from-indigo-500 to-purple-600">
             <svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
@@ -32,7 +32,7 @@
           <button type="button" @click="setUserForm"
             :class="['flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200',
               !showProviderForm ? 'bg-white text-indigo-700 shadow-sm shadow-indigo-100' : 'text-gray-500 hover:text-gray-700']">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
@@ -41,7 +41,7 @@
           <button type="button" @click="setProviderForm"
             :class="['flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200',
               showProviderForm ? 'bg-white text-indigo-700 shadow-sm shadow-indigo-100' : 'text-gray-500 hover:text-gray-700']">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
@@ -53,7 +53,7 @@
           <!-- Alert Messages -->
           <Transition name="slide-fade">
             <div v-if="error" class="mb-4 sm:mb-5 flex items-start gap-3 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-xl">
-              <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                   clip-rule="evenodd" />
@@ -64,7 +64,7 @@
 
           <Transition name="slide-fade">
             <div v-if="success" class="mb-4 sm:mb-5 flex items-start gap-3 p-3 sm:p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-              <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                   clip-rule="evenodd" />
@@ -163,7 +163,7 @@
                       class="w-full rounded-xl bg-transparent pl-2.5 pr-2 py-3 sm:py-3.5 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:outline-none"
                       :placeholder="$t('auth.passwordPlaceholder')" />
                     <button type="button" @click="showPassword = !showPassword"
-                      class="pr-3.5 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none flex-shrink-0"
+                      class="pr-3.5 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none shrink-0"
                       :aria-label="showPassword ? $t('auth.hidePassword') : $t('auth.showPassword')">
                       <svg v-if="!showPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -213,7 +213,7 @@
                       class="w-full rounded-xl bg-transparent pl-2.5 pr-2 py-3 sm:py-3.5 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 border-0 focus:ring-0 focus:outline-none"
                       :placeholder="$t('auth.confirmPasswordPlaceholder')" />
                     <button type="button" @click="showConfirmPassword = !showConfirmPassword"
-                      class="pr-3.5 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none flex-shrink-0"
+                      class="pr-3.5 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none shrink-0"
                       :aria-label="showConfirmPassword ? $t('auth.hidePassword') : $t('auth.showPassword')">
                       <svg v-if="!showConfirmPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -239,7 +239,7 @@
 
                 <!-- Info banner -->
                 <div class="flex items-start gap-3 p-3 sm:p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
-                  <svg class="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg class="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                   </svg>
                   <p class="text-xs sm:text-sm text-indigo-700 leading-relaxed">{{ $t('auth.providerFormInfo') }}</p>
@@ -357,7 +357,7 @@
             <!-- Submit Button -->
             <div class="mt-5 sm:mt-6 space-y-3">
               <button type="submit" :disabled="loading"
-                class="group relative w-full flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3.5 sm:py-4 text-sm sm:text-base font-semibold text-white shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:shadow-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100">
+                class="group relative w-full flex justify-center items-center gap-2 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 px-4 py-3.5 sm:py-4 text-sm sm:text-base font-semibold text-white shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:shadow-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100">
                 <svg v-if="loading" class="animate-spin h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor"
@@ -368,7 +368,7 @@
                     d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
                 {{ loading
-                  ? $t('auth.creatingAccount')
+                  ? (showProviderForm ? $t('auth.sendingRequest') : $t('auth.creatingAccount'))
                   : showProviderForm
                     ? $t('auth.providerRequestButton')
                     : $t('auth.createAccountButton') }}
@@ -538,7 +538,9 @@ async function handleRegister() {
       if (response.ok && data.success) {
         success.value = data.message || t('auth.providerRequestSuccess')
         resetProviderFields()
-        setUserForm()
+        setTimeout(() => {
+          router.push({ name: 'Login' })
+        }, 2000)
       } else {
         error.value = data.message || t('auth.providerRequestFailed')
       }

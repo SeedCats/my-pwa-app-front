@@ -25,3 +25,6 @@ export const unmarkSlotBooked = (providerId, date, time) =>
 
 export const updateTimeSlots = (slots) =>
   apiRequest('/api/bookingTimeSlot', { method: 'POST', body: { slots } })
+
+export const fetchAdminMapInfo = (adminId) =>
+  apiRequest(`/api/map/admin/${adminId}`)

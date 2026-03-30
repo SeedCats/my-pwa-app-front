@@ -1,4 +1,4 @@
-{
+﻿{
   "common": {
     "loading": "載入中...",
     "delete": "刪除",
@@ -30,6 +30,7 @@
     "confirmPasswordPlaceholder": "確認密碼",
     "createAccountButton": "建立帳戶",
     "creatingAccount": "建立中...",
+      "sendingRequest": "發送請求...",
     "alreadyHaveAccount": "已有帳戶？登入",
     "becomeProviderBtn": "想成為醫護人員？",
     "cancelProviderBtn": "取消醫護申請",
@@ -73,8 +74,7 @@
     "fieldRequired": "此欄位為必填",
     "emailInvalid": "請輸入有效的電子郵件地址",
     "passwordTooShort": "密碼至少需要 6 個字元",
-    "orDivider": "或",
-    "footerNote": "建立帳戶即表示您同意我們的服務條款與隱私政策。"
+    "orDivider": "或"
   },
   "nav": {
     "title": "健康監控系統",
@@ -378,7 +378,7 @@
     "bmiMax": "40"
   },
   "formatSettings": {
-    "title": "設定",
+    "title": "格式設定",
     "subtitle": "自訂您的應用程式偏好設定",
     "appearance": "外觀",
     "appearanceDesc": "選擇應用程式的顯示方式",
@@ -398,6 +398,16 @@
   },
   "userSettings": {
     "title": "帳戶設定",
+    "contactSystemOwner": "聯絡系統擁有者",
+    "contactOwnerModalTitle": "傳送訊息給系統擁有者",
+    "contactOwnerModalSubtitle": "傳送直接訊息給系統擁有者。他們將會回覆至您註冊的電子郵件。",
+    "subject": "主旨",
+    "contactMessageLabel": "訊息內容",
+    "contactMessagePlaceholder": "在此輸入您的訊息...",
+    "sending": "傳送中...",
+    "send": "傳送訊息",
+    "contactSuccess": "訊息已成功送出！",
+    "contactFailed": "訊息傳送失敗。",
     "subtitle": "管理您的帳戶資訊和偏好設定",
     "profile": "個人資料資訊",
     "profileDesc": "更新您帳戶的個人資料和電子郵件",
@@ -405,6 +415,8 @@
     "namePlaceholder": "請輸入您的全名",
     "email": "電子郵件",
     "emailPlaceholder": "請輸入您的電子郵件",
+    "address": "地址",
+    "addressPlaceholder": "請輸入您的地址",
     "updateProfile": "更新資料",
     "updating": "更新中...",
     "changePassword": "修改密碼",
@@ -627,6 +639,9 @@
       "四",
       "五",
       "六"
-    ]
+    ],
+    "providerLocation": "醫護人員位置",
+    "loadingMap": "地圖加載中..."
   }
 }
+

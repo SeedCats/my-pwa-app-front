@@ -29,8 +29,7 @@
     "passwordPlaceholder": "Password",
     "confirmPasswordPlaceholder": "Confirm password",
     "createAccountButton": "Create Account",
-    "creatingAccount": "Creating account...",
-    "alreadyHaveAccount": "Already have an account? Sign In",
+    "creatingAccount": "Creating account...",      "sendingRequest": "Sending Request...",    "alreadyHaveAccount": "Already have an account? Sign In",
     "becomeProviderBtn": "Want to be a Healthcare Provider?",
     "cancelProviderBtn": "Cancel provider request",
     "providerRequestButton": "Send Provider Request",
@@ -74,8 +73,7 @@
     "fieldRequired": "This field is required",
     "emailInvalid": "Please enter a valid email address",
     "passwordTooShort": "Password must be at least 6 characters",
-    "orDivider": "or",
-    "footerNote": "By creating an account you agree to our Terms of Service and Privacy Policy."
+    "orDivider": "or"
   },
   "nav": {
     "title": "Health Monitoring System",
@@ -384,7 +382,7 @@
     "bmiMax": "40"
   },
   "formatSettings": {
-    "title": "Settings",
+    "title": "Format Settings",
     "subtitle": "Customize your application preferences",
     "appearance": "Appearance",
     "appearanceDesc": "Choose how the application looks for you",
@@ -403,7 +401,17 @@
     "languageDesc": "Choose your preferred display language"
   },
   "userSettings": {
-    "title": "Account Settings",
+    "title": "User Settings",
+    "contactSystemOwner": "Contact System Owner",
+    "contactOwnerModalTitle": "Message System Owner",
+    "contactOwnerModalSubtitle": "Send a direct message to the system owner. They will reply to your email.",
+    "subject": "Subject",
+    "contactMessageLabel": "Message",
+    "contactMessagePlaceholder": "Type your message here...",
+    "sending": "Sending...",
+    "send": "Send Message",
+    "contactSuccess": "Message sent successfully!",
+    "contactFailed": "Failed to send message.",
     "subtitle": "Manage your account information and preferences",
     "profile": "Profile Information",
     "profileDesc": "Update your account's profile information and email address.",
@@ -411,6 +419,8 @@
     "namePlaceholder": "Enter your full name",
     "email": "Email",
     "emailPlaceholder": "Enter your email address",
+    "address": "Address",
+    "addressPlaceholder": "Enter your address",
     "updateProfile": "Update Profile",
     "updating": "Updating...",
     "changePassword": "Change Password",
@@ -626,6 +636,8 @@
     "slotsSaveFailed": "Failed to save time slots.",
     "noDateSelected": "Click on a date to manage its available time slots.",
     "toggleAll": "Toggle All",
-    "calDayHeaders": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    "calDayHeaders": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "providerLocation": "Provider Location",
+    "loadingMap": "Loading map..."
   }
 }

@@ -6,7 +6,7 @@
       <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div class="flex items-center gap-3 mb-1">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200 dark:shadow-blue-900/40">
+            <div class="w-10 h-10 rounded-2xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200 dark:shadow-blue-900/40">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -21,7 +21,7 @@
         </div>
         <!-- Quick stats badges -->
         <div class="flex items-center gap-2 flex-wrap">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-sm">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-linear-to-r from-blue-500 to-indigo-500 text-white shadow-sm">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
             {{ bookings.length }} {{ $t('booking.statsTotal') }}
           </div>
@@ -44,12 +44,12 @@
           <div class="rounded-2xl shadow-sm border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
 
             <!-- Card header gradient banner -->
-            <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 px-6 py-5">
+            <div class="relative overflow-hidden bg-linear-to-br from-blue-600 via-blue-500 to-indigo-600 px-6 py-5">
               <!-- Decorative circles -->
               <div class="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-full"></div>
               <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-white/10 rounded-full"></div>
               <div class="relative flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                   </svg>
@@ -98,7 +98,7 @@
                     "
                   >
                     <!-- Selected glow bg -->
-                    <div v-if="form.service === svc.value" class="absolute inset-0 bg-gradient-to-br opacity-10" :class="svc.gradientFrom + ' ' + svc.gradientTo"></div>
+                    <div v-if="form.service === svc.value" class="absolute inset-0 bg-linear-to-br opacity-10" :class="svc.gradientFrom + ' ' + svc.gradientTo"></div>
                     <!-- Checkmark -->
                     <div v-if="form.service === svc.value" class="absolute top-2 right-2 w-4.5 h-4.5">
                       <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
@@ -124,7 +124,7 @@
                   class="flex items-center gap-3 p-3 rounded-xl border"
                   :class="[themeClasses.inputBackground, themeClasses.border]"
                 >
-                  <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
@@ -218,7 +218,7 @@
                       </div>
                     </div>
                     <div class="px-3 py-1.5 border-t flex items-center gap-1.5 text-[10px]" :class="[themeClasses.border, themeClasses.textSecondary]">
-                      <span class="inline-block w-2 h-2 rounded-sm ring-1 ring-green-500 flex-shrink-0" />
+                      <span class="inline-block w-2 h-2 rounded-sm ring-1 ring-green-500 shrink-0" />
                       {{ $t('booking.availableDates') }}
                     </div>
                   </div>
@@ -259,7 +259,7 @@
                         :class="slot.booked
                           ? ['opacity-40 cursor-not-allowed', themeClasses.inputBackground, themeClasses.border, themeClasses.textSecondary]
                           : form.times.includes(slot.time)
-                            ? 'bg-gradient-to-br from-blue-500 to-blue-700 border-blue-600 text-white shadow-md scale-[1.05]'
+                            ? 'bg-linear-to-br from-blue-500 to-blue-700 border-blue-600 text-white shadow-md scale-[1.05]'
                             : form.times.length >= 2
                               ? ['opacity-30 cursor-not-allowed', themeClasses.inputBackground, themeClasses.border, themeClasses.textSecondary]
                               : [themeClasses.inputBackground, 'border-transparent ring-1 ring-inset', themeClasses.textPrimary, themeClasses.hoverBackground, 'hover:ring-blue-400 dark:hover:ring-blue-500']
@@ -357,7 +357,7 @@
               <button
                 type="submit"
                 :disabled="isSubmitting || !form.service || !form.date || form.times.length === 0"
-                class="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:shadow-blue-200 dark:hover:shadow-blue-900/40 active:scale-[0.99]"
+                class="w-full py-3.5 px-4 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:shadow-blue-200 dark:hover:shadow-blue-900/40 active:scale-[0.99]"
               >
                 <span v-if="isSubmitting" class="flex items-center justify-center gap-2">
                   <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -375,7 +375,7 @@
               <!-- Feedback -->
               <transition name="fade">
                 <div v-if="successMessage" class="flex items-center gap-2 p-3 rounded-xl bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
                   <p class="text-sm text-green-700 dark:text-green-400">{{ successMessage }}</p>
@@ -383,7 +383,7 @@
               </transition>
               <transition name="fade">
                 <div v-if="errorMessage" class="flex items-center gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12A9 9 0 113 12a9 9 0 0118 0z" />
                   </svg>
                   <p class="text-sm text-red-700 dark:text-red-400">{{ errorMessage }}</p>
@@ -402,7 +402,7 @@
           <div class="rounded-2xl shadow-sm border p-4" :class="[themeClasses.cardBackground, themeClasses.border]">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
               <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+                <div class="w-7 h-7 rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -414,7 +414,7 @@
               </div>
               <button
                 @click="toggleSort('date')"
-                class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
+                class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
                 :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground]"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -468,7 +468,7 @@
 
           <!-- Empty state -->
           <div v-else-if="filteredBookings.length === 0" class="flex flex-col items-center justify-center py-16 gap-4 rounded-2xl border border-dashed" :class="[themeClasses.border, themeClasses.cardBackground]">
-            <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center">
+            <div class="w-16 h-16 rounded-3xl bg-linear-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -490,7 +490,7 @@
             >
               <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-4">
                 <!-- Icon -->
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl shadow-sm"
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-2xl shadow-sm"
                   :class="getServiceBg(booking.service)">
                   {{ getServiceIcon(booking.service) }}
                 </div>
@@ -523,7 +523,7 @@
                 </div>
 
                 <!-- Status + action -->
-                <div class="flex sm:flex-col items-center sm:items-end gap-2 flex-shrink-0">
+                <div class="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
                   <span :class="getStatusClass(booking.status)" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap">
                     <span class="w-1.5 h-1.5 rounded-full" :class="getStatusDot(booking.status)"></span>
                     {{ $t(`booking.${booking.status}`) }}
@@ -568,6 +568,48 @@
           </template>
         </div>
       </div>
+
+      <!-- ADMIN LOCATION MAP -->
+      <transition name="fade">
+        <div v-if="mapData || mapLoading" class="mt-6 rounded-2xl shadow-sm border overflow-hidden transition-all duration-300 hover:shadow-md" :class="[themeClasses.cardBackground, themeClasses.border]">
+          <div class="px-4 sm:px-5 py-3.5 border-b flex items-center justify-between bg-linear-to-r from-transparent via-transparent to-blue-50/30 dark:to-blue-900/10" :class="themeClasses.border">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-800/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <h3 class="font-bold text-sm truncate" :class="themeClasses.textPrimary">{{ $t('booking.providerLocation') }}</h3>
+                <p v-if="mapData" class="text-[10px] sm:text-xs mt-0.5 truncate max-w-50 sm:max-w-62.5 md:max-w-xs" :class="themeClasses.textSecondary">
+                  {{ decodeURIComponent(mapData.encodedAddress) }}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="p-0 relative group">
+            <div v-if="mapLoading" class="flex flex-col items-center justify-center h-64 sm:h-80 md:h-96 lg:h-112.5 xl:h-150 w-full gap-3 bg-gray-50/50 dark:bg-gray-800/30 animate-pulse">
+              <svg class="animate-spin h-7 w-7 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+              <span class="text-sm font-medium" :class="themeClasses.textSecondary">{{ $t('booking.loadingMap') }}</span>
+            </div>
+            <div v-else-if="mapData" class="w-full h-64 sm:h-80 md:h-96 lg:h-112.5 xl:h-150 bg-gray-100 dark:bg-gray-800">
+              <iframe
+                class="w-full h-full transition-opacity duration-500"
+                style="border:0"
+                loading="lazy"
+                allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade"
+                :src="`https://www.google.com/maps/embed/v1/place?key=${mapData.apiKey}&q=${mapData.encodedAddress}`">
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </transition>
     </main>
   </div>
 </template>
@@ -576,7 +618,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from 'vue-i18n'
-import { fetchBookings, createBooking, updateBooking, fetchTimeSlots, markSlotBooked } from '../services/bookingService'
+import { fetchBookings, createBooking, updateBooking, fetchTimeSlots, markSlotBooked, fetchAdminMapInfo } from '../services/bookingService'
 import { fetchCurrentUserProfile } from '../services/userChatService'
 
 const { themeClasses } = useTheme()
@@ -748,6 +790,31 @@ const providers = ref([])
 
 const bookings = ref([])
 
+// Map state
+const mapData = ref(null)
+const mapLoading = ref(false)
+
+const loadMap = async (id) => {
+  if (!id) {
+    mapData.value = null
+    return
+  }
+  mapLoading.value = true
+  try {
+    const res = await fetchAdminMapInfo(id)
+    if (res?.success && res?.data?.apiKey && res?.data?.encodedAddress) {
+      mapData.value = res.data
+    } else {
+      mapData.value = null
+    }
+  } catch (error) {
+    console.error('Error fetching admin map info:', error)
+    mapData.value = null
+  } finally {
+    mapLoading.value = false
+  }
+}
+
 const currentPage = ref(1)
 const itemsPerPage = 10
 const appointmentsRef = ref(null)
@@ -841,6 +908,7 @@ watch(() => form.value.provider, (newId) => {
   form.value.times = []
   providerAvailability.value = {}
   loadProviderSlots(newId)
+  loadMap(newId)
 })
 
 const getProviderName = (id) => {
@@ -886,6 +954,7 @@ const loadData = async () => {
     // Load provider slots now that providerId is set
     if (form.value.provider) {
       await loadProviderSlots(form.value.provider)
+      await loadMap(form.value.provider)
     }
   } catch (error) {
     console.error('Error loading booking data:', error)

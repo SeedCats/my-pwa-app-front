@@ -49,4 +49,27 @@ app.post('/api/provider/request', async (req, res) => {
   }
 })
 
+app.post('/api/admin/contact', async (req, res) => {
+  const { name, email, message } = req.body || {}
+  if (!name || !email || !message) {
+    return res.status(400).json({ success: false, message: 'Missing required fields' })
+  }
+
+  const mailOptions = {
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to: TARGET_EMAIL,
+    subject: `Admin Contact: Message from ${name}`,
+    text: `Admin Name: ${name}\nAdmin Email: ${email}\n\nMessage:\n${message}\n\nReceived at: ${new Date().toISOString()}`
+  }
+
+  try {
+    const info = await transporter.sendMail(mailOptions)
+    console.log('Admin contact request sent:', info.messageId)
+    return res.json({ success: true, message: 'Message sent successfully' })
+  } catch (err) {
+    console.error('Error sending admin contact request:', err)
+    return res.status(500).json({ success: false, message: 'Failed to send message' })
+  }
+})
+
 app.listen(PORT, () => console.log(`Provider request server listening on port ${PORT}`))

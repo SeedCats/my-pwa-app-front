@@ -8,7 +8,7 @@
           :class="isDarkMode ? 'bg-indigo-900/40 border-indigo-700' : 'bg-indigo-50 border-indigo-200'">
           <div class="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
             <div class="flex items-center gap-3 flex-1 min-w-0">
-              <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+              <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
                 :class="isDarkMode ? 'bg-indigo-700' : 'bg-indigo-100'">
                 <svg class="w-4 h-4" :class="isDarkMode ? 'text-indigo-300' : 'text-indigo-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
               </div>
@@ -21,7 +21,7 @@
               </div>
             </div>
             <button @click="goBackToUserManagement"
-              class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+              class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
               :class="isDarkMode ? 'bg-indigo-700 hover:bg-indigo-600 text-white' : 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700'">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
               {{ $t('home.returnToUserManagement') }}
@@ -33,7 +33,7 @@
       <!-- Header -->
       <div class="mb-8 pt-6">
         <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center bg-linear-to-br from-indigo-500 to-purple-600 shadow-md">
             <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
@@ -49,7 +49,7 @@
       <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-200" leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
         <div v-if="successMessage" class="mb-6 p-4 rounded-xl border flex items-start gap-3"
           :class="isDarkMode ? 'bg-green-900/50 border-green-700' : 'bg-green-50 border-green-200'">
-          <div class="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5" :class="isDarkMode ? 'bg-green-700' : 'bg-green-200'">
+          <div class="shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5" :class="isDarkMode ? 'bg-green-700' : 'bg-green-200'">
             <svg class="w-3 h-3" :class="isDarkMode ? 'text-green-300' : 'text-green-700'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
           </div>
           <p class="text-sm flex-1" :class="isDarkMode ? 'text-green-200' : 'text-green-700'">{{ successMessage }}</p>
@@ -59,7 +59,7 @@
       <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-200" leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
         <div v-if="errorMessage" class="mb-6 p-4 rounded-xl border flex items-start gap-3"
           :class="isDarkMode ? 'bg-red-900/50 border-red-700' : 'bg-red-50 border-red-200'">
-          <div class="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5" :class="isDarkMode ? 'bg-red-700' : 'bg-red-200'">
+          <div class="shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5" :class="isDarkMode ? 'bg-red-700' : 'bg-red-200'">
             <svg class="w-3 h-3" :class="isDarkMode ? 'text-red-300' : 'text-red-700'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
           </div>
           <p class="text-sm flex-1" :class="isDarkMode ? 'text-red-200' : 'text-red-700'">{{ errorMessage }}</p>
@@ -70,7 +70,7 @@
         <!-- Profile Information -->
         <div class="shadow-sm rounded-xl border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
           <div class="px-6 py-5 border-b flex items-center gap-3" :class="themeClasses.border">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" :class="isDarkMode ? 'bg-indigo-900 text-indigo-400' : 'bg-indigo-50 text-indigo-600'">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="isDarkMode ? 'bg-indigo-900 text-indigo-400' : 'bg-indigo-50 text-indigo-600'">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             </div>
             <div>
@@ -82,7 +82,7 @@
           <form @submit.prevent="updateProfile" class="p-6 space-y-6">
             <!-- Profile Icon -->
             <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 mb-6 p-4 rounded-xl" :class="isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'">
-              <div class="relative group cursor-pointer flex-shrink-0" @click="triggerIconUpload">
+              <div class="relative group cursor-pointer shrink-0" @click="triggerIconUpload">
                 <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0 scale-90" enter-to-class="opacity-100 scale-100" mode="out-in">
                   <img v-if="profileForm.icon" :key="profileForm.icon" :src="profileForm.icon" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 shadow-lg transition-all duration-200" :class="isDarkMode ? 'border-gray-600' : 'border-white'" />
                   <div v-else class="w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border-2 border-dashed transition-colors duration-200" :class="[themeClasses.border, themeClasses.textSecondary, 'group-hover:border-indigo-500 group-hover:text-indigo-500']">
@@ -134,11 +134,21 @@
                   isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
                 ]" :placeholder="$t('userSettings.emailPlaceholder')" required />
               </div>
+
+              <!-- Address (Admins Only) -->
+              <div v-if="userState.user?.role === 'admin'" class="sm:col-span-2">
+                <label for="address" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{
+                  $t('userSettings.address') || 'Address' }}</label>
+                <input type="text" id="address" v-model="profileForm.address" :class="[
+                  'block w-full px-3 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200',
+                  isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
+                ]" :placeholder="$t('userSettings.addressPlaceholder') || 'Address'" />
+              </div>
             </div>
 
             <div class="flex flex-col sm:flex-row sm:justify-end gap-3 pt-2">
               <button type="submit" :disabled="profileLoading"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md active:scale-95">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md active:scale-95">
                 <svg v-if="profileLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -153,7 +163,7 @@
         <!-- Change Password -->
         <div class="shadow-sm rounded-xl border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
           <div class="px-6 py-5 border-b flex items-center gap-3" :class="themeClasses.border">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" :class="isDarkMode ? 'bg-amber-900/50 text-amber-400' : 'bg-amber-50 text-amber-600'">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="isDarkMode ? 'bg-amber-900/50 text-amber-400' : 'bg-amber-50 text-amber-600'">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
             </div>
             <div>
@@ -166,7 +176,7 @@
           <div v-if="isViewingOtherUser" class="px-6 pt-4 pb-2">
             <div class="p-3 rounded-lg text-sm flex items-start gap-2"
               :class="isDarkMode ? 'bg-blue-900/50 border border-blue-700 text-blue-200' : 'bg-blue-50 border border-blue-200 text-blue-800'">
-              <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               <span><strong>{{ $t('home.adminNote') }}:</strong> {{ $t('home.adminPasswordNote') }}</span>
             </div>
           </div>
@@ -250,7 +260,7 @@
 
             <div class="flex flex-col sm:flex-row sm:justify-end gap-3 pt-2">
               <button type="submit" :disabled="passwordLoading"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md active:scale-95">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md active:scale-95">
                 <svg v-if="passwordLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -266,7 +276,7 @@
         <div class="shadow-sm rounded-xl border overflow-hidden"
           :class="isDarkMode ? 'bg-gray-800 border-red-800' : 'bg-white border-red-200'">
           <div class="px-6 py-5 border-b flex items-center gap-3" :class="isDarkMode ? 'border-red-800' : 'border-red-200'">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" :class="isDarkMode ? 'bg-red-900/60 text-red-400' : 'bg-red-50 text-red-600'">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="isDarkMode ? 'bg-red-900/60 text-red-400' : 'bg-red-50 text-red-600'">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
             </div>
             <div>
@@ -277,17 +287,27 @@
 
           <div class="p-6">
             <!-- Admin warning when trying to delete own account -->
-            <div v-if="userState.user && userState.user.role === 'admin' && !isViewingOtherUser"
-              class="flex items-start gap-3 p-4 rounded-xl border"
-              :class="isDarkMode ? 'bg-red-900/40 border-red-800 text-red-300' : 'bg-red-50 border-red-200 text-red-800'">
-              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-              <strong class="text-sm">{{ $t('userSettings.adminCannotDeleteSelf') }}</strong>
+<div v-if="userState.user && userState.user.role === 'admin' && !isViewingOtherUser" class="space-y-4">
+                <div class="flex items-start gap-3 p-4 rounded-xl border"
+                  :class="isDarkMode ? 'bg-red-900/40 border-red-800 text-red-300' : 'bg-red-50 border-red-200 text-red-800'">
+                  <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                  <strong class="text-sm">{{ $t('userSettings.adminCannotDeleteSelf') }}</strong>
+                </div>
+                
+                <!-- Contact System Owner Button -->
+                <button
+                    @click="openContactOwnerModal"
+                  class="inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-xl transition-all shadow-sm active:scale-95"
+                  :class="isDarkMode ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-600 hover:bg-indigo-700'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                  {{ $t('userSettings.contactSystemOwner') || 'Contact System Owner' }}
+                </button>
             </div>
 
             <div v-else class="space-y-4">
               <div class="flex items-start gap-3 p-4 rounded-xl border"
                 :class="isDarkMode ? 'bg-red-900/20 border-red-900 text-red-300' : 'bg-red-50 border-red-100 text-red-700'">
-                <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 <p class="text-sm">{{ $t('userSettings.deleteAccountDesc') }}</p>
               </div>
 
@@ -335,7 +355,7 @@
 
                   <button @click="showDeletePassword = false; deletePassword = ''"
                     class="inline-flex items-center gap-2 px-4 py-2.5 border text-sm font-medium rounded-xl focus:outline-none transition-all duration-200 active:scale-95"
-                    :class="isDarkMode ? 'border-gray-600 text-gray-300 bg-gray-700 hover:bg-gray-600' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'">
+                    :class="isDarkMode ? 'border-red-800 text-red-400 bg-red-900/30 hover:bg-red-900/50' : 'border-red-200 text-red-700 bg-red-50 hover:bg-red-100'">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     {{ $t('common.cancel') }}
                   </button>
@@ -385,9 +405,57 @@
         </div>
       </div>
     </transition>
-  </div>
-</template>
 
+      <!-- Contact System Owner Modal -->
+      <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition ease-in duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
+        <div v-if="showContactOwnerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
+          <div class="w-full max-w-md rounded-2xl shadow-xl overflow-hidden" :class="isDarkMode ? 'bg-gray-800' : 'bg-white'">
+            <div class="px-6 py-4 border-b" :class="isDarkMode ? 'border-gray-700' : 'border-gray-200'">
+              <h3 class="text-lg font-semibold" :class="isDarkMode ? 'text-white' : 'text-gray-900'">{{ $t('userSettings.contactOwnerModalTitle') || 'Message System Owner' }}</h3>
+              <p class="text-sm mt-1" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{ $t('userSettings.contactOwnerModalSubtitle') || 'Send a direct message to the system owner.' }}</p>
+            </div>
+            <div class="p-6 space-y-4">
+              <div>
+                <label class="block text-sm font-medium mb-1.5" :class="isDarkMode ? 'text-gray-300' : 'text-gray-700'">{{ $t('userSettings.name') || 'Name' }} <span class="text-red-500">*</span></label>
+                <input v-model="contactOwnerForm.name" type="text"
+                  class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all"
+                  :class="isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'" required />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1.5" :class="isDarkMode ? 'text-gray-300' : 'text-gray-700'">{{ $t('userSettings.email') || 'Email' }} <span class="text-red-500">*</span></label>
+                <input v-model="contactOwnerForm.email" type="email"
+                  class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all"
+                  :class="isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'" required />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1.5" :class="isDarkMode ? 'text-gray-300' : 'text-gray-700'">{{ $t('userSettings.subject') || 'Subject' }} <span class="text-red-500">*</span></label>
+                <input v-model="contactOwnerForm.subject" type="text"
+                  class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all"
+                  :class="isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'" required />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1.5" :class="isDarkMode ? 'text-gray-300' : 'text-gray-700'">{{ $t('userSettings.contactMessageLabel') || 'Message' }} <span class="text-red-500">*</span></label>
+                <textarea v-model="contactOwnerForm.message" rows="4"
+                  :placeholder="$t('userSettings.contactMessagePlaceholder') || 'Type your message here...'"
+                  class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all resize-none"
+                  :class="isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'" required></textarea>
+              </div>
+            </div>
+            <div class="px-6 py-4 border-t flex justify-end gap-3" :class="isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-200 bg-gray-50'">
+              <button @click="showContactOwnerModal = false" :disabled="isSendingContactModal" class="px-4 py-2 text-sm font-medium rounded-xl transition-all" :class="isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200'">
+                {{ $t('common.cancel') }}
+              </button>
+              <button @click="submitContactOwner" :disabled="!isContactOwnerFormValid || isSendingContactModal"
+                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg v-if="isSendingContactModal" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                {{ isSendingContactModal ? ($t('userSettings.sending') || 'Sending...') : ($t('userSettings.send') || 'Send Message') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition>    </div>
+</template>
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -404,7 +472,7 @@ const { t } = useI18n()
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 // State
-const profileForm = ref({ name: '', email: '', icon: '' })
+const profileForm = ref({ name: '', email: '', icon: '', address: '' })
 const targetUserId = ref(null)
 const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
 
@@ -514,7 +582,7 @@ const loadUserData = async () => {
 
     if (user) {
       // populate profile form
-      profileForm.value = { name: user.name || '', email: user.email || '', icon: user.icon || '' }
+      profileForm.value = { name: user.name || '', email: user.email || '', icon: user.icon || '', address: user.address || '' }
       // If no explicit targetUserId set above, set it to the current user's id
       if (!targetUserId.value && user.id) targetUserId.value = user.id
 
@@ -538,7 +606,14 @@ const goBackToUserManagement = () => {
 onMounted(loadUserData)
 
 const clearMessages = () => { successMessage.value = ''; errorMessage.value = '' }
-const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
+const scrollToTop = () => {
+  const container = document.getElementById('main-scroll-container');
+  if (container) {
+    container.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
 
 const updateProfile = async () => {
   clearMessages()
@@ -553,7 +628,7 @@ const updateProfile = async () => {
         const updatedUser = data?.data?.user || data?.user || data
         if (updatedUser) {
           viewedUserData.value = updatedUser
-          profileForm.value = { name: updatedUser.name || '', email: updatedUser.email || '', icon: updatedUser.icon || '' }
+          profileForm.value = { name: updatedUser.name || '', email: updatedUser.email || '', icon: updatedUser.icon || '', address: updatedUser.address || '' }
         }
         successMessage.value = data.message || 'Profile updated successfully!'
       } else {
@@ -574,8 +649,8 @@ const updateProfile = async () => {
     const data = await response.json()
 
     if (response.ok && data.success) {
-      const updatedUser = data.data?.user || data.data || data
-      window.dispatchEvent(new CustomEvent('userUpdated', { detail: data.data.user }))
+        const updatedUser = data.data?.user || data.data || data || {}
+        window.dispatchEvent(new CustomEvent('userUpdated', { detail: updatedUser }))
       successMessage.value = data.message || 'Profile updated successfully!'
     } else {
       errorMessage.value = data.message || 'Failed to update profile'
@@ -797,6 +872,64 @@ const deleteAccount = async () => {
     scrollToTop()
   } finally {
     deleteLoading.value = false
+  }
+}
+
+// Contact System Owner Modal
+const showContactOwnerModal = ref(false)
+const contactOwnerForm = ref({
+  name: '',
+  email: '',
+  subject: '',
+  message: ''
+})
+const isSendingContactModal = ref(false)
+
+const isContactOwnerFormValid = computed(() => {
+  return contactOwnerForm.value.name.trim() && 
+         contactOwnerForm.value.email.trim() && 
+         contactOwnerForm.value.subject.trim() && 
+         contactOwnerForm.value.message.trim()
+})
+
+const openContactOwnerModal = () => {
+  contactOwnerForm.value.name = userState.user?.name || userState.user?.email || 'Admin'
+  contactOwnerForm.value.email = userState.user?.email || ''
+  contactOwnerForm.value.subject = ''
+  contactOwnerForm.value.message = ''
+  showContactOwnerModal.value = true
+}
+
+const submitContactOwner = async () => {
+  if (!isContactOwnerFormValid.value) return
+
+  isSendingContactModal.value = true
+  successMessage.value = ''
+  errorMessage.value = ''
+
+  try {
+    const response = await fetch(`${API_URL}/api/provider/request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(contactOwnerForm.value)
+    })
+
+    const data = await response.json().catch(() => null)
+    if (response.ok && data?.success) {
+      successMessage.value = t('userSettings.contactSuccess') || 'Message sent successfully!'
+      showContactOwnerModal.value = false
+      contactOwnerForm.value.message = ''
+      scrollToTop()
+    } else {
+      errorMessage.value = data?.message || t('userSettings.contactFailed') || 'Failed to send message.'
+      scrollToTop()
+    }
+  } catch (error) {
+    errorMessage.value = t('auth.networkError') || 'Network error. Please try again.'
+    scrollToTop()
+  } finally {
+    isSendingContactModal.value = false
   }
 }
 </script>

@@ -6,8 +6,8 @@
       showSidebar ? 'pt-16' : '',
       showSidebar && !sidebarHidden ? 'lg:ml-72' : 'lg:ml-0'
     ]">
-      <div class="flex-1 min-h-0 overflow-y-auto">
-        <router-view />
+      <div id="main-scroll-container" class="flex-1 min-h-0 overflow-y-auto flex flex-col relative w-full">
+        <router-view class="w-full" />
       </div>
     </div>
   </div>

@@ -431,7 +431,7 @@
                         </button>
 
                         <!-- Danger Zone: delete records -->
-                        <div class="rounded-xl border p-4 mt-2"
+                        <div v-if="hasHeartRateData || hasStressData" class="rounded-xl border p-4 mt-2"
                             :class="isDarkMode ? 'border-red-900/60 bg-red-950/20' : 'border-red-200 bg-red-50/50'">
                             <p class="text-xs font-semibold uppercase tracking-wide mb-3"
                                 :class="isDarkMode ? 'text-red-400' : 'text-red-600'">

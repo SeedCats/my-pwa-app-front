@@ -554,13 +554,6 @@
                                     class="w-full flex items-start gap-3 p-3 rounded-xl transition-all duration-150 text-left group"
                                     :class="isDarkMode ? 'hover:bg-gray-700/60 bg-gray-700/30' : 'hover:bg-gray-50 bg-blue-50/60'"
                                 >
-                                    <div class="shrink-0 relative">
-                                        <img v-if="unreadIcon" :src="unreadIcon" alt="Sender" class="w-10 h-10 rounded-full object-cover ring-2 ring-blue-500/30" />
-                                        <div v-else class="w-10 h-10 rounded-full bg-linear-to-br from-blue-400 to-indigo-600 flex items-center justify-center ring-2 ring-blue-500/20 shrink-0">
-                                            <span class="text-white font-bold text-sm">{{ (unreadSender || 'S').charAt(0).toUpperCase() }}</span>
-                                        </div>
-                                        <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-400 border-2" :class="isDarkMode ? 'border-gray-800' : 'border-white'"></span>
-                                    </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center justify-between gap-1">
                                             <p class="font-semibold text-sm truncate" :class="themeClasses.textPrimary">
@@ -827,7 +820,6 @@ const isDesktopSidebarHidden = ref(false)
 const userData = ref(null)
 const unreadCount = ref(0)
 const unreadSender = ref('')
-const unreadIcon = ref('')
 const unreadLastText = ref('')
 const unreadTimestamp = ref('')
 const showNotificationPanel = ref(false)
@@ -1080,8 +1072,12 @@ const loadUnreadCount = async () => {
 
             const lastMessage = json?.lastMessage || json?.data?.lastMessage || null
             unreadLastText.value = lastMessage?.text || json?.lastMessageText || json?.data?.lastMessageText || ''
-            unreadSender.value = lastMessage?.senderName || lastMessage?.sender || json?.senderName || json?.data?.senderName || ''
-            unreadIcon.value = lastMessage?.senderIcon || lastMessage?.icon || json?.senderIcon || json?.data?.senderIcon || json?.icon || json?.data?.icon || ''
+            
+            let senderObj = lastMessage?.sender
+            if (typeof senderObj === 'string') senderObj = null
+            
+            unreadSender.value = lastMessage?.senderName || senderObj?.name || (typeof lastMessage?.sender === 'string' ? lastMessage.sender : '') || json?.senderName || json?.data?.senderName || ''
+            
             unreadTimestamp.value = lastMessage?.createdAt || lastMessage?.time || json?.lastMessageCreatedAt || json?.data?.lastMessageCreatedAt || ''
 
             loadedFromEndpoint = true
@@ -1099,14 +1095,12 @@ const loadUnreadCount = async () => {
             unreadCount.value = 0
             unreadLastText.value = ''
             unreadSender.value = ''
-            unreadIcon.value = ''
             unreadTimestamp.value = ''
         }
     } catch {
         unreadCount.value = 0
         unreadLastText.value = ''
         unreadSender.value = ''
-        unreadIcon.value = ''
         unreadTimestamp.value = ''
     }
 }
@@ -1138,18 +1132,25 @@ onMounted(() => {
     window.addEventListener('messagesRead', loadUnreadCount)
     window.addEventListener('open-mobile-sidebar', openMobileSidebarEvent)
     window.addEventListener('userUpdated', (e) => {
-        const updated = e?.detail || {}
-        const currentId = userStore.user?.id || userStore.user?._id || userData.value?.id || userData.value?._id
-        if (updated && currentId && (String(updated.id) === String(currentId) || String(updated._id) === String(currentId)))
-            userData.value = updated
+        if (e.detail && Object.keys(e.detail).length > 0) {
+            userData.value = { ...userData.value, ...e.detail }
+        } else {
+            loadUserData()
+        }
     })
+    window.addEventListener('aiChatUpdated', handleAiChatUpdated)
 })
+
+const handleAiChatUpdated = () => {
+    if (isAiSupportRoute.value && !isAdmin()) loadAiChatList(1)
+}
 
 onUnmounted(() => {
     if (unreadPollTimer) { clearInterval(unreadPollTimer); unreadPollTimer = null }
     window.removeEventListener('mousedown', handleGlobalClick)
     window.removeEventListener('messagesRead', loadUnreadCount)
     window.removeEventListener('open-mobile-sidebar', openMobileSidebarEvent)
+    window.removeEventListener('aiChatUpdated', handleAiChatUpdated)
 })
 
 watch(() => route.path, (newPath) => {

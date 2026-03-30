@@ -12,12 +12,8 @@
             <!-- Chat Container -->
             <div class="flex-1 lg:flex-none min-h-0 flex flex-col max-w-7xl mx-auto w-full">
                 <div class="flex-1 lg:flex-none min-h-0 flex flex-col relative">
-                    <div class="flex items-center justify-between mb-2 gap-2">
-                        <div v-if="showTitle" class="text-base sm:text-lg font-semibold truncate"
-                            :class="[themeClasses.textPrimary, isDarkMode ? 'text-white' : 'text-gray-900']">{{
-                            currentTitle }}</div>
-                        <div class="flex items-center space-x-1 sm:space-x-2 shrink-0"
-                            :class="showTitle ? '' : 'ml-auto'">
+                    <div class="flex items-center justify-end mb-2 gap-2">
+                        <div class="flex items-center space-x-1 sm:space-x-2 shrink-0">
                             
                             <!-- History Mobile Button -->
                             <button @click.prevent="openMobileHistory" :disabled="isChatBusy"
@@ -448,8 +444,6 @@ const historyPage = ref(1)
 const historyPerPage = ref(3)
 const historyTotal = ref(0)
 const chatId = ref(null)
-const currentTitle = ref(t('aiSupport.newConversation'))
-const showTitle = ref(false)
 
 const parseId = (idCandidate) => {
     if (!idCandidate) return null
@@ -754,6 +748,8 @@ const loadChatList = async (page = 1) => {
             historyPage.value = res.data.pagination.currentPage
             historyPerPage.value = res.data.pagination.perPage
             historyTotal.value = res.data.pagination.total
+            // Notify other components (like Sidebar) to refresh their AI history
+            window.dispatchEvent(new CustomEvent('aiChatUpdated'))
         } else {
             historyError.value = res && res.message ? res.message : 'Failed to load chats'
         }
@@ -808,7 +804,6 @@ const deleteAllChats = async (skipConfirm = false) => {
             if (chatId.value && ids.includes(chatId.value)) {
                 chatId.value = null
                 messages.value = []
-                currentTitle.value = 'New Conversation'
             }
         } catch (e) { console.warn(e) }
 
@@ -877,9 +872,6 @@ const loadChatIntoConversation = async (id) => {
 
             // record the loaded chat id so future messages append to it
             chatId.value = parseId(res.data._id || res.data.id)
-            // set current title to loaded chat title
-            currentTitle.value = res.data.title || 'Untitled'
-            showTitle.value = true
             // loaded messages replace the current conversation; do not inject a synthetic assistant message
             await scrollToBottom()
             // keep history panel visible after loading a conversation
@@ -926,8 +918,6 @@ const deleteChat = async (id, skipConfirm = false) => {
             if (parseId(chatId.value) === parseId(id)) {
                 chatId.value = null
                 messages.value = []
-                currentTitle.value = 'New Conversation'
-                showTitle.value = false
             }
         } else {
             historyError.value = res && res.message ? res.message : 'Failed to delete chat'
@@ -976,8 +966,6 @@ const saveEdit = async (chat) => {
         if (res && res.success) {
             const idx = (chatList.value || []).findIndex(c => parseId(c._id || c.id) === id)
             if (idx >= 0) chatList.value[idx].title = trimmed
-            // if the currently loaded chat matches, update the displayed currentTitle
-            if (parseId(chatId.value) === id) currentTitle.value = trimmed
             editingId.value = null
             editTitle.value = ''
             // remove document click listener
@@ -1224,8 +1212,6 @@ const sendMessage = async () => {
                             }
                         } catch (e) { console.warn('updateAichatLastMessage create error throw:', e) }
                     }
-                    currentTitle.value = createRes.data.title || 'New Conversation'
-                    showTitle.value = true
                 }
             } catch (e) {
                 // non-fatal: log and continue (we'll still send message to AI)
@@ -1450,8 +1436,6 @@ const sendMessage = async () => {
                                     }
                                 } catch (err) { console.warn('updateAichatLastMessage create2 error throw:', err) }
                             }
-                            currentTitle.value = createRes2.data.title || 'New Conversation'
-                            showTitle.value = true
                         }
                     } catch (e2) {
                         console.warn('Failed to create chat with assistant message:', e2)
@@ -1519,8 +1503,6 @@ const startNewChat = async () => {
     chatId.value = null
     selectedFile.value = null
     errorMessage.value = ''
-    currentTitle.value = 'New Conversation'
-    showTitle.value = true
 
     // Also clear any file input
     if (fileInput.value && 'value' in fileInput.value) {
@@ -1600,7 +1582,12 @@ const forceReloadStressDates = async () => {
 
 onMounted(() => {
     // Scroll to top when entering the page
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    const container = document.getElementById('main-scroll-container');
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     // Load health data for suggested prompts
     loadHealthData()
