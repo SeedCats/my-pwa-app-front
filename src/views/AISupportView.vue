@@ -55,7 +55,7 @@
                         :class="[themeClasses.cardBackground, themeClasses.border]">
                         <!-- Chat Messages -->
                         <div ref="chatContainer"
-                            class="flex-1 min-h-0 lg:min-h-[55vh] lg:max-h-[65vh] overflow-y-auto p-3 sm:p-5 space-y-4 chat-scroll"
+                            class="flex-1 min-h-0 lg:min-h-[65vh] lg:max-h-[75vh] overflow-y-auto p-3 sm:p-5 space-y-4 chat-scroll"
                             :class="isDarkMode ? 'bg-gray-950' : 'bg-gray-50/80'">
                             <!-- Welcome Message -->
                             <div v-if="visibleMessages.length === 0" class="flex items-center justify-center h-full">

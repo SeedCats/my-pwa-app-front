@@ -43,7 +43,9 @@
             </span>
           </template>
           <button @click="goBackToUserManagement"
-            class="inline-flex items-center gap-1 text-xs font-medium underline underline-offset-2 opacity-80 hover:opacity-100 transition-opacity">
+            class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+            :class="isDarkMode ? 'bg-indigo-700 hover:bg-indigo-600 text-white' : 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700'">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             {{ $t('home.returnToUserManagement') }}
           </button>
         </div>
@@ -944,6 +946,13 @@ const loadBMIData = async () => {
 }
 
 const bmiCategoryKey = computed(() => {
+  const bmiVal = parseFloat(bmiData.value.bmi)
+  if (!isNaN(bmiVal)) {
+    if (bmiVal < 18.5) return 'underweight'
+    if (bmiVal < 25) return 'normal'
+    if (bmiVal < 30) return 'overweight'
+    return 'obese'
+  }
   const raw = (bmiData.value.category || '').toString().toLowerCase()
   if (raw.includes('under') || raw.includes('過輕')) return 'underweight'
   if (raw.includes('normal') || raw.includes('正常')) return 'normal'

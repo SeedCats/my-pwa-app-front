@@ -991,7 +991,16 @@ const deleteAllAiChats = async (skipConfirm = false) => {
 }
 
 // Helper to check active route for styling
-const isActiveRoute = (path) => route.path === path
+const isActiveRoute = (path) => {
+    // Determine active nav item. If we are on /user but looking at another user's profile, don't highlight
+    if (path === '/user' && route.path === '/user' && route.query.userId) {
+        const currentUser = userStore.user;
+        if (currentUser && String(currentUser.id) !== String(route.query.userId)) {
+            return false; // Viewing another user's profile
+        }
+    }
+    return route.path === path;
+}
 
 const toggleDesktopSidebar = () => {
     isDesktopSidebarHidden.value = !isDesktopSidebarHidden.value

@@ -8,12 +8,12 @@
         </div>
 
         <!-- ── Stats Overview ──────────────────────────────────────── -->
-        <div class="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="mb-8 flex flex-col gap-4">
 
-          <!-- Today -->
+          <!-- Today (Top Full Width) -->
           <div class="rounded-xl border shadow-sm overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
             <div class="flex items-center gap-2.5 px-4 py-3 border-b" :class="themeClasses.border">
-              <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
+              <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13l-.87.5M4.21 17.5l-.87.5M20.66 17.5l-.87-.5M4.21 6.5l-.87-.5M21 12h-1M4 12H3" />
                   <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" fill="none" />
@@ -38,29 +38,58 @@
             </div>
           </div>
 
-          <!-- This Month -->
-          <div class="rounded-xl border shadow-sm overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
-            <div class="flex items-center gap-2.5 px-4 py-3 border-b" :class="themeClasses.border">
-              <div class="w-7 h-7 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- This Month -->
+            <div class="rounded-xl border shadow-sm overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
+              <div class="flex items-center gap-2.5 px-4 py-3 border-b" :class="themeClasses.border">
+                <div class="w-7 h-7 rounded-lg bg-purple-600 flex items-center justify-center shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('booking.statsThisMonth') }}</span>
+                <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">{{ statsMonth.total }} {{ $t('booking.statsTotal') }}</span>
               </div>
-              <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('booking.statsThisMonth') }}</span>
-              <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">{{ statsMonth.total }} {{ $t('booking.statsTotal') }}</span>
+              <div class="grid grid-cols-3 divide-x" :class="themeClasses.border">
+                <div class="flex flex-col items-center py-4 gap-1">
+                  <span class="text-2xl font-bold text-amber-500">{{ statsMonth.pending }}</span>
+                  <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.pending') }}</span>
+                </div>
+                <div class="flex flex-col items-center py-4 gap-1">
+                  <span class="text-2xl font-bold text-green-500">{{ statsMonth.confirmed }}</span>
+                  <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.confirmed') }}</span>
+                </div>
+                <div class="flex flex-col items-center py-4 gap-1">
+                  <span class="text-2xl font-bold text-blue-500">{{ statsMonth.completed }}</span>
+                  <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.completed') }}</span>
+                </div>
+              </div>
             </div>
-            <div class="grid grid-cols-3 divide-x" :class="themeClasses.border">
-              <div class="flex flex-col items-center py-4 gap-1">
-                <span class="text-2xl font-bold text-amber-500">{{ statsMonth.pending }}</span>
-                <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.pending') }}</span>
+
+            <!-- All Day (All Time) -->
+            <div class="rounded-xl border shadow-sm overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
+              <div class="flex items-center gap-2.5 px-4 py-3 border-b" :class="themeClasses.border">
+                <div class="w-7 h-7 rounded-lg bg-teal-600 flex items-center justify-center shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+              <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('admin.statsAllTime') }}</span>
+                <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300">{{ statsAllTime.total }} {{ $t('booking.statsTotal') }}</span>
               </div>
-              <div class="flex flex-col items-center py-4 gap-1">
-                <span class="text-2xl font-bold text-green-500">{{ statsMonth.confirmed }}</span>
-                <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.confirmed') }}</span>
-              </div>
-              <div class="flex flex-col items-center py-4 gap-1">
-                <span class="text-2xl font-bold text-blue-500">{{ statsMonth.completed }}</span>
-                <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.completed') }}</span>
+              <div class="grid grid-cols-3 divide-x" :class="themeClasses.border">
+                <div class="flex flex-col items-center py-4 gap-1">
+                  <span class="text-2xl font-bold text-amber-500">{{ statsAllTime.pending }}</span>
+                  <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.pending') }}</span>
+                </div>
+                <div class="flex flex-col items-center py-4 gap-1">
+                  <span class="text-2xl font-bold text-green-500">{{ statsAllTime.confirmed }}</span>
+                  <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.confirmed') }}</span>
+                </div>
+                <div class="flex flex-col items-center py-4 gap-1">
+                  <span class="text-2xl font-bold text-blue-500">{{ statsAllTime.completed }}</span>
+                  <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.completed') }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -72,43 +101,56 @@
         <div class="mb-8 rounded-lg shadow-md border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
           <!-- Header -->
           <div class="flex items-center gap-3 p-4 border-b" :class="themeClasses.border">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <div class="flex-1 min-w-0">
               <h2 class="text-base font-semibold" :class="themeClasses.textPrimary">{{ $t('booking.availabilityCalendar') }}</h2>
               <p class="text-xs" :class="themeClasses.textSecondary">{{ $t('booking.availabilityDesc') }}</p>
             </div>
-            <!-- Refresh button -->
-            <button
-              @click="refreshAvailability"
-              :disabled="isRefreshingCal"
-              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all"
-              :class="[
-                isRefreshingCal
-                  ? 'opacity-60 cursor-not-allowed'
-                  : 'hover:shadow-sm',
-                themeClasses.inputBackground, themeClasses.border, themeClasses.textPrimary
-              ]"
-              :title="$t('common.refresh')"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-3.5 w-3.5 transition-transform duration-500"
-                :class="isRefreshingCal ? 'animate-spin' : ''"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            <div class="flex items-center gap-2">
+              <button
+                @click="removeOutdatedSlots"
+                :disabled="isSavingSlots || isRefreshingCal"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20 disabled:opacity-60 disabled:cursor-not-allowed"
+                :title="$t('admin.removeOutdated') || 'Remove Outdated'"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span class="hidden sm:inline">{{ isRefreshingCal ? $t('common.loading') : $t('common.refresh') }}</span>
-            </button>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span class="hidden sm:inline">{{ $t('admin.removeOutdated') || 'Remove Outdated' }}</span>
+              </button>
+              <!-- Refresh button -->
+              <button
+                @click="refreshAvailability"
+                :disabled="isRefreshingCal"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all"
+                :class="[
+                  isRefreshingCal
+                    ? 'opacity-60 cursor-not-allowed'
+                    : 'hover:shadow-sm',
+                  themeClasses.inputBackground, themeClasses.border, themeClasses.textPrimary
+                ]"
+                :title="$t('common.refresh')"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-3.5 w-3.5 transition-transform duration-500"
+                  :class="isRefreshingCal ? 'animate-spin' : ''"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span class="hidden sm:inline">{{ isRefreshingCal ? $t('common.loading') : $t('common.refresh') }}</span>
+              </button>
+            </div>
           </div>
 
           <div class="p-4">
             <div class="flex flex-col lg:flex-row gap-6">
 
               <!-- ── Monthly Calendar ─── -->
-              <div class="flex-shrink-0 w-full lg:w-72">
+              <div class="shrink-0 w-full lg:w-72">
                 <!-- Month nav -->
                 <div class="flex items-center justify-between mb-3">
                   <button
@@ -297,7 +339,7 @@
             <div class="flex gap-2 flex-wrap sm:flex-nowrap">
               <button 
                 @click="toggleSort('date')"
-                class="px-3 py-2 rounded-lg border flex items-center justify-center gap-1.5 transition-all duration-150 text-sm font-medium flex-shrink-0"
+                class="px-3 py-2 rounded-lg border flex items-center justify-center gap-1.5 transition-all duration-150 text-sm font-medium shrink-0"
                 :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border, themeClasses.hoverBackground, sortKey === 'date' ? 'ring-2 ring-blue-500/40' : '']"
                 :title="$t('common.sort') || 'Sort by Date'"
               >
@@ -309,7 +351,7 @@
               </button>
               <select 
                 v-model="serviceFilter"
-                class="px-3 py-2 rounded-lg border text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all flex-shrink-0"
+                class="px-3 py-2 rounded-lg border text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all shrink-0"
                 :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
               >
                 <option value="">{{ $t('booking.allServices') || 'All Services' }}</option>
@@ -320,7 +362,7 @@
               </select>
               <select 
                 v-model="statusFilter"
-                class="px-3 py-2 rounded-lg border text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all flex-shrink-0"
+                class="px-3 py-2 rounded-lg border text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all shrink-0"
                 :class="[themeClasses.inputBackground, themeClasses.textPrimary, themeClasses.border]"
               >
                 <option value="">{{ $t('booking.allStatus') || 'All Status' }}</option>
@@ -405,7 +447,7 @@
                     <div class="text-xs" :class="themeClasses.textSecondary">{{ booking.time }}</div>
                   </td>
                   <td class="p-4">
-                    <div class="text-xs max-w-[150px] whitespace-normal break-words" :class="themeClasses.textSecondary" :title="booking.notes">
+                    <div class="text-xs max-w-37.5 whitespace-normal wrap-break-word" :class="themeClasses.textSecondary" :title="booking.notes">
                       {{ booking.notes || '-' }}
                     </div>
                   </td>
@@ -546,6 +588,16 @@ const statsMonth = computed(() => {
     total:     monthly.length
   }
 })
+
+const statsAllTime = computed(() => {
+  const all = bookings.value
+  return {
+    pending:   all.filter(b => b.status === 'pending').length,
+    confirmed: all.filter(b => b.status === 'confirmed').length,
+    completed: all.filter(b => b.status === 'completed').length,
+    total:     all.length
+  }
+})
 // ── End Stats ─────────────────────────────────────────────────────────────
 const isLoading = ref(true)
 const errorMessage = ref('')
@@ -665,7 +717,7 @@ const loadBookings = async () => {
 
 // ── Availability Calendar ──────────────────────────────────────────────────
 const CAL_TIME_SLOTS = [
-  '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
+  'All day', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
   '11:00', '11:30', '12:00',
   '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
   '17:00', '17:30', "18:00", "18:30", "19:00"
@@ -818,6 +870,17 @@ const loadAvailability = async () => {
 
 const calHasBookedSlots = (day) =>
   (availability.value[calDateKey(day)] || []).some(s => s.booked)
+
+const removeOutdatedSlots = async () => {
+  if (!confirm(t('admin.confirmRemoveOutdated') || 'Are you sure you want to remove all outdated availability slots?')) return
+  const todayStr = new Date().toISOString().slice(0, 10)
+  for (const date in availability.value) {
+    if (date < todayStr) {
+      delete availability.value[date]
+    }
+  }
+  await calSaveSlots()
+}
 
 const refreshAvailability = async () => {
   isRefreshingCal.value = true

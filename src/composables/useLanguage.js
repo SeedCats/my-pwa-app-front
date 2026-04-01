@@ -7,6 +7,8 @@ export function useLanguage() {
     { code: 'en', name: 'English', flag: '🇺🇸' },
     { code: 'zh', name: '中文', flag: '🇨🇳' }
   ]
+  // Cache the languages list into local storage
+  localStorage.setItem('languages_list', JSON.stringify(languages))
 
   const changeLanguage = (lang) => {
     locale.value = lang

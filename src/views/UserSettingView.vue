@@ -135,8 +135,8 @@
                 ]" :placeholder="$t('userSettings.emailPlaceholder')" required />
               </div>
 
-              <!-- Address (Admins Only) -->
-              <div v-if="userState.user?.role === 'admin'" class="sm:col-span-2">
+              <!-- Address (Admins Only, only when viewing their own profile) -->
+              <div v-if="userState.user?.role === 'admin' && !isViewingOtherUser" class="sm:col-span-2">
                 <label for="address" class="block text-sm font-medium mb-2" :class="themeClasses.textPrimary">{{
                   $t('userSettings.address') || 'Address' }}</label>
                 <input type="text" id="address" v-model="profileForm.address" :class="[
@@ -625,7 +625,7 @@ const updateProfile = async () => {
       const data = await updateUserById(targetUserId.value, profileForm.value)
       if (data && data.success) {
         // Sync the saved user data with the viewing buffer so the banner updates only on success
-        const updatedUser = data?.data?.user || data?.user || data
+        const updatedUser = data?.data?.user || data?.user || data?.data || data
         if (updatedUser) {
           viewedUserData.value = updatedUser
           profileForm.value = { name: updatedUser.name || '', email: updatedUser.email || '', icon: updatedUser.icon || '', address: updatedUser.address || '' }

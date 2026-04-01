@@ -19,8 +19,8 @@ const tryEndpoints = async (id, paths, fetchOpts) => {
 }
 
 const USER_PATHS = [
-  (id) => `/api/admin/users/${id}`,
   (id) => `/api/admin/user/${id}`,
+  (id) => `/api/admin/users/${id}`,
   (id) => `/api/users/${id}`,
   (id) => `/api/user/${id}`
 ]

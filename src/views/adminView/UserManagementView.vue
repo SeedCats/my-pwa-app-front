@@ -121,9 +121,59 @@
               </div>
             </div>
 
-            <!-- User Table -->
+            <!-- User List View -->
             <div v-else class="rounded-xl border shadow-sm overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
-              <div class="overflow-x-auto">
+              <!-- Mobile view (Card style) -->
+              <div class="block md:hidden divide-y" :class="themeClasses.border">
+                <div v-for="u in filteredUsers" :key="'mobile-'+u.id" class="p-4 space-y-3 transition-colors duration-150" :class="themeClasses.hoverBackground">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0 flex-1">
+                      <p class="text-sm font-semibold truncate" :class="themeClasses.textPrimary">{{ u.name }}</p>
+                      <p class="text-xs truncate mt-0.5" :class="themeClasses.textSecondary">{{ u.email }}</p>
+                    </div>
+                    <span :class="[
+                      'inline-flex items-center justify-center shrink-0 gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider',
+                      u.serviceStatusKey === 'completed'
+                        ? (isDarkMode ? 'bg-green-900/40 text-green-300' : 'bg-green-50 text-green-700')
+                        : (isDarkMode ? 'bg-amber-900/40 text-amber-300' : 'bg-amber-50 text-amber-700')
+                    ]">
+                      <span class="w-1.5 h-1.5 rounded-full" :class="u.serviceStatusKey === 'completed' ? 'bg-green-500' : 'bg-amber-500'" />
+                      {{ u.serviceStatusKey === 'completed' ? $t('admin.statusCompleted') : $t('admin.statusOnGoing') }}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center flex-wrap gap-3 text-xs" :class="themeClasses.textSecondary">
+                    <div class="flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      {{ formatDate(u.createdAt) }}
+                    </div>
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium"
+                          :class="isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'">
+                      {{ u.role }}
+                    </span>
+                  </div>
+                  
+                  <div class="pt-1 flex items-center gap-2">
+                    <button @click="goToChat(u)"
+                      class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all duration-150 hover:shadow-md bg-purple-600 text-white hover:bg-purple-700 focus:ring-2 focus:ring-purple-500/50">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                      </svg>
+                      <span>{{ $t('nav.chat') }}</span>
+                    </button>
+                    <button @click="openOperations(u)"
+                      class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all duration-150 hover:shadow-md bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500/50">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                      </svg>
+                      <span>{{ $t('admin.operation') }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Desktop Table view -->
+              <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                   <thead>
                     <tr class="border-b" :class="[themeClasses.border, themeClasses.background]">
@@ -131,8 +181,24 @@
                       <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider hidden md:table-cell" :class="themeClasses.textSecondary">{{ $t('admin.email') }}</th>
                       <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider hidden lg:table-cell" :class="themeClasses.textSecondary">{{ $t('admin.role') }}</th>
                       <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider hidden xl:table-cell" :class="themeClasses.textSecondary">{{ $t('admin.id') }}</th>
-                      <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider hidden lg:table-cell" :class="themeClasses.textSecondary">{{ $t('admin.created') }}</th>
-                      <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-center" :class="themeClasses.textSecondary">{{ $t('admin.status') }}</th>
+                      <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider hidden lg:table-cell cursor-pointer hover:opacity-80 transition-opacity" :class="themeClasses.textSecondary" @click="toggleSort('createdAt')">
+                        <div class="flex items-center gap-1">
+                          {{ $t('admin.created') }}
+                          <span class="inline-flex flex-col">
+                            <svg class="w-2 h-2" :class="sortField === 'createdAt' && sortOrder === 'asc' ? 'text-blue-500' : 'opacity-40'" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4l8 16H4z"/></svg>
+                            <svg class="w-2 h-2" :class="sortField === 'createdAt' && sortOrder === 'desc' ? 'text-blue-500' : 'opacity-40'" fill="currentColor" viewBox="0 0 24 24"><path d="M12 20L4 4h16z"/></svg>
+                          </span>
+                        </div>
+                      </th>
+                      <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-center cursor-pointer hover:opacity-80 transition-opacity" :class="themeClasses.textSecondary" @click="toggleSort('status')">
+                        <div class="flex items-center justify-center gap-1">
+                          {{ $t('admin.status') }}
+                          <span class="inline-flex flex-col">
+                            <svg class="w-2 h-2" :class="sortField === 'status' && sortOrder === 'asc' ? 'text-blue-500' : 'opacity-40'" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4l8 16H4z"/></svg>
+                            <svg class="w-2 h-2" :class="sortField === 'status' && sortOrder === 'desc' ? 'text-blue-500' : 'opacity-40'" fill="currentColor" viewBox="0 0 24 24"><path d="M12 20L4 4h16z"/></svg>
+                          </span>
+                        </div>
+                      </th>
                       <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-right" :class="themeClasses.textSecondary">{{ $t('admin.operation') }}</th>
                     </tr>
                   </thead>
@@ -303,16 +369,6 @@
                       </div>
                       <span>{{ $t('admin.userSetting') }}</span>
                     </button>
-
-                    <button @click="goToChat(selectedUser)"
-                      class="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 hover:shadow-sm bg-purple-600 text-white hover:bg-purple-700">
-                      <div class="w-8 h-8 rounded-lg bg-purple-700/50 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                        </svg>
-                      </div>
-                      <span>{{ $t('nav.chat') }}</span>
-                    </button>
                   </div>
 
                   <!-- Status Actions -->
@@ -346,12 +402,22 @@
                           <dd :class="themeClasses.textPrimary">{{ selectedUser ? selectedUser.name : '' }}</dd>
                         </div>
                         <div class="flex items-center gap-2">
+                          <dt class="font-medium w-20 shrink-0" :class="themeClasses.textSecondary">{{ $t('admin.email') }}</dt>
+                          <dd :class="themeClasses.textPrimary">{{ selectedUser ? selectedUser.email : '' }}</dd>
+                        </div>
+                        <div class="flex items-center gap-2">
                           <dt class="font-medium w-20 shrink-0" :class="themeClasses.textSecondary">{{ $t('admin.id') }}</dt>
                           <dd class="font-mono text-xs" :class="themeClasses.textPrimary">{{ selectedUser ? selectedUser.id : '' }}</dd>
                         </div>
                         <div class="flex items-center gap-2">
                           <dt class="font-medium w-20 shrink-0" :class="themeClasses.textSecondary">{{ $t('admin.role') }}</dt>
                           <dd :class="themeClasses.textPrimary">{{ selectedUser ? selectedUser.role : '' }}</dd>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <dt class="font-medium w-20 shrink-0" :class="themeClasses.textSecondary">{{ $t('admin.status') }}</dt>
+                          <dd :class="themeClasses.textPrimary">
+                            {{ selectedUser ? (selectedUser.serviceStatusKey === 'completed' ? $t('admin.statusCompleted') : $t('admin.statusOnGoing')) : '' }}
+                          </dd>
                         </div>
                         <div class="flex items-center gap-2">
                           <dt class="font-medium w-20 shrink-0" :class="themeClasses.textSecondary">{{ $t('admin.created') }}</dt>
@@ -435,8 +501,31 @@ const loadUsers = async () => {
   }
 }
 
+const sortField = ref('status')
+const sortOrder = ref('asc')
+
+const toggleSort = (field) => {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortField.value = field
+    sortOrder.value = 'asc'
+  }
+  sortUsers()
+}
+
 const sortUsers = () => {
-  users.value.sort((a, b) => (a.serviceStatusKey === 'ongoing' ? 0 : 1) - (b.serviceStatusKey === 'ongoing' ? 0 : 1))
+  users.value.sort((a, b) => {
+    if (sortField.value === 'createdAt') {
+      const dateA = new Date(a.createdAt || 0).getTime()
+      const dateB = new Date(b.createdAt || 0).getTime()
+      return sortOrder.value === 'asc' ? dateA - dateB : dateB - dateA
+    } else {
+      const statusA = a.serviceStatusKey === 'ongoing' ? 0 : 1
+      const statusB = b.serviceStatusKey === 'ongoing' ? 0 : 1
+      return sortOrder.value === 'asc' ? statusA - statusB : statusB - statusA
+    }
+  })
 }
 
 const totalPages = computed(() => Math.max(1, Math.ceil(total.value / limit.value)))

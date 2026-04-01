@@ -666,9 +666,11 @@ const sendMessage = async () => {
     const response = await sendAdminChatMessage(selectedUser.value.id, text, selectedUser.value.id, file)
     if (response?.message) {
       messages.value.push(response.message)
+      await loadAssignedUsers()
       scrollToBottom()
     } else {
       await selectUser(selectedUser.value)
+      await loadAssignedUsers()
     }
   } catch (error) {
     errorMessage.value = error.message || 'Failed to send patient message'

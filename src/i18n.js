@@ -2,12 +2,15 @@ import { createI18n } from 'vue-i18n'
 import en from './locales/en.json'
 import zh from './locales/zh.json'
 
-// Get saved language from localStorage, always default to English if not set
 const savedLanguage = localStorage.getItem('language')
 const defaultLanguage = savedLanguage || 'en'
 
+// Cache translations into local storage
+localStorage.setItem('locales_en', JSON.stringify(en))
+localStorage.setItem('locales_zh', JSON.stringify(zh))
+
 const i18n = createI18n({
-  legacy: false, // Use Composition API mode
+  legacy: false,
   locale: defaultLanguage,
   fallbackLocale: 'en',
   messages: {

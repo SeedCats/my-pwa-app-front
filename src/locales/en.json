@@ -151,7 +151,10 @@
     "selectPatientHint": "Choose a user to view conversation history",
     "noPatientMessages": "No messages found for this user",
     "refresh": "Refresh",
-    "deleteChatHistory": "Delete Chat History"
+    "deleteChatHistory": "Delete Chat History",
+    "statsAllTime": "All Day",
+    "removeOutdated": "Remove Outdated",
+    "confirmRemoveOutdated": "Are you sure you want to remove all outdated availability slots?"
   },
   "home": {
     "title": "Home",
@@ -238,7 +241,7 @@
     "loadingUser": "Loading user...",
     "userNotFound": "User not found",
     "userLoadFailed": "Failed to load user",
-    "returnToUserManagement": "Return to user management",
+    "returnToUserManagement": "Return to User Management",
     "returnToDashboard": "Return to DashBoard",
     "modifyHealthData": "Modify Health Data",
     "adminNote": "Admin Note",

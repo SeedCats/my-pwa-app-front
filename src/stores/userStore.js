@@ -29,17 +29,36 @@ const isCacheValid = (lastLoad, duration) => Date.now() - lastLoad < duration
 export const checkAuth = async (forceRefresh = false) => {
   if (!forceRefresh && state.isAuthenticated !== null && isCacheValid(state.lastAuthCheck, AUTH_CACHE_DURATION))
     return state.isAuthenticated
+
+  const lsAuth = getLS('isAuth')
+  if (!forceRefresh && lsAuth === false) {
+    state.isAuthenticated = false
+    state.user = null
+    state.lastAuthCheck = Date.now()
+    return false
+  }
+
   try {
     const response = await fetch(`${API_URL}/api/user/me`, { method: 'GET', credentials: 'include', headers: { 'Content-Type': 'application/json' } })
-    if (!response.ok) { state.isAuthenticated = false; state.user = null; return false }
+    if (!response.ok) { 
+      state.isAuthenticated = false; 
+      state.user = null; 
+      state.lastAuthCheck = Date.now(); 
+      setLS('isAuth', false);
+      return false 
+    }
     const data = await response.json()
-    state.isAuthenticated = !!(data.success === true && data.data?.user)
+    const isAuthed = !!(data.success === true && data.data?.user)
+    state.isAuthenticated = isAuthed
     state.user = data.data?.user || null
     state.lastAuthCheck = Date.now()
+    setLS('isAuth', isAuthed)
     return state.isAuthenticated
   } catch {
     state.isAuthenticated = false
     state.user = null
+    state.lastAuthCheck = Date.now()
+    setLS('isAuth', false)
     return false
   }
 }
@@ -88,7 +107,8 @@ export const invalidateHeartRateCache = () => { state.heartRateDates = null; sta
 export const invalidateStressCache = () => { state.stressDates = null; state.lastStressDatesLoad = 0; removeLS('stressDates') }
 
 export const clearAllCaches = () => {
-  Object.assign(state, { isAuthenticated: null, user: null, bmiData: null, heartRateDates: null, stressDates: null, lastAuthCheck: 0, lastBmiLoad: 0, lastHeartRateDatesLoad: 0, lastStressDatesLoad: 0 })
+  Object.assign(state, { isAuthenticated: false, user: null, bmiData: null, heartRateDates: null, stressDates: null, lastAuthCheck: Date.now(), lastBmiLoad: 0, lastHeartRateDatesLoad: 0, lastStressDatesLoad: 0 })
+  setLS('isAuth', false)
   removeLS('bmiData'); removeLS('heartRateDates'); removeLS('stressDates')
   try {
     Object.keys(localStorage)
