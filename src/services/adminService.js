@@ -11,7 +11,7 @@ const parseResponse = async (res) => {
 // Try several endpoints in order, returning the first non-404 response
 const tryEndpoints = async (id, paths, fetchOpts) => {
   for (const path of paths) {
-    const res = await fetchWithAuth(`${API_URL}${path(id)}`, { credentials: 'include', ...fetchOpts })
+    const res = await fetchWithAuth(`${API_URL}${path(id)}`, { ...fetchOpts })
     if (res.status === 404) continue
     return parseResponse(res)
   }

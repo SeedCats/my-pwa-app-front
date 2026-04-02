@@ -2,7 +2,19 @@ import router from '../router'
 import { clearAllCaches } from '../stores/userStore'
 
 export const fetchWithAuth = async (url, options = {}) => {
-  const response = await fetch(url, options)
+  // Add authentication token
+  const token = localStorage.getItem('token');
+  const headers = { ...options.headers };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const finalOptions = {
+    ...options,
+    headers,
+  };
+
+  const response = await fetch(url, finalOptions)
   
   // Ignore 401s if the URL is for checking auth or login, 
   // as the caller (userStore/checkAuth, Login component) should handle it

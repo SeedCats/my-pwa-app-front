@@ -21,10 +21,10 @@ export const buildQuery = (params = {}) => {
 }
 
 export const apiRequest = async (path, opts = {}) => {
-  const { method = 'GET', headers = {}, body = null, isForm = false, credentials = 'include', query = null, expectStream = false } = opts
+  const { method = 'GET', headers = {}, body = null, isForm = false, query = null, expectStream = false } = opts
   const url = `${API_URL}${path}${query ? (path.includes('?') ? '&' : '?') + buildQuery(query) : ''}`
   const mergedHeaders = isForm ? headers : { 'Content-Type': 'application/json', ...headers }
   const payload = isForm || body instanceof FormData || typeof body === 'string' ? body : (body ? JSON.stringify(body) : null)
-  const res = await fetchWithAuth(url, { method, headers: mergedHeaders, body: payload, credentials })
+  const res = await fetchWithAuth(url, { method, headers: mergedHeaders, body: payload })
   return handleResponse(res, expectStream)
 }

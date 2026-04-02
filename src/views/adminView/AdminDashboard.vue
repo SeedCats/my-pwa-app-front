@@ -325,7 +325,7 @@ const barOptions = computed(() => ({
 }))
 
 const loadUsers = async () => {
-  const res = await fetchWithAuth(`${API_URL}/api/admin/assigned-users?page=1&limit=200`, { credentials: 'include' })
+  const res = await fetchWithAuth(`${API_URL}/api/admin/assigned-users?page=1&limit=200`, { })
   if (!res.ok) throw new Error(t('admin.failedLoadAssignedUsers'))
   const json = await res.json()
   const data = json.data || json
@@ -333,7 +333,7 @@ const loadUsers = async () => {
 
   await Promise.all(loadedUsers.map(async (u, idx) => {
     try {
-      const statusRes = await fetchWithAuth(`${API_URL}/api/admin/users/${u.id}/status`, { credentials: 'include' })
+      const statusRes = await fetchWithAuth(`${API_URL}/api/admin/users/${u.id}/status`, { })
       if (!statusRes.ok) return
       const statusJson = await statusRes.json().catch(() => null)
       const statusText = statusJson?.data?.status || 'On-going'

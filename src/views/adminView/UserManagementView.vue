@@ -474,14 +474,14 @@ const loadUsers = async () => {
   loading.value = true
   error.value = ''
   try {
-    const res = await fetch(`${API_URL}/api/admin/assigned-users?page=${page.value}&limit=${limit.value}`, { credentials: 'include' })
+    const res = await fetchWithAuth(`${API_URL}/api/admin/assigned-users?page=${page.value}&limit=${limit.value}`)
     if (!res.ok) throw new Error(t('admin.failedLoadAssignedUsers'))
     const json = await res.json()
     const data = json.data || json
     users.value = (data.users || []).map(u => ({ ...u, serviceStatusKey: 'ongoing' }))
     await Promise.all(users.value.map(async (u, idx) => {
       try {
-        const resStatus = await fetchWithAuth(`${API_URL}/api/admin/users/${u.id}/status`, { credentials: 'include' })
+        const resStatus = await fetchWithAuth(`${API_URL}/api/admin/users/${u.id}/status`)
         if (resStatus.ok) {
           const jsonStatus = await resStatus.json().catch(() => null)
           const statusText = jsonStatus?.data?.status || 'On-going'
@@ -574,8 +574,7 @@ const completeService = async (user) => {
   try {
     const res = await fetchWithAuth(`${API_URL}/api/admin/users/${user.id}/status/completed`, {
       method: 'PUT',
-      credentials: 'include'
-    })
+      })
     if (!res.ok) throw new Error(t('admin.serviceCompleteFailed'))
     info.value = t('admin.serviceCompleted')
     // Update local status immediately and re-sort
@@ -619,8 +618,7 @@ const setOnGoingService = async (user) => {
   try {
     const res = await fetchWithAuth(`${API_URL}/api/admin/users/${user.id}/status/ongoing`, { 
       method: 'PUT', 
-      credentials: 'include' 
-    })
+      })
 
     if (!res.ok) throw new Error(t('admin.serviceSetOnGoingFailed'))
 

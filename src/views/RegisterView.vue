@@ -525,7 +525,6 @@ async function handleRegister() {
       const response = await fetch(`${API_URL}/api/provider/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           name: registerForm.value.providerName,
           email: registerForm.value.providerEmail,
@@ -562,7 +561,6 @@ async function handleRegister() {
     const response = await fetch(`${API_URL}/api/user/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({
         name: registerForm.value.name,
         email: registerForm.value.email,
@@ -572,6 +570,8 @@ async function handleRegister() {
     const data = await response.json().catch(() => null)
     if (!data) { error.value = t('auth.invalidResponse'); return }
     if (response.ok && data.success) {
+      const token = data.token || data.data?.token
+      if (token) localStorage.setItem('token', token)
       success.value = data.message || t('auth.registrationSuccess')
       setTimeout(() => router.push('/home'), 1000)
     } else {

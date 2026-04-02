@@ -69,7 +69,6 @@ const processGrokResponse = async (response, onChunk) => {
 
 const GROK_FETCH_OPTS = {
     method: 'POST',
-    credentials: 'include',
     headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream, application/json' }
 }
 
@@ -152,8 +151,7 @@ const retryWithSanitizedContent = async (id, msgObj) => {
         if (!short || short === msgObj.content) return null
 
         const retryRes = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
-            method: 'PUT', credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ messages: [{ ...msgObj, content: short }], append: true })
         })
         if (retryRes.ok) return { success: true, data: await retryRes.json(), retried: true }
@@ -172,7 +170,6 @@ export const updateAichatLastMessage = async (id, lastMessage = null) => {
     try {
         const res = await fetchWithAuth(`${API_URL}/api/ai/chat/${id}`, {
             method: 'PUT',
-            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ messages: [msgObj], append: true })
         })

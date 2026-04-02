@@ -39,18 +39,23 @@ export const checkAuth = async (forceRefresh = false) => {
   }
 
   try {
-    const response = await fetch(`${API_URL}/api/user/me`, { method: 'GET', credentials: 'include', headers: { 'Content-Type': 'application/json' } })
+    const token = localStorage.getItem('token')
+    const headers = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
+
+    const response = await fetch(`${API_URL}/api/user/me`, { method: 'GET', headers })
     if (!response.ok) { 
       state.isAuthenticated = false; 
       state.user = null; 
       state.lastAuthCheck = Date.now(); 
       setLS('isAuth', false);
+      localStorage.removeItem('token');
       return false 
     }
     const data = await response.json()
-    const isAuthed = !!(data.success === true && data.data?.user)
+    const isAuthed = !!(data.success === true && (data.data?.user || data.user))
     state.isAuthenticated = isAuthed
-    state.user = data.data?.user || null
+    state.user = data.data?.user || data.user || null
     state.lastAuthCheck = Date.now()
     setLS('isAuth', isAuthed)
     return state.isAuthenticated
@@ -109,6 +114,7 @@ export const invalidateStressCache = () => { state.stressDates = null; state.las
 export const clearAllCaches = () => {
   Object.assign(state, { isAuthenticated: false, user: null, bmiData: null, heartRateDates: null, stressDates: null, lastAuthCheck: Date.now(), lastBmiLoad: 0, lastHeartRateDatesLoad: 0, lastStressDatesLoad: 0 })
   setLS('isAuth', false)
+  localStorage.removeItem('token')
   removeLS('bmiData'); removeLS('heartRateDates'); removeLS('stressDates')
   try {
     Object.keys(localStorage)

@@ -460,6 +460,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { fetchWithAuth } from '../utils/fetchWithAuth'
 import { useTheme } from '../composables/useTheme'
 import { getUserById, updateUserById, deleteUserById, updateUserPasswordById } from '../services/adminService'
 import { useUserStore } from '../stores/userStore'
@@ -573,7 +574,7 @@ const loadUserData = async () => {
 
     // If no target user loaded, load current user
     if (!user) {
-      const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
+      const res = await fetchWithAuth(`${API_URL}/api/user/me`)
       if (res.ok) {
         const data = await res.json()
         user = data.data?.user || data.user || data.data || data
@@ -639,10 +640,9 @@ const updateProfile = async () => {
     }
 
     // Regular user updating own profile
-    const response = await fetch(`${API_URL}/api/user/profile`, {
+    const response = await fetchWithAuth(`${API_URL}/api/user/profile`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify(profileForm.value)
     })
 
@@ -770,10 +770,9 @@ const updatePassword = async () => {
     }
 
     // Regular user updating own password
-    const response = await fetch(`${API_URL}/api/user/password`, {
+    const response = await fetchWithAuth(`${API_URL}/api/user/password`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({
         currentPassword: passwordForm.value.currentPassword,
         newPassword: passwordForm.value.newPassword
@@ -788,10 +787,9 @@ const updatePassword = async () => {
 
       // Logout to clear cookies/tokens
       try {
-        await fetch(`${API_URL}/api/logout`, {
+        await fetchWithAuth(`${API_URL}/api/logout`, {
           method: 'POST',
-          credentials: 'include'
-        })
+          })
       } catch (err) {
         console.error('Logout error:', err)
       }
@@ -841,10 +839,9 @@ const deleteAccount = async () => {
     }
 
     // Regular user delete self
-    const response = await fetch(`${API_URL}/api/user/delete`, {
+    const response = await fetchWithAuth(`${API_URL}/api/user/delete`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({ password: deletePassword.value })
     })
 
@@ -908,10 +905,9 @@ const submitContactOwner = async () => {
   errorMessage.value = ''
 
   try {
-    const response = await fetch(`${API_URL}/api/provider/request`, {
+    const response = await fetchWithAuth(`${API_URL}/api/provider/request`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify(contactOwnerForm.value)
     })
 

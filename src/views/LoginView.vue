@@ -215,7 +215,7 @@ const API_URL = import.meta.env.VITE_API_URL || ''
 // Check if already authenticated via API
 onMounted(async () => {
   // Clear all localStorage except login-related items
-  const keysToKeep = [REMEMBER_EMAIL_KEY, 'theme', 'darkMode']
+  const keysToKeep = [REMEMBER_EMAIL_KEY, 'theme', 'darkMode', 'token', 'language']
   const saved = Object.fromEntries(keysToKeep.flatMap(k => { const v = localStorage.getItem(k); return v !== null ? [[k, v]] : [] }))
   localStorage.clear()
   Object.entries(saved).forEach(([k, v]) => localStorage.setItem(k, v))
@@ -256,7 +256,6 @@ async function handleLogin() {
     const response = await fetch(`${API_URL}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify(loginForm.value),
     })
 
@@ -267,10 +266,18 @@ async function handleLogin() {
     }
 
     if (response.ok && data.success) {
+      const token = data.token || data.data?.token
+      if (token) localStorage.setItem('token', token)
+      
       if (loginForm.value.remember) localStorage.setItem(REMEMBER_EMAIL_KEY, loginForm.value.email)
       else localStorage.removeItem(REMEMBER_EMAIL_KEY)
       success.value = data.message || t('auth.loginSuccess')
-      await checkAuth(true)
+      const isAuth = await checkAuth(true)
+      if (!isAuth) {
+        error.value = "Failed to fetch user data with token."
+        success.value = ""
+        return
+      }
       const state = useUserStore()
       router.push({ name: state.user?.role === 'admin' ? 'AdminDashboard' : 'home' })
     } else {

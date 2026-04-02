@@ -715,6 +715,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { fetchWithAuth } from '../utils/fetchWithAuth'
 import { useTheme } from '../composables/useTheme'
 import { useLanguage } from '../composables/useLanguage'
 import { clearAllCaches, useUserStore, isAdmin } from '../stores/userStore'
@@ -1053,7 +1054,7 @@ const loadUnreadCount = async () => {
         for (const endpoint of endpoints) {
             let response
             try {
-                response = await fetch(`${API_URL}${endpoint}`, { credentials: 'include' })
+                response = await fetchWithAuth(`${API_URL}${endpoint}`)
             } catch (err) {
                 // Network error (ERR_INTERNET_DISCONNECTED etc.) - skip this endpoint silently
                 console.warn(`Failed to fetch unread count from ${endpoint}:`, err.message)
@@ -1116,7 +1117,7 @@ const loadUnreadCount = async () => {
 
 const handleLogOut = async () => {
     try {
-        await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' })
+        await fetchWithAuth(`${API_URL}/api/logout`, { method: 'POST' })
     } catch { /* ignore */ }
     clearAllCaches()  // Clear all cached data on logout
     router.push('/')
@@ -1124,7 +1125,7 @@ const handleLogOut = async () => {
 
 const loadUserData = async () => {
     try {
-        const res = await fetch(`${API_URL}/api/user/me`, { credentials: 'include' })
+        const res = await fetchWithAuth(`${API_URL}/api/user/me`)
         if (res.ok) {
             const json = await res.json()
             userData.value = json.data?.user || json.data || json.user || json
