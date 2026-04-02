@@ -424,42 +424,16 @@
                 <span>{{ booking.date }} {{ booking.time }}</span>
               </div>
               
-              <div v-if="booking.notes" class="mb-3 p-2 rounded bg-opacity-50 text-xs break-words" :class="[themeClasses.inputBackground, themeClasses.textSecondary]">
+              <div v-if="booking.notes" class="mb-3 p-2 rounded bg-opacity-50 text-xs wrap-break-word" :class="[themeClasses.inputBackground, themeClasses.textSecondary]">
                 {{ booking.notes }}
               </div>
               
               <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t" :class="themeClasses.border">
-                <button 
-                  v-if="booking.status === 'pending'"
-                  @click="updateStatus(booking._id || booking.id, 'confirmed')"
-                  class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-all duration-150"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                  {{ $t('booking.approve') }}
-                </button>
-                <button 
-                  v-if="booking.status === 'pending'"
-                  @click="updateStatus(booking._id || booking.id, 'rejected')"
-                  class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-all duration-150"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                  {{ $t('booking.reject') }}
-                </button>
-                <button 
-                  v-if="booking.status === 'confirmed'"
-                  @click="updateStatus(booking._id || booking.id, 'completed')"
-                  class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-all duration-150"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  {{ $t('booking.complete') || 'Complete' }}
-                </button>
-                <button 
-                  @click="deleteBookingRecord(booking._id || booking.id)"
-                  class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 border text-xs font-medium rounded-lg transition-all duration-200"
-                  :class="isDarkMode ? 'border-red-700 text-red-500 hover:bg-red-900/30' : 'border-red-300 text-red-600 hover:bg-red-50'"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  {{ $t('booking.delete') || 'Delete' }}
+                <button v-for="act in getActionButtons(booking)" :key="act.id" @click="handleAction(booking._id || booking.id, act.type)"
+                  class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 text-xs font-medium rounded-lg transition-all duration-150"
+                  :class="act.isBorder ? (isDarkMode ? 'border border-red-700 text-red-500 hover:bg-red-900/30' : 'border border-red-300 text-red-600 hover:bg-red-50') : `${act.bg} hover:brightness-110 text-white`">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="act.icon" /></svg>
+                  {{ act.text }}
                 </button>
               </div>
             </div>
@@ -554,37 +528,11 @@
                   </td>
                   <td class="p-3">
                     <div class="flex flex-col sm:flex-row flex-wrap justify-end gap-1.5 items-center">
-                      <button 
-                        v-if="booking.status === 'pending'"
-                        @click="updateStatus(booking._id || booking.id, 'confirmed')"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-all duration-150 hover:shadow-sm whitespace-nowrap"
-                      >
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                        {{ $t('booking.approve') }}
-                      </button>
-                      <button 
-                        v-if="booking.status === 'pending'"
-                        @click="updateStatus(booking._id || booking.id, 'rejected')"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-all duration-150 hover:shadow-sm whitespace-nowrap"
-                      >
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                        {{ $t('booking.reject') }}
-                      </button>
-                      <button 
-                        v-if="booking.status === 'confirmed'"
-                        @click="updateStatus(booking._id || booking.id, 'completed')"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-all duration-150 hover:shadow-sm whitespace-nowrap"
-                      >
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        {{ $t('booking.complete') || 'Complete' }}
-                      </button>
-                      <button 
-                        @click="deleteBookingRecord(booking._id || booking.id)"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 py-1.5 border text-xs font-medium rounded-lg transition-all duration-200 whitespace-nowrap"
-                        :class="isDarkMode ? 'border-red-700 text-red-400 hover:bg-red-900/30' : 'border-red-300 text-red-600 hover:bg-red-50'"
-                      >
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        {{ $t('booking.delete') || 'Delete' }}
+                      <button v-for="act in getActionButtons(booking)" :key="act.id" @click="handleAction(booking._id || booking.id, act.type)"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all duration-150 hover:shadow-sm whitespace-nowrap"
+                        :class="act.isBorder ? (isDarkMode ? 'border border-red-700 text-red-400 hover:bg-red-900/30' : 'border border-red-300 text-red-600 hover:bg-red-50') : `${act.bg} hover:brightness-110 text-white`">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="act.icon" /></svg>
+                        {{ act.text }}
                       </button>
                     </div>
                   </td>
@@ -983,6 +931,27 @@ onMounted(async () => {
   loadAvailability()
   loadBookings()
 })
+
+const getActionButtons = (booking) => {
+  const actions = []
+  if (booking.status === 'pending') {
+    actions.push({ id: 'approve', type: 'confirmed', text: t('booking.approve'), bg: 'bg-green-600', icon: 'M5 13l4 4L19 7' })
+    actions.push({ id: 'reject', type: 'rejected', text: t('booking.reject'), bg: 'bg-red-600', icon: 'M6 18L18 6M6 6l12 12' })
+  }
+  if (booking.status === 'confirmed') {
+    actions.push({ id: 'complete', type: 'completed', text: t('booking.complete') || 'Complete', bg: 'bg-blue-600', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' })
+  }
+  actions.push({ id: 'delete', type: 'delete', text: t('booking.delete') || 'Delete', isBorder: true, icon: 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' })
+  return actions
+}
+
+const handleAction = (id, type) => {
+  if (type === 'delete') {
+    deleteBookingRecord(id)
+  } else {
+    updateStatus(id, type)
+  }
+}
 
 const getStatusClass = (status) => {
   switch (status) {
