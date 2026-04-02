@@ -377,7 +377,96 @@
         </div>
 
         <div class="rounded-lg shadow-md border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
-          <div class="overflow-x-auto">
+          
+          <!-- Mobile View (Cards) -->
+          <div class="block sm:hidden divide-y" :class="themeClasses.border">
+            <div v-if="isLoading" class="p-8 flex flex-col items-center justify-center gap-3">
+              <svg class="w-6 h-6 animate-spin" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              <span class="text-sm" :class="themeClasses.textSecondary">{{ $t('common.loading') || 'Loading...' }}</span>
+            </div>
+            
+            <div v-else-if="bookings.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
+              <div class="w-14 h-14 rounded-full flex items-center justify-center mb-3" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-100'">
+                <svg class="w-7 h-7 opacity-40" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <p class="text-sm font-medium" :class="themeClasses.textPrimary">{{ $t('common.noResults') }}</p>
+              <p class="text-xs mt-1" :class="themeClasses.textSecondary">{{ searchQuery ? 'Try adjusting your filters' : '' }}</p>
+            </div>
+            
+            <div v-else v-for="booking in paginatedBookings" :key="booking._id || booking.id" class="p-4" :class="themeClasses.hoverBackground">
+              <div class="flex justify-between items-start mb-2">
+                <div>
+                  <div class="text-sm font-semibold truncate" :class="themeClasses.textPrimary">{{ booking.name || booking.patientName }}</div>
+                  <div class="text-xs truncate" :class="themeClasses.textSecondary">{{ booking.email || booking.patientEmail }}</div>
+                </div>
+                <span :class="getStatusClass(booking.status)" class="inline-flex items-center gap-1.5 justify-center px-2 py-1 rounded-full text-[10px] font-semibold">
+                  <span class="w-1 h-1 rounded-full" :class="{
+                    'bg-yellow-500': booking.status === 'pending',
+                    'bg-green-500': booking.status === 'confirmed',
+                    'bg-blue-500': booking.status === 'completed',
+                    'bg-red-500': booking.status === 'cancelled' || booking.status === 'rejected',
+                    'bg-gray-500': !['pending','confirmed','completed','cancelled','rejected'].includes(booking.status)
+                  }" />
+                  {{ $t(`booking.${booking.status}`) }}
+                </span>
+              </div>
+              
+              <div class="flex items-center gap-2 mb-3 text-xs" :class="themeClasses.textSecondary">
+                 <span class="inline-flex items-center px-2 py-0.5 rounded-md font-medium" :class="isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'">
+                  {{ $t(`booking.${getServiceKey(booking.service)}`) }}
+                </span>
+                <span>•</span>
+                <span>{{ booking.date }} {{ booking.time }}</span>
+              </div>
+              
+              <div v-if="booking.notes" class="mb-3 p-2 rounded bg-opacity-50 text-xs break-words" :class="[themeClasses.inputBackground, themeClasses.textSecondary]">
+                {{ booking.notes }}
+              </div>
+              
+              <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t" :class="themeClasses.border">
+                <button 
+                  v-if="booking.status === 'pending'"
+                  @click="updateStatus(booking._id || booking.id, 'confirmed')"
+                  class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-all duration-150"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                  {{ $t('booking.approve') }}
+                </button>
+                <button 
+                  v-if="booking.status === 'pending'"
+                  @click="updateStatus(booking._id || booking.id, 'rejected')"
+                  class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-all duration-150"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                  {{ $t('booking.reject') }}
+                </button>
+                <button 
+                  v-if="booking.status === 'confirmed'"
+                  @click="updateStatus(booking._id || booking.id, 'completed')"
+                  class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-all duration-150"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {{ $t('booking.complete') || 'Complete' }}
+                </button>
+                <button 
+                  @click="deleteBookingRecord(booking._id || booking.id)"
+                  class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 border text-xs font-medium rounded-lg transition-all duration-200"
+                  :class="isDarkMode ? 'border-red-700 text-red-500 hover:bg-red-900/30' : 'border-red-300 text-red-600 hover:bg-red-50'"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  {{ $t('booking.delete') || 'Delete' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop View (Table) -->
+          <div class="hidden sm:block overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="border-b" :class="[themeClasses.border, themeClasses.background]">
