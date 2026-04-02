@@ -10,6 +10,7 @@ export const fetchWithAuth = async (url, options = {}) => {
   }
 
   const finalOptions = {
+    cache: 'no-store', // explicitly bust Safari aggressive caching
     ...options,
     headers,
   };

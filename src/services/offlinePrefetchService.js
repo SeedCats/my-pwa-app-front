@@ -14,10 +14,10 @@ export const prefetchHealthDataForOffline = async ({ force = false } = {}) => {
 
   inFlightPrefetch = (async () => {
     try {
-      const [bmiRes, hrDatesRes, stressDatesRes] = await Promise.allSettled([
-        getLatestBMIRecord(),
-        getHeartRateDates(),
-        getStressDates()
+      const [bmiRes, hrDatesRes, stressDatesRes] = await Promise.all([
+        getLatestBMIRecord().then(v => ({ status: 'fulfilled', value: v })).catch(e => ({ status: 'rejected', reason: e })),
+        getHeartRateDates().then(v => ({ status: 'fulfilled', value: v })).catch(e => ({ status: 'rejected', reason: e })),
+        getStressDates().then(v => ({ status: 'fulfilled', value: v })).catch(e => ({ status: 'rejected', reason: e }))
       ])
 
       if (bmiRes.status === 'fulfilled' && bmiRes.value?.success && bmiRes.value?.data) {

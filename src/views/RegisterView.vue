@@ -573,7 +573,7 @@ async function handleRegister() {
       const token = data.token || data.data?.token
       if (token) localStorage.setItem('token', token)
       success.value = data.message || t('auth.registrationSuccess')
-      setTimeout(() => router.push('/home'), 1000)
+      setTimeout(() => { window.location.href = '/home' }, 1000)
     } else {
       error.value = data.message || t('auth.registrationFailed')
     }

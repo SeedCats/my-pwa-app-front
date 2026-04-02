@@ -43,7 +43,11 @@ export const checkAuth = async (forceRefresh = false) => {
     const headers = { 'Content-Type': 'application/json' }
     if (token) headers['Authorization'] = `Bearer ${token}`
 
-    const response = await fetch(`${API_URL}/api/user/me`, { method: 'GET', headers })
+    const response = await fetch(`${API_URL}/api/user/me?_t=${Date.now()}`, { 
+      method: 'GET', 
+      headers,
+      cache: 'no-store'
+    })
     if (!response.ok) { 
       state.isAuthenticated = false; 
       state.user = null; 

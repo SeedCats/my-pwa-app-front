@@ -279,7 +279,8 @@ async function handleLogin() {
         return
       }
       const state = useUserStore()
-      router.push({ name: state.user?.role === 'admin' ? 'AdminDashboard' : 'home' })
+      const targetRoute = state.user?.role === 'admin' ? '/admin' : '/home'
+      window.location.href = targetRoute
     } else {
       error.value = data.message || t('auth.loginFailed')
     }
