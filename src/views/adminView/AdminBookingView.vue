@@ -10,29 +10,28 @@
         <!-- ── Stats Overview ──────────────────────────────────────── -->
         <div class="mb-8 flex flex-col gap-4">
 
-          <!-- Today (Top Full Width) -->
+          <!-- All Day (Top Full Width) -->
           <div class="rounded-xl border shadow-sm overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
             <div class="flex items-center gap-2.5 px-4 py-3 border-b" :class="themeClasses.border">
-              <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
+              <div class="w-7 h-7 rounded-lg bg-teal-600 flex items-center justify-center shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13l-.87.5M4.21 17.5l-.87.5M20.66 17.5l-.87-.5M4.21 6.5l-.87-.5M21 12h-1M4 12H3" />
-                  <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" fill="none" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
               </div>
-              <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('booking.statsToday') }}</span>
-              <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">{{ statsToday.total }} {{ $t('booking.statsTotal') }}</span>
+              <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('admin.statsAllTime') }}</span>
+              <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300">{{ statsAllTime.total }} {{ $t('booking.statsTotal') }}</span>
             </div>
             <div class="grid grid-cols-3 divide-x" :class="themeClasses.border">
               <div class="flex flex-col items-center py-4 gap-1">
-                <span class="text-2xl font-bold text-amber-500">{{ statsToday.pending }}</span>
+                <span class="text-2xl font-bold text-amber-500">{{ statsAllTime.pending }}</span>
                 <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.pending') }}</span>
               </div>
               <div class="flex flex-col items-center py-4 gap-1">
-                <span class="text-2xl font-bold text-green-500">{{ statsToday.confirmed }}</span>
+                <span class="text-2xl font-bold text-green-500">{{ statsAllTime.confirmed }}</span>
                 <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.confirmed') }}</span>
               </div>
               <div class="flex flex-col items-center py-4 gap-1">
-                <span class="text-2xl font-bold text-blue-500">{{ statsToday.completed }}</span>
+                <span class="text-2xl font-bold text-blue-500">{{ statsAllTime.completed }}</span>
                 <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.completed') }}</span>
               </div>
             </div>
@@ -66,28 +65,29 @@
               </div>
             </div>
 
-            <!-- All Day (All Time) -->
+            <!-- Today (Inside Grid) -->
             <div class="rounded-xl border shadow-sm overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
               <div class="flex items-center gap-2.5 px-4 py-3 border-b" :class="themeClasses.border">
-                <div class="w-7 h-7 rounded-lg bg-teal-600 flex items-center justify-center shrink-0">
+                <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13l-.87.5M4.21 17.5l-.87.5M20.66 17.5l-.87-.5M4.21 6.5l-.87-.5M21 12h-1M4 12H3" />
+                    <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" fill="none" />
                   </svg>
                 </div>
-              <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('admin.statsAllTime') }}</span>
-                <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300">{{ statsAllTime.total }} {{ $t('booking.statsTotal') }}</span>
+                <span class="font-semibold text-sm" :class="themeClasses.textPrimary">{{ $t('booking.statsToday') }}</span>
+                <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">{{ statsToday.total }} {{ $t('booking.statsTotal') }}</span>
               </div>
               <div class="grid grid-cols-3 divide-x" :class="themeClasses.border">
                 <div class="flex flex-col items-center py-4 gap-1">
-                  <span class="text-2xl font-bold text-amber-500">{{ statsAllTime.pending }}</span>
+                  <span class="text-2xl font-bold text-amber-500">{{ statsToday.pending }}</span>
                   <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.pending') }}</span>
                 </div>
                 <div class="flex flex-col items-center py-4 gap-1">
-                  <span class="text-2xl font-bold text-green-500">{{ statsAllTime.confirmed }}</span>
+                  <span class="text-2xl font-bold text-green-500">{{ statsToday.confirmed }}</span>
                   <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.confirmed') }}</span>
                 </div>
                 <div class="flex flex-col items-center py-4 gap-1">
-                  <span class="text-2xl font-bold text-blue-500">{{ statsAllTime.completed }}</span>
+                  <span class="text-2xl font-bold text-blue-500">{{ statsToday.completed }}</span>
                   <span class="text-[11px] font-medium" :class="themeClasses.textSecondary">{{ $t('booking.completed') }}</span>
                 </div>
               </div>
@@ -379,7 +379,7 @@
         <div class="rounded-lg shadow-md border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
           
           <!-- Mobile View (Cards) -->
-          <div class="block sm:hidden divide-y" :class="themeClasses.border">
+          <div class="block sm:hidden p-3 space-y-3 bg-gray-50 dark:bg-gray-900/20">
             <div v-if="isLoading" class="p-8 flex flex-col items-center justify-center gap-3">
               <svg class="w-6 h-6 animate-spin" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
@@ -388,7 +388,7 @@
               <span class="text-sm" :class="themeClasses.textSecondary">{{ $t('common.loading') || 'Loading...' }}</span>
             </div>
             
-            <div v-else-if="bookings.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
+            <div v-else-if="bookings.length === 0" class="p-12 flex flex-col items-center justify-center text-center bg-white dark:bg-gray-800 rounded-xl shadow-sm border" :class="themeClasses.border">
               <div class="w-14 h-14 rounded-full flex items-center justify-center mb-3" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-100'">
                 <svg class="w-7 h-7 opacity-40" :class="themeClasses.textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -398,14 +398,21 @@
               <p class="text-xs mt-1" :class="themeClasses.textSecondary">{{ searchQuery ? 'Try adjusting your filters' : '' }}</p>
             </div>
             
-            <div v-else v-for="booking in paginatedBookings" :key="booking._id || booking.id" class="p-4" :class="themeClasses.hoverBackground">
-              <div class="flex justify-between items-start mb-2">
-                <div>
-                  <div class="text-sm font-semibold truncate" :class="themeClasses.textPrimary">{{ booking.name || booking.patientName }}</div>
-                  <div class="text-xs truncate" :class="themeClasses.textSecondary">{{ booking.email || booking.patientEmail }}</div>
+            <div v-else v-for="booking in paginatedBookings" :key="booking._id || booking.id" 
+                 class="p-4 rounded-xl border shadow-sm transition-all bg-white dark:bg-gray-800" 
+                 :class="[themeClasses.border, themeClasses.hoverBackground]">
+              <div class="flex justify-between items-start mb-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm shrink-0">
+                    {{ (booking.name || booking.patientName).charAt(0).toUpperCase() }}
+                  </div>
+                  <div>
+                    <div class="text-sm font-bold truncate tracking-tight" :class="themeClasses.textPrimary">{{ booking.name || booking.patientName }}</div>
+                    <div class="text-xs truncate opacity-80" :class="themeClasses.textSecondary">{{ booking.email || booking.patientEmail }}</div>
+                  </div>
                 </div>
-                <span :class="getStatusClass(booking.status)" class="inline-flex items-center gap-1.5 justify-center px-2 py-1 rounded-full text-[10px] font-semibold">
-                  <span class="w-1 h-1 rounded-full" :class="{
+                <span :class="getStatusClass(booking.status)" class="inline-flex items-center gap-1.5 justify-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0">
+                  <span class="w-1.5 h-1.5 rounded-full" :class="{
                     'bg-yellow-500': booking.status === 'pending',
                     'bg-green-500': booking.status === 'confirmed',
                     'bg-blue-500': booking.status === 'completed',
@@ -416,23 +423,32 @@
                 </span>
               </div>
               
-              <div class="flex items-center gap-2 mb-3 text-xs" :class="themeClasses.textSecondary">
-                 <span class="inline-flex items-center px-2 py-0.5 rounded-md font-medium" :class="isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'">
-                  {{ $t(`booking.${getServiceKey(booking.service)}`) }}
-                </span>
-                <span>•</span>
-                <span>{{ booking.date }} {{ booking.time }}</span>
+              <div class="grid grid-cols-2 gap-3 mb-3 text-xs" :class="themeClasses.textSecondary">
+                 <div class="flex flex-col gap-1">
+                   <span class="opacity-60 font-medium">{{ $t('booking.service') }}</span>
+                   <span class="inline-flex items-center w-fit px-2 py-1 rounded-md font-medium" :class="isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'">
+                    {{ $t(`booking.${getServiceKey(booking.service)}`) }}
+                  </span>
+                 </div>
+                 <div class="flex flex-col gap-1">
+                   <span class="opacity-60 font-medium">{{ $t('booking.date') }}</span>
+                   <span class="font-medium flex items-center gap-1" :class="themeClasses.textPrimary">
+                     <svg class="w-3.5 h-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                     {{ booking.date }} {{ booking.time }}
+                   </span>
+                 </div>
               </div>
               
-              <div v-if="booking.notes" class="mb-3 p-2 rounded bg-opacity-50 text-xs wrap-break-word" :class="[themeClasses.inputBackground, themeClasses.textSecondary]">
-                {{ booking.notes }}
+              <div v-if="booking.notes" class="mb-3 p-3 rounded-lg border bg-gray-50/50 dark:bg-gray-900/30 text-xs wrap-break-word flex gap-2" :class="[themeClasses.border, themeClasses.textSecondary]">
+                <svg class="w-4 h-4 shrink-0 opacity-50 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                <span class="leading-relaxed">{{ booking.notes }}</span>
               </div>
               
-              <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t" :class="themeClasses.border">
+              <div class="flex gap-2 mt-4 pt-3 border-t" :class="themeClasses.border" v-if="getActionButtons(booking).length > 0">
                 <button v-for="act in getActionButtons(booking)" :key="act.id" @click="handleAction(booking._id || booking.id, act.type)"
-                  class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 text-xs font-medium rounded-lg transition-all duration-150"
-                  :class="act.isBorder ? (isDarkMode ? 'border border-red-700 text-red-500 hover:bg-red-900/30' : 'border border-red-300 text-red-600 hover:bg-red-50') : `${act.bg} hover:brightness-110 text-white`">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="act.icon" /></svg>
+                  class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                  :class="act.isBorder ? (isDarkMode ? 'border border-red-700/50 text-red-400 hover:bg-red-900/30' : 'border border-red-200 text-red-600 hover:bg-red-50') : `${act.bg} hover:brightness-110 text-white shadow-sm hover:shadow`">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="act.icon" /></svg>
                   {{ act.text }}
                 </button>
               </div>
