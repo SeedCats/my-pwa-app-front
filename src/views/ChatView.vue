@@ -63,9 +63,9 @@
                                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 tracking-tight" :class="isDarkMode ? 'text-white' : 'text-gray-900'">
+                    <h2 class="text-xl font-bold mb-2 tracking-tight" :class="isDarkMode ? 'text-white' : 'text-gray-900'">
                         {{ t('chat.noMessages') }}
-                    </h3>
+                    </h2>
                     <p class="text-[15px] leading-relaxed" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">
                         {{ noProviderAssigned ? t('chat.noProviderAssigned') : t('chat.startConversation') }}
                     </p>
@@ -316,7 +316,9 @@ const formatMsgTime = (ts) => {
 const scrollToBottom = () => {
     nextTick(() => {
         if (messagesContainer.value) {
+          requestAnimationFrame(() => {
             messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+          })
         }
     })
 }

@@ -821,7 +821,9 @@ const appointmentsRef = ref(null)
 
 const changePage = (page) => {
   currentPage.value = page
-  appointmentsRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  requestAnimationFrame(() => {
+    appointmentsRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
 }
 
 const _userSort = (() => {

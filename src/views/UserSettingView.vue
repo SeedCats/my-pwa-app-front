@@ -372,7 +372,7 @@
       <div v-if="showCropper" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col transform transition-all" style="height: 80vh; max-height: 800px;">
           <div class="p-4 border-b dark:border-gray-700 flex justify-between items-center shrink-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('userSettings.cropImage') || 'Crop Image' }}</h3>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('userSettings.cropImage') || 'Crop Image' }}</h2>
             <button @click="cancelCrop" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
@@ -411,7 +411,7 @@
         <div v-if="showContactOwnerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
           <div class="w-full max-w-md rounded-2xl shadow-xl overflow-hidden" :class="isDarkMode ? 'bg-gray-800' : 'bg-white'">
             <div class="px-6 py-4 border-b" :class="isDarkMode ? 'border-gray-700' : 'border-gray-200'">
-              <h3 class="text-lg font-semibold" :class="isDarkMode ? 'text-white' : 'text-gray-900'">{{ $t('userSettings.contactOwnerModalTitle') || 'Message System Owner' }}</h3>
+              <h2 class="text-lg font-semibold" :class="isDarkMode ? 'text-white' : 'text-gray-900'">{{ $t('userSettings.contactOwnerModalTitle') || 'Message System Owner' }}</h2>
               <p class="text-sm mt-1" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{ $t('userSettings.contactOwnerModalSubtitle') || 'Send a direct message to the system owner.' }}</p>
             </div>
             <div class="p-6 space-y-4">

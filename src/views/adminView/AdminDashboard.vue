@@ -167,7 +167,7 @@
           </div>
         </div>
 
-        <p class="text-xs font-semibold uppercase tracking-widest mb-3" :class="themeClasses.textSecondary">Quick Access</p>
+        <h2 class="text-xs font-semibold uppercase tracking-widest mb-3" :class="themeClasses.textSecondary">Quick Access</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <router-link to="/admin/users" class="group p-4 rounded-xl border hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex items-start gap-3.5" :class="[themeClasses.cardBackground, themeClasses.border]">
             <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-blue-50 dark:bg-blue-900/30 group-hover:scale-110 transition-transform duration-200">
@@ -222,23 +222,42 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from '../../composables/useTheme'
 import { fetchBookings } from '../../services/bookingService'
-import { fetchWithAuth } from '../../utils/fetchWithAuth'
-import { Doughnut, Bar } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement
-} from 'chart.js'
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement)
+const Doughnut = defineAsyncComponent(async () => {
+  const [chartJs, vueChartjs] = await Promise.all([
+    import('chart.js'),
+    import('vue-chartjs')
+  ])
+  chartJs.Chart.register(
+    chartJs.ArcElement,
+    chartJs.Tooltip,
+    chartJs.Legend,
+    chartJs.CategoryScale,
+    chartJs.LinearScale,
+    chartJs.BarElement
+  )
+  return vueChartjs.Doughnut
+})
+
+const Bar = defineAsyncComponent(async () => {
+  const [chartJs, vueChartjs] = await Promise.all([
+    import('chart.js'),
+    import('vue-chartjs')
+  ])
+  chartJs.Chart.register(
+    chartJs.ArcElement,
+    chartJs.Tooltip,
+    chartJs.Legend,
+    chartJs.CategoryScale,
+    chartJs.LinearScale,
+    chartJs.BarElement
+  )
+  return vueChartjs.Bar
+})
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 const { t } = useI18n()

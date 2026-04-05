@@ -309,7 +309,7 @@
                 <!-- Modal Header -->
                 <div class="flex items-center gap-3 px-6 py-4 border-b" :class="themeClasses.border">
                   <div class="flex-1 min-w-0">
-                    <h3 class="text-base font-bold truncate" :class="themeClasses.textPrimary">{{ selectedUser ? selectedUser.name : '' }}</h3>
+                    <h2 class="text-base font-bold truncate" :class="themeClasses.textPrimary">{{ selectedUser ? selectedUser.name : '' }}</h2>
                     <p class="text-xs truncate" :class="themeClasses.textSecondary">{{ selectedUser ? selectedUser.email : '' }}</p>
                   </div>
                   <div class="flex items-center gap-2">

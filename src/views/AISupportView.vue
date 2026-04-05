@@ -1082,7 +1082,9 @@ const cleanContent = (content) => {
 const scrollToBottom = async () => {
     await nextTick()
     if (chatContainer.value) {
+      requestAnimationFrame(() => {
         chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+      })
     }
 }
 

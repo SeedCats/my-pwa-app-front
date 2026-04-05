@@ -112,7 +112,7 @@
       </div>
 
       <!-- ── Overall Analysis ── -->
-      <div v-if="showOverallAnalysis" class="mb-8">
+      <div class="mb-8">
         <div class="rounded-2xl shadow-sm border overflow-hidden"
           :class="[themeClasses.cardBackground, themeClasses.border]">
           <!-- Header strip -->
@@ -169,8 +169,8 @@
                   <span>0</span><span>{{ $t('home.healthScore') }}</span><span>100</span>
                 </div>
                 <div class="h-2 rounded-full overflow-hidden" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'">
-                  <div :style="{ width: overallAnalysis.score + '%' }" class="h-full rounded-full transition-all duration-700"
-                    :class="overallAnalysis.progressClass"></div>
+                  <div :style="{ width: (overallAnalysis.score === '--' ? 0 : overallAnalysis.score) + '%' }" class="h-full rounded-full transition-all duration-700"
+                    :class="overallAnalysis.progressClass || 'bg-gray-400'"></div>
                 </div>
               </div>
             </div>
@@ -754,10 +754,8 @@
 
 <script setup>
 import { useTheme } from '../composables/useTheme'
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
-import { Line } from 'vue-chartjs'
 import { useI18n } from 'vue-i18n'
 import { prefetchHealthDataForOffline } from '../services/offlinePrefetchService'
 import { getLatestBMIRecord } from '../services/bmiService'
@@ -768,7 +766,23 @@ import { getUserById } from '../services/adminService'
 import { fetchWithAuth } from '../utils/fetchWithAuth'
 const API_URL = import.meta.env.VITE_API_URL || ''
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
+const Line = defineAsyncComponent(async () => {
+  const [chartJs, vueChartjs] = await Promise.all([
+    import('chart.js'),
+    import('vue-chartjs')
+  ])
+  chartJs.Chart.register(
+    chartJs.CategoryScale,
+    chartJs.LinearScale,
+    chartJs.PointElement,
+    chartJs.LineElement,
+    chartJs.Title,
+    chartJs.Tooltip,
+    chartJs.Legend,
+    chartJs.Filler
+  )
+  return vueChartjs.Line
+})
 
 const { isDarkMode, themeClasses } = useTheme()
 const { t, locale } = useI18n()
@@ -1014,7 +1028,7 @@ const overallAnalysis = computed(() => {
   const stressVal = (typeof stressStats.value?.avg === 'number' ? parseFloat(stressStats.value.avg) : (stressMean.value !== null ? parseFloat(stressMean.value) : null))
 
   if (!bmi || !hr || stressVal === null || typeof stressVal === 'undefined' || isNaN(stressVal)) {
-    return { score: '--', statusKey: 'noData', summary: t('home.overallAnalysis.noData'), advice: [], badgeClass: 'bg-gray-400', progressClass: 'bg-gray-400' }
+    return { score: '--', statusKey: 'noData', summary: t('home.overallAnalysis.noData'), advice: [t('common.loading') || 'Loading analysis...'], badgeClass: 'bg-gray-400', progressClass: 'bg-gray-400' }
   }
 
   // BMI penalty: normal range 18.5 - 24, deviation penalized up to 40 points
