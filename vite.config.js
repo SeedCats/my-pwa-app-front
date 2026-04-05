@@ -72,6 +72,15 @@ export default defineConfig({
     }
   },
   build: {
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vue-vendor': ['vue', 'vue-router', 'vue-i18n'],
+          'chart': ['chart.js', 'vue-chartjs'],
+          'headlessui': ['@headlessui/vue']
+        }
+      }
+    }
   },
 });

@@ -100,13 +100,15 @@
             </h1>
             <p class="mt-1 text-sm sm:text-base" :class="themeClasses.textSecondary">{{ $t('home.healthDashboard') }}</p>
           </div>
-          <div v-if="showOverallAnalysis"
-            class="inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm font-semibold"
-            :class="[themeClasses.border, overallAnalysis.badgeClass, 'text-white shadow-sm']">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            {{ $t(`home.overallAnalysis.statuses.${overallAnalysis.statusKey}`) }} · {{ overallAnalysis.score }}
+          <div class="flex items-center justify-start min-h-10.5 shrink-0">
+            <div v-if="showOverallAnalysis"
+              class="inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm font-semibold"
+              :class="[themeClasses.border, overallAnalysis.badgeClass, 'text-white shadow-sm']">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              {{ $t(`home.overallAnalysis.statuses.${overallAnalysis.statusKey}`) }} · {{ overallAnalysis.score }}
+            </div>
           </div>
         </div>
       </div>
@@ -191,9 +193,9 @@
           <h2 class="text-xl sm:text-2xl font-bold" :class="themeClasses.textPrimary">{{ $t('home.bmi.title') }}</h2>
         </div>
 
-        <div class="rounded-2xl shadow-sm border overflow-hidden" :class="[themeClasses.cardBackground, themeClasses.border]">
+        <div class="rounded-2xl shadow-sm border overflow-hidden min-h-88" :class="[themeClasses.cardBackground, themeClasses.border]">
           <!-- Loading -->
-          <div v-if="isBMILoading" class="flex flex-col items-center justify-center py-14 gap-3">
+          <div v-if="isBMILoading" class="flex flex-col items-center justify-center py-14 gap-3 h-88">
             <svg class="animate-spin h-9 w-9 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -418,8 +420,8 @@
         <!-- Heart Rate Chart -->
         <div class="mb-5">
           <div class="rounded-2xl shadow-sm p-4 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-            <div class="relative" style="height: 300px;">
-              <Line v-if="chartData" :data="chartData" :options="chartOptions" />
+            <div class="relative" style="height: 300px;" ref="hrChartContainer">
+              <Line v-if="isHrChartVisible && chartData" :data="chartData" :options="chartOptions" />
               <div v-else class="h-full flex items-center justify-center rounded-xl"
                 :class="isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50'">
                 <span class="text-sm" :class="themeClasses.textSecondary">{{ isHeartRateLoading ? $t('home.heartRate.loading') : $t('home.heartRate.noData') }}</span>
@@ -598,8 +600,8 @@
         <!-- Stress Chart -->
         <div class="mb-5">
           <div class="rounded-2xl shadow-sm p-4 border" :class="[themeClasses.cardBackground, themeClasses.border]">
-            <div class="relative" style="height: 260px;">
-              <Line v-if="stressChartData" :data="stressChartData" :options="stressChartOptions" />
+            <div class="relative" style="height: 260px;" ref="stressChartContainer">
+              <Line v-if="isStressChartVisible && stressChartData" :data="stressChartData" :options="stressChartOptions" />
               <div v-else class="h-full flex items-center justify-center rounded-xl"
                 :class="isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50'">
                 <span class="text-sm" :class="themeClasses.textSecondary">{{ isStressLoading ? $t('home.stress.loading') : $t('home.stress.noData') }}</span>
@@ -793,6 +795,13 @@ const chartData = ref(null)
 const selectedDate = ref('')
 const currentDate = ref('')
 const availableDates = ref([])
+
+// Charts Intersection Observer refs
+const hrChartContainer = ref(null)
+const stressChartContainer = ref(null)
+const isHrChartVisible = ref(false)
+const isStressChartVisible = ref(false)
+let chartObserver = null
 
 // Viewed user info (when admin views another user's home)
 const viewedUser = ref(null)
@@ -1985,6 +1994,22 @@ watch(viewedUserId, async () => {
 }, { immediate: true })
 
 onMounted(() => {
+  if (typeof IntersectionObserver !== 'undefined') {
+    chartObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (entry.target === hrChartContainer.value) isHrChartVisible.value = true
+          if (entry.target === stressChartContainer.value) isStressChartVisible.value = true
+        }
+      })
+    }, { rootMargin: '50px' })
+    if (hrChartContainer.value) chartObserver.observe(hrChartContainer.value)
+    if (stressChartContainer.value) chartObserver.observe(stressChartContainer.value)
+  } else {
+    isHrChartVisible.value = true
+    isStressChartVisible.value = true
+  }
+
   initHeartRateData()
   loadBMIData()
   // Also attempt to load stress dates (if stress-only CSV was uploaded)
@@ -1992,9 +2017,13 @@ onMounted(() => {
 
   // Trigger aggressive background prefetching whenever the dashboard is loaded 
   // so you don't have to manually click through the calendar dates to cache them.
-  setTimeout(() => prefetchHealthDataForOffline({ force: true }), 3000)
-
-  // Ensure initial viewed user is loaded if needed
+  setTimeout(() => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => prefetchHealthDataForOffline({ force: true }))
+    } else {
+      setTimeout(() => prefetchHealthDataForOffline({ force: true }), 2000)
+    }
+  }, 4000)
   if (viewedUserId.value) loadViewedUser()
   // Also load cached/available stress dates and set default stress date
   loadAvailableStressDates()
@@ -2008,6 +2037,10 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  if (chartObserver) {
+    chartObserver.disconnect()
+    chartObserver = null
+  }
   window.removeEventListener('bmiDataUpdated', forceReloadBMIData)
   window.removeEventListener('heartRateDataUpdated', forceReloadHeartRateData)
   window.removeEventListener('stressDataUpdated', forceReloadStressData)

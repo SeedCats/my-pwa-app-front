@@ -88,7 +88,13 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   const isAuthenticated = await checkAuth()
-  if (isAuthenticated) prefetchHealthDataForOffline().catch(() => {})
+  if (isAuthenticated) {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => prefetchHealthDataForOffline().catch(() => {}))
+    } else {
+      setTimeout(() => prefetchHealthDataForOffline().catch(() => {}), 2000)
+    }
+  }
 
   if (to.meta.requiresAuth && !isAuthenticated) next({ name: 'Login' })
   else if (to.meta.requiresRole && !hasRole(to.meta.requiresRole)) next({ name: 'home' })
