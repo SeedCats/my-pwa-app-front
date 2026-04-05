@@ -15,17 +15,23 @@ export const fetchWithAuth = async (url, options = {}) => {
     headers,
   };
 
-  const response = await fetch(url, finalOptions)
-  
-  // Ignore 401s if the URL is for checking auth or login, 
-  // as the caller (userStore/checkAuth, Login component) should handle it
-  if (response.status === 401 && !url.includes('/api/user/me') && !url.includes('/api/login')) {
-    // Check if we are already on Login to avoid redundant pushes
-    if (router.currentRoute.value.name !== 'Login') {
-      clearAllCaches()
-      router.push({ name: 'Login' })
+  try {
+    const response = await fetch(url, finalOptions)
+
+    // Ignore 401s if the URL is for checking auth or login,
+    // as the caller (userStore/checkAuth, Login component) should handle it
+    if (response.status === 401 && !url.includes('/api/user/me') && !url.includes('/api/login')) {
+      // Check if we are already on Login to avoid redundant pushes
+      if (router.currentRoute.value.name !== 'Login') {
+        clearAllCaches()
+        router.push({ name: 'Login' })
+      }
     }
+
+    return response
+  } catch (error) {
+    // If fetch throws, we're likely offline or the request is entirely blocked
+    console.warn('Network request failed:', url);
+    throw error;
   }
-  
-  return response
 }

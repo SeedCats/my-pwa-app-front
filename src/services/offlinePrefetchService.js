@@ -42,25 +42,32 @@ export const prefetchHealthDataForOffline = async ({ force = false } = {}) => {
       const hrDateList = Array.isArray(hrDates) ? hrDates : []
       const stressDateList = Array.isArray(stressDates) ? stressDates : []
       
-      const MAX_PREFETCH_COUNT = 14; 
+       
       
-      const hrToFetch = hrDateList.slice(0, Math.ceil(MAX_PREFETCH_COUNT / 2));
-      const stressToFetch = stressDateList.slice(0, Math.ceil(MAX_PREFETCH_COUNT / 2));
+      const hrToFetch = hrDateList;
+      const stressToFetch = stressDateList;
 
-      for (const date of hrToFetch) {
-        try {
-          const res = await getHeartRateRecords({ date });
-          if (res.success && res.data?.records?.length > 0) setCachedHeartRateRecord(date, res.data.records[0]);
-          await new Promise(r => setTimeout(r, 150));
-        } catch(e){}
-      }
-      for (const date of stressToFetch) {
-        try {
-          const res = await getStressRecords({ date });
-          if (res.success && res.data?.records?.length > 0) setCachedStressRecord(date, res.data.records[0]);
-          await new Promise(r => setTimeout(r, 150));
-        } catch(e){}
-      }
+      const fetchHR = async () => {
+        for (const date of hrToFetch) {
+          try {
+            const res = await getHeartRateRecords({ date });
+            if (res.success && res.data?.records?.length > 0) setCachedHeartRateRecord(date, res.data.records[0]);
+            await new Promise(r => setTimeout(r, 150));
+          } catch(e){}
+        }
+      };
+
+      const fetchStress = async () => {
+        for (const date of stressToFetch) {
+          try {
+            const res = await getStressRecords({ date });
+            if (res.success && res.data?.records?.length > 0) setCachedStressRecord(date, res.data.records[0]);
+            await new Promise(r => setTimeout(r, 150));
+          } catch(e){}
+        }
+      };
+
+      await Promise.all([fetchHR(), fetchStress()]);
     } catch {
       // Ignore prefetch failures
     } finally {

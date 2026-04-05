@@ -63,7 +63,13 @@ export const checkAuth = async (forceRefresh = false) => {
     state.lastAuthCheck = Date.now()
     setLS('isAuth', isAuthed)
     return state.isAuthenticated
-  } catch {
+  } catch (error) {
+    if (localStorage.getItem('token')) {
+      // Network layer failed (Offline, DNS, etc): assume authenticated if token exists
+      state.isAuthenticated = true;
+      state.lastAuthCheck = Date.now();
+      return true;
+    }
     state.isAuthenticated = false
     state.user = null
     state.lastAuthCheck = Date.now()
