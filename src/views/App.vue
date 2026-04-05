@@ -2,7 +2,7 @@
   <div id="app">
     <Sidebar v-if="showSidebar" @update:sidebarState="updateSidebarState" />
     <div :class="[
-      'h-screen overflow-hidden flex flex-col transition-all duration-300 ease-in-out',
+      'h-screen overflow-hidden flex flex-col',
       showSidebar ? 'pt-16' : '',
       showSidebar && !sidebarHidden ? 'lg:ml-72' : 'lg:ml-0'
     ]">

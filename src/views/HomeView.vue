@@ -114,7 +114,7 @@
       </div>
 
       <!-- ── Overall Analysis ── -->
-      <div class="mb-8">
+      <div class="mb-8 min-h-100 sm:min-h-62.5">
         <div class="rounded-2xl shadow-sm border overflow-hidden"
           :class="[themeClasses.cardBackground, themeClasses.border]">
           <!-- Header strip -->
@@ -139,7 +139,7 @@
                     :stroke-dasharray="`${(overallAnalysis.score / 100) * 314} 314`"
                     stroke-linecap="round"
                     :stroke="{ excellent: '#22c55e', good: '#14b8a6', fair: '#eab308', poor: '#f97316', critical: '#dc2626', noData: '#9ca3af' }[overallAnalysis.statusKey] || '#9ca3af'"
-                    style="transition: stroke-dasharray 0.6s ease;" />
+                     />
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center">
                   <span class="text-3xl font-extrabold leading-none" :class="themeClasses.textPrimary">{{ overallAnalysis.score }}</span>
@@ -171,7 +171,7 @@
                   <span>0</span><span>{{ $t('home.healthScore') }}</span><span>100</span>
                 </div>
                 <div class="h-2 rounded-full overflow-hidden" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'">
-                  <div :style="{ width: (overallAnalysis.score === '--' ? 0 : overallAnalysis.score) + '%' }" class="h-full rounded-full transition-all duration-700"
+                  <div :style="{ transform: `scaleX(${(overallAnalysis.score === '--' ? 0 : overallAnalysis.score) / 100})` }" class="w-full h-full rounded-full transition-transform duration-700 origin-left"
                     :class="overallAnalysis.progressClass || 'bg-gray-400'"></div>
                 </div>
               </div>
@@ -181,7 +181,7 @@
       </div>
 
 <!-- ══ BMI Section ══ -->
-      <div class="mb-8">
+      <div class="mb-8 min-h-88 sm:min-h-88">
         <!-- Section header -->
         <div class="flex items-center gap-3 mb-4">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -235,7 +235,7 @@
             <!-- BMI Gradient Slider -->
             <div class="mb-6">
               <div class="relative h-3 bg-linear-to-r from-blue-400 via-green-400 to-orange-500 rounded-full mb-3 shadow-inner">
-                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 bg-white border-[3px] border-gray-700 dark:border-gray-200 rounded-full shadow-lg transition-all duration-500"
+                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 bg-white border-[3px] border-gray-700 dark:border-gray-200 rounded-full shadow-lg"
                   :style="{ left: bmiSliderPosition + '%' }"></div>
               </div>
               <div class="flex justify-between text-xs font-medium" :class="themeClasses.textSecondary">
@@ -306,7 +306,7 @@
       </div>
 
       <!-- ══ Heart Rate Section ══ -->
-      <div class="mb-8">
+      <div class="mb-8 sm:min-h-150 min-h-175">
         <!-- Section header -->
         <div class="flex items-center gap-3 mb-4">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -483,7 +483,7 @@
       </div>
 
       <!-- ══ Stress Section ══ -->
-      <div class="mb-8">
+      <div class="mb-8 sm:min-h-150 min-h-175">
         <!-- Section header -->
         <div class="flex items-center gap-3 mb-4">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -1430,21 +1430,35 @@ const loadHeartRateData = async () => {
   if (!selectedDate.value) return
   const userId = viewedUserId.value
 
-  /* if (showOfflineBanner.value) {
-    isHeartRateLoading.value = false
-    return
-  } */
+    isHeartRateLoading.value = true
 
-  isHeartRateLoading.value = true
-  try {
-    const response = await getHeartRateRecords({ date: selectedDate.value, userId })
+    // OPTIMISTIC RENDER: Instantly show cached visualization before fetching fresh data
+    const cached = getCachedHeartRateRecord(selectedDate.value)
+    if (!userId && cached) {
+      showingCachedData.value = true
+      heartRateData.value = cached.hourlyData
+      const hourlyValues = cached.hourlyData.filter(h => h.avg > 0)
+      const avgValues = hourlyValues.map(h => h.avg)
+      stats.value = {
+        min: avgValues.length > 0 ? Math.min(...avgValues) : 0,
+        max: avgValues.length > 0 ? Math.max(...avgValues) : 0,
+        avg: avgValues.length > 0 ? Math.round(avgValues.reduce((s, v) => s + v, 0) / avgValues.length) : 0,
+        resting: hourlyValues.length > 0 ? Math.min(...hourlyValues.map(h => h.min)) : 0,
+        count: cached.dailyStats?.count || 0
+      }
+      hasHeartRateData.value = true
+      updateChartFromAggregated(cached.hourlyData)
+    }
 
-    if (response.success && response.data.records.length > 0) {
-      const record = response.data.records[0]  // One document per day
+    try {
+      const response = await getHeartRateRecords({ date: selectedDate.value, userId })
 
-      // Cache the record for offline use (only for current user)
-      if (!userId) setCachedHeartRateRecord(selectedDate.value, record)
-      showingCachedData.value = false
+      if (response.success && response.data.records.length > 0) {
+        const record = response.data.records[0]  // One document per day        
+
+        // Cache the record for offline use (only for current user)
+        if (!userId) setCachedHeartRateRecord(selectedDate.value, record)       
+        showingCachedData.value = false
 
       // Use aggregated hourly data directly
       heartRateData.value = record.hourlyData
@@ -1986,11 +2000,20 @@ const manualRefreshAllData = async () => {
 
 // Handle online/offline events
 watch(viewedUserId, async () => {
-  // Re-initialize data when admin switches to view a specific user's home
-  await loadViewedUser()
-  await initHeartRateData()
-  await loadAvailableStressDates()
-  await loadBMIData()
+  // Use setTimeout to defer execution and free up the main thread
+  setTimeout(async () => {
+    // Re-initialize data when admin switches to view a specific user's home
+    await loadViewedUser()
+    setTimeout(async () => {
+      await loadBMIData()
+      setTimeout(async () => {
+        await initHeartRateData()
+        setTimeout(async () => {
+          await loadAvailableStressDates()
+        }, 50)
+      }, 50)
+    }, 50)
+  }, 0)
 }, { immediate: true })
 
 onMounted(() => {
@@ -2003,17 +2026,23 @@ onMounted(() => {
         }
       })
     }, { rootMargin: '50px' })
-    if (hrChartContainer.value) chartObserver.observe(hrChartContainer.value)
-    if (stressChartContainer.value) chartObserver.observe(stressChartContainer.value)
+    
+    // Defer observing elements to avoid blocking main thread on mount
+    setTimeout(() => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(() => {
+          if (hrChartContainer.value) chartObserver.observe(hrChartContainer.value)
+          if (stressChartContainer.value) chartObserver.observe(stressChartContainer.value)
+        })
+      } else {
+        if (hrChartContainer.value) chartObserver.observe(hrChartContainer.value)
+        if (stressChartContainer.value) chartObserver.observe(stressChartContainer.value)
+      }
+    }, 500)
   } else {
     isHrChartVisible.value = true
     isStressChartVisible.value = true
   }
-
-  initHeartRateData()
-  loadBMIData()
-  // Also attempt to load stress dates (if stress-only CSV was uploaded)
-  forceReloadStressData()
 
   // Trigger aggressive background prefetching whenever the dashboard is loaded 
   // so you don't have to manually click through the calendar dates to cache them.
@@ -2024,9 +2053,9 @@ onMounted(() => {
       setTimeout(() => prefetchHealthDataForOffline({ force: true }), 2000)
     }
   }, 4000)
-  if (viewedUserId.value) loadViewedUser()
-  // Also load cached/available stress dates and set default stress date
-  loadAvailableStressDates()
+  
+  // Cleaned up duplicated data loading functions that were already handled by the watch(..., {immediate: true})
+  
   window.addEventListener('bmiDataUpdated', forceReloadBMIData)
   window.addEventListener('heartRateDataUpdated', forceReloadHeartRateData)
   window.addEventListener('stressDataUpdated', forceReloadStressData)

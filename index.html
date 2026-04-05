@@ -18,6 +18,14 @@
       -webkit-text-size-adjust: 100%; 
       text-size-adjust: 100%;
       overscroll-behavior: none;
+      margin: 0;
+      padding: 0;
+      background-color: #f9fafb; /* Light theme background */
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #111827; /* Dark theme background */
+      }
     }
     input, textarea, select { 
       font-size: 16px; 
@@ -33,10 +41,61 @@
         font-size: 16px;
       }
     }
+    /* App Skeleton Loader to improve FCP/LCP */
+    #app-skeleton {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .sk-shimmer {
+      position: relative;
+      overflow: hidden;
+      background-color: #f3f4f6;
+      border-radius: 12px;
+    }
+    .sk-shimmer::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(229, 231, 235, 0.8) 50%, transparent 100%);
+      transform: translateX(-100%);
+      animation: shimmer 1.5s infinite linear;
+    }
+    @media (prefers-color-scheme: dark) {
+      .sk-shimmer {
+        background-color: #374151;
+      }
+      .sk-shimmer::before {
+        background: linear-gradient(90deg, transparent 0%, rgba(75, 85, 99, 0.8) 50%, transparent 100%);
+      }
+    }
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
+    }
+    .sk-header { height: 60px; max-width: 400px; margin-bottom: 10px; }
+    .sk-card-lg { height: 180px; width: 100%; }
+    .sk-card-md { height: 120px; width: 100%; }
+    .sk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
   </style>
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <div id="app-skeleton">
+      <div class="sk-shimmer sk-header w-3/4"></div>
+      <div class="sk-shimmer sk-card-lg"></div>
+      <div class="sk-grid">
+        <div class="sk-shimmer sk-card-md"></div>
+        <div class="sk-shimmer sk-card-md"></div>
+      </div>
+      <div class="sk-shimmer sk-card-lg" style="margin-top: 20px;"></div>
+    </div>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

@@ -3,10 +3,24 @@ import vue from '@vitejs/plugin-vue';
 import { VitePWA } from 'vite-plugin-pwa';
 import tailwindcss from '@tailwindcss/vite'
 
+function deferCssPlugin() {
+  return {
+    name: 'defer-css',
+    enforce: 'post',
+    transformIndexHtml(html) {
+      return html.replace(
+        /<link\s+rel="stylesheet"\s+crossorigin\s+href="([^"]+)">/g,
+        '<link rel="preload" crossorigin href="$1" as="style" onload="this.onload=null;this.rel=\'stylesheet\'"><noscript><link rel="stylesheet" crossorigin href="$1"></noscript>'
+      );
+    }
+  };
+}
+
 export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
+    deferCssPlugin(),
     VitePWA({
       registerType: 'autoUpdate',  // Automatically updates the service worker
       injectRegister: 'inline', // Inlines the service worker registration script to avoid render blocking
@@ -72,15 +86,6 @@ export default defineConfig({
     }
   },
   build: {
-    chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vue-vendor': ['vue', 'vue-router', 'vue-i18n'],
-          'chart': ['chart.js', 'vue-chartjs'],
-          'headlessui': ['@headlessui/vue']
-        }
-      }
-    }
+    chunkSizeWarningLimit: 1000
   },
 });
