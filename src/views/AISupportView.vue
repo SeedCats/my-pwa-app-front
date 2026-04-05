@@ -47,7 +47,7 @@
 
                             <button @click.prevent="startNewChat" :disabled="isChatBusy" :aria-disabled="isChatBusy"
                                 :title="isChatBusy ? $t('aiSupport.waitForResponse') : $t('aiSupport.newChat')"
-                                :class="isChatBusy ? 'px-3 py-1 text-sm rounded bg-green-400 text-white cursor-not-allowed' : 'px-3 py-1 text-sm rounded bg-green-600 text-white hover:bg-green-700'">{{
+                                :class="isChatBusy ? 'px-3 py-1 text-sm rounded bg-green-600/50 text-white cursor-not-allowed' : 'px-3 py-1 text-sm rounded bg-green-600 text-white hover:bg-green-700'">{{
                                 $t('aiSupport.newChat') }}</button>
                         </div>
                     </div>
@@ -67,8 +67,8 @@
                                                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                                         </svg>
                                     </div>
-                                    <h3 class="text-lg font-semibold mb-2" :class="themeClasses.textPrimary">{{
-                                        $t('aiSupport.welcome') }}</h3>
+                                    <h2 class="text-lg font-semibold mb-2" :class="themeClasses.textPrimary">{{
+                                        $t('aiSupport.welcome') }}</h2>
                                     <p class="text-sm mb-6" :class="themeClasses.textSecondary">{{
                                         $t('aiSupport.welcomeDesc') }}</p>
 
@@ -313,7 +313,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-lg font-semibold">{{ $t('aiSupport.settings') }}</h3>
+                                <h2 class="text-lg font-semibold">{{ $t('aiSupport.settings') }}</h2>
                                 <p class="text-sm mt-0.5" :class="isDarkMode ? 'text-gray-400' : 'text-gray-500'">{{
                                     $t('aiSupport.settingsDescription') }}</p>
                             </div>

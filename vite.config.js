@@ -9,6 +9,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',  // Automatically updates the service worker
+      injectRegister: 'inline', // Inlines the service worker registration script to avoid render blocking
       devOptions: { enabled: false },  // Disabled in dev to prevent service worker from serving stale cached chunks
       workbox: {
         clientsClaim: true,
@@ -71,21 +72,6 @@ export default defineConfig({
     }
   },
   build: {
-    chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('chart.js') || id.includes('vue-chartjs')) {
-              return 'chart';
-            }
-            if (id.includes('vue') || id.includes('vue-router') || id.includes('vue-i18n')) {
-              return 'vue';
-            }
-            return 'vendor';
-          }
-        }
-      }
-    }
+    chunkSizeWarningLimit: 1000
   },
 });

@@ -1,12 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import FormatSettingView from '../views/FormatSettingView.vue'
-import UserSetting from '../views/UserSettingView.vue'
-import LoginView from '../views/LoginView.vue'
-import RegisterView from '../views/RegisterView.vue'
-import DataSettingView from '../views/DataSettingView.vue'
-import AISupportView from '../views/AISupportView.vue'
-import ChatView from '../views/ChatView.vue'
 import { checkAuth, hasRole } from '../stores/userStore.js'
 import { prefetchHealthDataForOffline } from '../services/offlinePrefetchService'
 
@@ -16,49 +8,49 @@ const router = createRouter({
     {
       path: '/',
       name: 'Login',
-      component: LoginView,
+      component: () => import('../views/LoginView.vue'),
       meta: { requiresGuest: true }  // Only accessible when NOT logged in
     },
     {
       path: '/register',
       name: 'Register',
-      component: RegisterView,
+      component: () => import('../views/RegisterView.vue'),
       meta: { requiresGuest: true }  // Only accessible when NOT logged in
     },
     {
       path: '/home',
       name: 'home',
-      component: HomeView,
+      component: () => import('../views/HomeView.vue'),
       meta: { requiresAuth: true }   // Requires authentication
     },
     {
       path: '/setting',
       name: 'FormatSetting',
-      component: FormatSettingView,
+      component: () => import('../views/FormatSettingView.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/user',
       name: 'UserSetting',
-      component: UserSetting,
+      component: () => import('../views/UserSettingView.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/data-setting',
       name: 'DataSetting',
-      component: DataSettingView,
+      component: () => import('../views/DataSettingView.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/ai-support',
       name: 'AiSupport',
-      component: AISupportView,
+      component: () => import('../views/AISupportView.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/chat',
       name: 'Chat',
-      component: ChatView,
+      component: () => import('../views/ChatView.vue'),
       meta: { requiresAuth: true }
     },
     {

@@ -153,7 +153,7 @@
             <div class="hidden md:block w-px self-stretch" :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-200'"></div>
             <!-- Advice column -->
             <div class="flex-1 min-w-0">
-              <h4 class="text-sm font-semibold mb-3" :class="themeClasses.textPrimary">{{ $t('home.overallAnalysis.adviceTitle') }}</h4>
+              <h3 class="text-sm font-semibold mb-3" :class="themeClasses.textPrimary">{{ $t('home.overallAnalysis.adviceTitle') }}</h3>
               <ul class="space-y-2">
                 <li v-for="(a, i) in overallAnalysis.advice" :key="i"
                   class="flex items-start gap-2 text-sm" :class="themeClasses.textSecondary">
@@ -279,7 +279,7 @@
 
             <!-- Data Analysis cards -->
             <div class="border-t pt-5" :class="themeClasses.border">
-              <h4 class="text-sm font-semibold mb-4" :class="themeClasses.textPrimary">{{ $t('home.dataAnalysis') }}</h4>
+              <h3 class="text-sm font-semibold mb-4" :class="themeClasses.textPrimary">{{ $t('home.dataAnalysis') }}</h3>
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div class="rounded-xl border p-3 text-center" :class="[themeClasses.border, isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/70']">
                   <div class="text-xl font-bold mb-0.5" :class="themeClasses.textPrimary">{{ bmiData.age || '--' }}</div>
@@ -319,7 +319,7 @@
           <!-- Date Picker with Available Dates Indicator -->
           <template v-if="hasHeartRateData">
             <div class="flex justify-center items-center gap-3 mb-5 w-full">
-              <button @click="previousDate"
+              <button @click="previousDate" aria-label="Previous date"
                 class="w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
                 :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
                 <svg class="w-5 h-5" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -385,7 +385,7 @@
                 </div>
               </div>
 
-              <button @click="nextDate"
+              <button @click="nextDate" aria-label="Next date"
                 class="w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
                 :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
                 <svg class="w-5 h-5" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -496,7 +496,7 @@
         <!-- Date Picker with Available Dates Indicator for Stress -->
         <template v-if="hasStressData">
           <div class="flex justify-center items-center gap-3 mb-5 w-full">
-            <button @click="previousStressDate"
+            <button @click="previousStressDate" aria-label="Previous date"
               class="w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
               :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
               <svg class="w-5 h-5" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -562,7 +562,7 @@
               </div>
             </div>
 
-            <button @click="nextStressDate"
+            <button @click="nextStressDate" aria-label="Next date"
               class="w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
               :class="isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-200'">
               <svg class="w-5 h-5" :class="isDarkMode ? 'text-white' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">

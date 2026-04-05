@@ -49,7 +49,7 @@
                                                     <router-link :to="item.to" :class="[
                                                         isActiveRoute(item.to)
                                                             ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
-                                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent',
+                                                            : (isDarkMode ? 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent' : 'text-gray-500 hover:bg-gray-500/10 hover:text-gray-900 border-l-2 border-transparent'),
                                                         'group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95'
                                                     ]" @click="sidebarOpen = false">
                                                         <div class="relative shrink-0">
@@ -199,7 +199,7 @@
                                                         class="group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95"
                                                         :class="isActiveRoute('/setting')
                                                             ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
-                                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent'" @click="sidebarOpen = false">
+                                                            : (isDarkMode ? 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 border-l-2 border-transparent')" @click="sidebarOpen = false">
                                                         <Cog6ToothIcon class="size-5 shrink-0" aria-hidden="true" />
                                                         {{ t('nav.formatSettings') }}
                                                     </router-link>
@@ -209,7 +209,7 @@
                                                         class="group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95"
                                                         :class="isActiveRoute('/user')
                                                             ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
-                                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent'" @click="sidebarOpen = false">
+                                                            : (isDarkMode ? 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 border-l-2 border-transparent')" @click="sidebarOpen = false">
                                                         <UsersIcon class="size-5 shrink-0" aria-hidden="true" />
                                                         {{ t('nav.userSettings') }}
                                                     </router-link>
@@ -256,7 +256,7 @@
                                     <router-link :to="item.to" :class="[
                                         isActiveRoute(item.to)
                                             ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
-                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent',
+                                            : (isDarkMode ? 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 border-l-2 border-transparent'),
                                         'group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95'
                                     ]">
                                         <div class="relative shrink-0">
@@ -406,7 +406,7 @@
                                         class="group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95"
                                         :class="isActiveRoute('/setting')
                                             ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
-                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent'">
+                                            : (isDarkMode ? 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 border-l-2 border-transparent')">
                                         <Cog6ToothIcon class="size-5 shrink-0" aria-hidden="true" />
                                         {{ t('nav.formatSettings') }}
                                     </router-link>
@@ -416,7 +416,7 @@
                                         class="group flex gap-x-3 rounded-r-md pl-2 pr-3 py-2.5 text-sm font-medium items-center transition-all duration-150 ease-in-out active:scale-95"
                                         :class="isActiveRoute('/user')
                                             ? 'bg-indigo-500/15 text-indigo-400 border-l-2 border-indigo-400'
-                                            : 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent'">
+                                            : (isDarkMode ? 'text-gray-400 hover:bg-gray-500/10 hover:text-white border-l-2 border-transparent' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 border-l-2 border-transparent')">
                                         <UsersIcon class="size-5 shrink-0" aria-hidden="true" />
                                         {{ t('nav.userSettings') }}
                                     </router-link>
